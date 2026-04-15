@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Car Detailing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+
+<div class="max-w-6xl mx-auto p-6">
+    <h1 class="text-3xl font-bold text-center mb-6">Car Detailing Booking</h1>
+
+    <!-- TRAVEL FEE INFO -->
+    <div class="bg-yellow-100 p-4 rounded-xl mb-6">
+        <p class="font-semibold">Travel Fee Policy:</p>
+        <p class="text-sm">• Within 14km → FREE</p>
+        <p class="text-sm">• Beyond 14km → +R50 travel fee</p>
+    </div>
+
+    <!-- PRICING + DESCRIPTION -->
+    <div class="grid md:grid-cols-3 gap-4 mb-8">
+
+        <div class="bg-white p-4 rounded-2xl shadow">
+            <h3 class="font-bold text-lg">Full Body Detail</h3>
+            <p class="text-sm text-gray-500">Available all year (300+ working days)</p>
+            <p class="line-through text-gray-400">R600</p>
+            <p class="text-green-600 text-xl font-bold">R350</p>
+        </div>
+
+        <div class="bg-white p-4 rounded-2xl shadow">
+            <h3 class="font-bold text-lg">Deep Scrub Detail</h3>
+            <p class="text-sm text-gray-500">Available all year (300+ working days)</p>
+            <p class="line-through text-gray-400">R1000</p>
+            <p class="text-green-600 text-xl font-bold">R500</p>
+        </div>
+
+        <div class="bg-white p-4 rounded-2xl shadow">
+            <h3 class="font-bold text-lg">Basic Wash</h3>
+            <p class="text-sm text-gray-500">Available daily</p>
+            <p class="line-through text-gray-400">R200</p>
+            <p class="text-green-600 text-xl font-bold">R120</p>
+        </div>
+
+        <div class="bg-white p-4 rounded-2xl shadow">
+            <h3 class="font-bold text-lg">Interior Refresh</h3>
+            <p class="text-sm text-gray-500">Available all year</p>
+            <p class="line-through text-gray-400">R400</p>
+            <p class="text-green-600 text-xl font-bold">R250</p>
+        </div>
+
+        <div class="bg-white p-4 rounded-2xl shadow">
+            <h3 class="font-bold text-lg">Weekly Subscription</h3>
+            <p class="text-sm text-gray-500">4–5 washes per month</p>
+            <p class="line-through text-gray-400">R800</p>
+            <p class="text-green-600 text-xl font-bold">R500</p>
+        </div>
+
+        <div class="bg-white p-4 rounded-2xl shadow">
+            <h3 class="font-bold text-lg">Premium Monthly Plan</h3>
+            <p class="text-sm text-gray-500">4–6 washes per month + priority service</p>
+            <p class="line-through text-gray-400">R1500</p>
+            <p class="text-green-600 text-xl font-bold">R900</p>
+        </div>
+
+    </div>
+
+    <!-- PRODUCT SECTION -->
+    <div class="mb-8">
+        <h2 class="text-2xl font-bold mb-4">Detailing Products</h2>
+        <div class="grid md:grid-cols-3 gap-4">
+
+            <div class="bg-white p-4 rounded-2xl shadow">
+                <h3 class="font-bold">Car Shampoo</h3>
+                <p class="text-gray-500 text-sm">High foam cleaning solution</p>
+                <p class="font-bold mt-2">R150</p>
+            </div>
+
+            <div class="bg-white p-4 rounded-2xl shadow">
+                <h3 class="font-bold">Tire Shine</h3>
+                <p class="text-gray-500 text-sm">Long-lasting glossy finish</p>
+                <p class="font-bold mt-2">R120</p>
+            </div>
+
+            <div class="bg-white p-4 rounded-2xl shadow">
+                <h3 class="font-bold">Interior Cleaner</h3>
+                <p class="text-gray-500 text-sm">Safe for all surfaces</p>
+                <p class="font-bold mt-2">R180</p>
+            </div>
+
+            <div class="bg-white p-4 rounded-2xl shadow">
+                <h3 class="font-bold">Microfiber Cloth Set</h3>
+                <p class="text-gray-500 text-sm">Ultra-soft premium cloths</p>
+                <p class="font-bold mt-2">R100</p>
+            </div>
+
+            <div class="bg-white p-4 rounded-2xl shadow">
+                <h3 class="font-bold">Wax Polish</h3>
+                <p class="text-gray-500 text-sm">Protective shine coating</p>
+                <p class="font-bold mt-2">R250</p>
+            </div>
+
+            <div class="bg-white p-4 rounded-2xl shadow">
+                <h3 class="font-bold">Glass Cleaner</h3>
+                <p class="text-gray-500 text-sm">Streak-free clarity</p>
+                <p class="font-bold mt-2">R130</p>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- BOOKING FORM -->
+    <div class="bg-white p-6 rounded-2xl shadow">
+        <form id="bookingForm" class="space-y-4">
+
+            <input type="text" id="name" placeholder="Full Name" required class="w-full p-3 border rounded-lg">
+
+            <input type="tel" id="phone" placeholder="Phone Number" required class="w-full p-3 border rounded-lg">
+
+            <input type="text" id="location" placeholder="Location / Address" required class="w-full p-3 border rounded-lg">
+
+            <input type="number" id="distance" placeholder="Distance from us (km)" required class="w-full p-3 border rounded-lg">
+
+            <input type="text" id="car" placeholder="Car Model" required class="w-full p-3 border rounded-lg">
+
+            <input type="date" id="date" required class="w-full p-3 border rounded-lg">
+
+            <input type="time" id="time" required class="w-full p-3 border rounded-lg">
+
+            <button type="button" onclick="addExtraDay()" class="bg-blue-500 text-white px-4 py-2 rounded-lg">Add Extra Wash Day</button>
+
+            <div id="extraDays" class="space-y-2"></div>
+
+            <select id="service" class="w-full p-3 border rounded-lg">
+                <option value="Full Body Detail" data-price="350">Full Body Detail (R350)</option>
+                <option value="Deep Scrub Detail" data-price="500">Deep Scrub Detail (R500)</option>
+                <option value="Basic Wash" data-price="120">Basic Wash (R120)</option>
+                <option value="Interior Refresh" data-price="250">Interior Refresh (R250)</option>
+                <option value="Weekly Subscription" data-price="500">Weekly Subscription (R500)</option>
+                <option value="Premium Monthly Plan" data-price="900">Premium Monthly Plan (R900)</option>
+            </select>
+
+            <select id="payment" class="w-full p-3 border rounded-lg">
+                <option value="Cash">Cash</option>
+                <option value="Card">Card</option>
+            </select>
+
+            <button type="submit" class="w-full bg-green-500 text-white py-3 rounded-lg">Book Now</button>
+
+        </form>
+    </div>
+
+    <!-- BOOKINGS LIST -->
+    <div class="mt-6 bg-white p-6 rounded-2xl shadow">
+        <h2 class="text-xl font-semibold mb-4">Bookings</h2>
+        <ul id="bookingList" class="space-y-2"></ul>
+    </div>
+</div>
+
+<script>
+    function addExtraDay() {
+      const container = document.getElementById('extraDays');
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'grid grid-cols-2 gap-2';
+
+      const dateInput = document.createElement('input');
+      dateInput.type = 'date';
+      dateInput.className = 'w-full p-3 border rounded-lg';
+
+      const timeInput = document.createElement('input');
+      timeInput.type = 'time';
+      timeInput.className = 'w-full p-3 border rounded-lg';
+
+      wrapper.appendChild(dateInput);
+      wrapper.appendChild(timeInput);
+      container.appendChild(wrapper);
+    }
+
+    document.getElementById('bookingForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const name = document.getElementById('name').value;
+      const phone = document.getElementById('phone').value;
+      const location = document.getElementById('location').value;
+      const distance = parseFloat(document.getElementById('distance').value);
+      const car = document.getElementById('car').value;
+      const date = document.getElementById('date').value;
+      const time = document.getElementById('time').value;
+      const serviceSelect = document.getElementById('service');
+      const service = serviceSelect.value;
+      const basePrice = parseFloat(serviceSelect.options[serviceSelect.selectedIndex].dataset.price);
+      const payment = document.getElementById('payment').value;
+
+      let travelFee = 0;
+      if(distance > 14) travelFee = 50;
+
+      const total = basePrice + travelFee;
+
+      const extraInputs = document.querySelectorAll('#extraDays > div');
+      let extraDates = [];
+
+      extraInputs.forEach(div => {
+        const inputs = div.querySelectorAll('input');
+        const d = inputs[0].value;
+        const t = inputs[1].value;
+        if(d && t) extraDates.push(`${d} at ${t}`);
+      });
+
+      const bookingItem = document.createElement('li');
+      bookingItem.className = 'p-3 bg-gray-100 rounded-lg';
+
+      bookingItem.innerHTML = `
+        <strong>${name}</strong><br>
+        Phone: ${phone}<br>
+        Location: ${location}<br>
+        Distance: ${distance}km<br>
+        Travel Fee: R${travelFee}<br>
+        Car: ${car}<br>
+        Main Booking: ${date} at ${time}<br>
+        Extra Days: ${extraDates.join(', ') || 'None'}<br>
+        Service: ${service}<br>
+        Payment: ${payment}<br>
+        <strong>Total: R${total}</strong>
+      `;
+
+      document.getElementById('bookingList').appendChild(bookingItem);
+
+      this.reset();
+      document.getElementById('extraDays').innerHTML = '';
+    });
+  </script>
+
+</body>
+</html>
