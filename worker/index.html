@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apex Auto Studio | Worker Console</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            gold: '#D4AF37',
+                            darkGold: '#AA7C11',
+                            charcoal: '#0C0D0E',
+                            accentBlue: '#00D8FF',
+                        }
+                    },
+                    fontFamily: {
+                        outfit: ['Outfit', 'sans-serif'],
+                        inter: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons via CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* Modern Premium Animations & Layout Utilities */
+        @keyframes float-slow {
+            0%, 100% { transform: translate(0px, 0px) scale(1); }
+            50% { transform: translate(30px, -40px) scale(1.1); }
+        }
+
+        .animate-float-slow-1 {
+            animation: float-slow 16s infinite ease-in-out;
+        }
+
+        .glass-card {
+            background: rgba(18, 20, 22, 0.7);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .glass-card:hover {
+            border-color: rgba(0, 216, 255, 0.15);
+            background: rgba(22, 25, 28, 0.8);
+        }
+
+        .glass-input {
+            background: rgba(10, 11, 12, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 1rem;
+            color: #ffffff;
+            transition: all 0.3s ease;
+        }
+        .glass-input:focus {
+            border-color: rgba(0, 216, 255, 0.5);
+            box-shadow: 0 0 15px rgba(0, 216, 255, 0.15);
+            outline: none;
+            background: rgba(5, 6, 7, 0.8);
+        }
+
+        /* Shine effect on buttons */
+        .shine-effect {
+            position: relative;
+            overflow: hidden;
+        }
+        .shine-effect::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.08) 50%, rgba(255, 255, 255, 0) 100%);
+            transform: translateX(-100%);
+            transition: none;
+        }
+        .shine-effect:hover::after {
+            transform: translateX(100%);
+            transition: transform 1s ease-in-out;
+        }
+
+        /* Styling lists scrollbars */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(18, 20, 22, 0.4);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 216, 255, 0.3);
+        }
+    </style>
+</head>
+<body class="h-full bg-[#070809] text-white font-inter overflow-y-auto overflow-x-hidden relative selection:bg-brand-accentBlue/30 selection:text-white">
+
+    <!-- Ambient Glowing Lights -->
+    <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+        <!-- Cyan glow top left -->
+        <div class="absolute top-10 -left-20 w-[500px] h-[500px] rounded-full bg-brand-accentBlue opacity-[0.1] filter blur-[120px] animate-float-slow-1"></div>
+        <!-- Violet glow bottom right -->
+        <div class="absolute bottom-20 right-10 w-[500px] h-[500px] rounded-full bg-indigo-600 opacity-[0.08] filter blur-[150px] animate-float-slow-1"></div>
+    </div>
+
+    <!-- Banner Overlay -->
+    <div class="absolute top-0 left-0 right-0 h-[280px] bg-gradient-to-b from-brand-charcoal/20 via-[#070809]/90 to-[#070809] z-0 overflow-hidden">
+        <img src="../premium_detailing_bg.png" alt="Detailing Backdrop Banner" class="w-full h-full object-cover filter brightness-[0.18] blur-[2px]">
+        <div class="absolute inset-0 bg-gradient-to-t from-[#070809] via-transparent to-black/60"></div>
+    </div>
+
+    <!-- ================= DASHBOARD CORE CONTAINER ================= -->
+    <div class="max-w-7xl mx-auto px-4 md:px-8 py-6 relative z-10">
+
+        <!-- HEADER SECTION -->
+        <header class="flex flex-col md:flex-row justify-between items-center py-5 border-b border-white/5 mb-10 gap-4">
+            <div class="flex items-center space-x-3.5">
+                <div class="w-11 h-11 rounded-xl bg-brand-accentBlue/10 border border-brand-accentBlue/25 flex items-center justify-center text-brand-accentBlue shadow-[0_0_15px_rgba(0,216,255,0.2)]">
+                    <i data-lucide="wrench" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold font-outfit tracking-tight flex items-center gap-2">
+                        <span>APEX</span><span class="text-brand-accentBlue font-light font-sans text-xl">WORKER PORTAL</span>
+                    </h1>
+                    <p class="text-xs text-gray-500 tracking-wider font-mono">FIELD OPERATIVE INTERFACE</p>
+                </div>
+            </div>
+
+            <!-- Portal Status Badge -->
+            <div class="flex items-center space-x-4 bg-white/5 border border-white/5 rounded-2xl px-4 py-2 text-sm backdrop-blur-md">
+                <span class="flex h-2.5 w-2.5 relative">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-brand-accentBlue"></span>
+                </span>
+                <span id="workerName" class="font-medium text-gray-300">Operator: Justin</span>
+                <a href="../index.html" class="text-xs font-semibold uppercase tracking-wider text-brand-accentBlue hover:text-white transition-colors border-l border-white/10 pl-3">
+                    Sign Out
+                </a>
+            </div>
+        </header>
+
+        <!-- OPERATIVE OVERVIEW GRID -->
+        <section class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-12">
+            <!-- Metric 1: Total Completed -->
+            <div class="glass-card rounded-2xl p-6 flex items-center justify-between relative overflow-hidden">
+                <div class="space-y-1 relative z-10">
+                    <span class="text-xs text-gray-500 uppercase tracking-wider font-mono">Completed Today</span>
+                    <h3 id="completedJobsCount" class="text-4xl font-extrabold font-outfit text-white">0</h3>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 relative z-10">
+                    <i data-lucide="check-circle" class="w-6 h-6"></i>
+                </div>
+            </div>
+
+            <!-- Metric 2: Personal Commission -->
+            <div class="glass-card rounded-2xl p-6 flex items-center justify-between relative overflow-hidden">
+                <div class="space-y-1 relative z-10">
+                    <span class="text-xs text-gray-500 uppercase tracking-wider font-mono">My Earnings (70%)</span>
+                    <h3 id="workerEarnings" class="text-4xl font-extrabold font-outfit text-brand-gold">R0</h3>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-brand-gold/20 flex items-center justify-center text-brand-gold relative z-10">
+                    <i data-lucide="dollar-sign" class="w-6 h-6"></i>
+                </div>
+            </div>
+
+            <!-- Metric 3: Active Status -->
+            <div class="glass-card rounded-2xl p-6 flex items-center justify-between relative overflow-hidden">
+                <div class="space-y-1 relative z-10">
+                    <span class="text-xs text-gray-500 uppercase tracking-wider font-mono">Operative Rank</span>
+                    <h3 class="text-2xl font-bold font-outfit text-white">Senior Valet</h3>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 relative z-10">
+                    <i data-lucide="award" class="w-6 h-6"></i>
+                </div>
+            </div>
+        </section>
+
+        <!-- MAIN LAYOUT -->
+        <main class="grid lg:grid-cols-3 gap-8">
+            
+            <!-- LEFT 2 COLUMNS: ACTIVE PIPELINE & JOBS MAP -->
+            <div class="lg:col-span-2 space-y-12">
+                
+                <!-- ACTIVE PIPELINE LIST -->
+                <section class="space-y-6">
+                    <div class="flex justify-between items-end border-b border-white/5 pb-4">
+                        <div>
+                            <h3 class="text-xl font-bold font-outfit text-white">Detailing Pipeline</h3>
+                            <p class="text-xs text-gray-500 mt-1">Accept and approve pending detailing requests in Johannesburg</p>
+                        </div>
+                        <span id="pipelineCountBadge" class="px-2.5 py-0.5 rounded-full bg-white/5 border border-white/10 text-xs font-semibold">0 Jobs</span>
+                    </div>
+
+                    <!-- Pipeline Grid -->
+                    <div id="pipelineList" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <!-- Placed dynamically via script. Shows bookings where status === 'Pending' or 'Approved' (if not assigned to others) -->
+                    </div>
+                </section>
+
+                <!-- MAP / GPS ROUTE SIMULATION -->
+                <section id="mockMapSection" class="hidden glass-card rounded-3xl p-6 space-y-4">
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center gap-2">
+                            <i data-lucide="navigation" class="w-5 h-5 text-brand-accentBlue animate-pulse"></i>
+                            <h4 class="font-bold text-white font-outfit">Operative Dispatch Route</h4>
+                        </div>
+                        <button onclick="closeMap()" class="text-xs text-gray-500 hover:text-white transition-colors">Close GPS</button>
+                    </div>
+                    
+                    <!-- Beautiful Vector Mock Map -->
+                    <div class="h-64 rounded-2xl bg-black/80 border border-white/5 relative overflow-hidden flex items-center justify-center">
+                        <!-- Grid lines -->
+                        <div class="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:20px_20px] pointer-events-none"></div>
+                        <!-- Cybernetic Route -->
+                        <svg class="absolute inset-0 w-full h-full opacity-60" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M 50,50 Q 200,100 250,180 T 500,220" fill="none" stroke="#00D8FF" stroke-width="4" stroke-linecap="round" stroke-dasharray="10 5" />
+                            <circle cx="50" cy="50" r="8" fill="#AA7C11" />
+                            <circle cx="500" cy="220" r="10" fill="#00D8FF" class="animate-pulse" />
+                        </svg>
+                        
+                        <div class="absolute top-4 left-4 bg-black/70 border border-white/10 px-3.5 py-1.5 rounded-xl text-xs space-y-0.5">
+                            <span class="text-gray-500 block text-[9px] uppercase font-mono">NAVIGATING TO</span>
+                            <span id="mapDestinationText" class="font-bold text-white">Sandton Drive</span>
+                        </div>
+                        
+                        <div class="absolute bottom-4 right-4 bg-brand-accentBlue text-black px-4 py-2 rounded-xl text-xs font-bold shadow-[0_0_15px_rgba(0,216,255,0.3)]">
+                            Route Dispatch Active • 12 mins
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+
+            <!-- RIGHT 1 COLUMN: ACTIVE DETAILED WORK TRACKER -->
+            <div class="lg:col-span-1">
+                
+                <!-- OPERATIVE PROGRESS CONTROLLER -->
+                <section class="glass-card border-brand-accentBlue/25 rounded-3xl p-6 md:p-8 space-y-6 relative overflow-hidden">
+                    <div class="absolute -top-10 -left-10 w-24 h-24 rounded-full bg-brand-accentBlue/5 filter blur-xl"></div>
+                    
+                    <div class="relative z-10 flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-xl bg-brand-accentBlue/15 border border-brand-accentBlue/30 flex items-center justify-center text-brand-accentBlue">
+                            <i data-lucide="play-circle" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold font-outfit text-white">Active Detailing Job</h3>
+                            <p class="text-xs text-gray-500">Live operational status tracking</p>
+                        </div>
+                    </div>
+
+                    <!-- No Active Job Placeholder -->
+                    <div id="noActiveJobPlaceholder" class="p-8 rounded-2xl bg-black/40 border border-white/5 text-center space-y-3 relative z-10">
+                        <i data-lucide="package-open" class="w-10 h-10 text-gray-600 mx-auto"></i>
+                        <h4 class="font-bold text-gray-400 text-sm">No Active Assignment</h4>
+                        <p class="text-xs text-gray-500 leading-relaxed">
+                            Select a claimed job from the detailing pipeline on the left, click <strong>"Start Work Operations"</strong> to initiate client status synchronization.
+                        </p>
+                    </div>
+
+                    <!-- Active Job Controller Block -->
+                    <div id="activeJobController" class="hidden space-y-6 relative z-10">
+                        
+                        <!-- Client Header -->
+                        <div class="p-4 rounded-2xl bg-black/60 border border-white/5 space-y-2">
+                            <span class="px-2 py-0.5 text-[8px] font-bold uppercase tracking-wider bg-brand-accentBlue/10 text-brand-accentBlue rounded border border-brand-accentBlue/20">Active Assignment</span>
+                            <div class="flex justify-between items-start pt-1">
+                                <div>
+                                    <h4 id="activeClientName" class="font-bold text-white text-sm">Marcus Aurelius</h4>
+                                    <span id="activeCarModel" class="text-xs text-gray-500 block">Porsche 911 GT3</span>
+                                </div>
+                                <span id="activeJobPrice" class="text-base font-black text-brand-gold font-outfit">R500</span>
+                            </div>
+                            <div class="text-[10px] text-gray-400 pt-2 border-t border-white/5 flex items-center gap-1">
+                                <i data-lucide="map-pin" class="w-3 h-3 text-brand-accentBlue"></i>
+                                <span id="activeJobLocation">42 Sandton Drive</span>
+                            </div>
+                        </div>
+
+                        <!-- Step tracker vertical visual indicator -->
+                        <div class="space-y-4">
+                            <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Detailing Steps</h4>
+                            
+                            <div class="space-y-3 pl-2 border-l border-white/10 relative ml-2.5">
+                                <!-- Step 1 -->
+                                <div class="relative flex items-start space-x-3.5">
+                                    <div id="stepDot_1" class="absolute -left-[14px] top-1.5 w-2 h-2 rounded-full bg-brand-accentBlue ring-4 ring-brand-accentBlue/20"></div>
+                                    <div>
+                                        <h5 id="stepText_1" class="text-xs font-bold text-brand-accentBlue">1. Arrived & Inspected</h5>
+                                        <p class="text-[10px] text-gray-500">Operative arrived on site; paint/interior check.</p>
+                                    </div>
+                                </div>
+                                <!-- Step 2 -->
+                                <div class="relative flex items-start space-x-3.5 pt-2">
+                                    <div id="stepDot_2" class="absolute -left-[14px] top-[14px] w-2 h-2 rounded-full bg-gray-600 ring-4 ring-black"></div>
+                                    <div>
+                                        <h5 id="stepText_2" class="text-xs font-bold text-gray-500">2. Active: Foam Washing</h5>
+                                        <p class="text-[10px] text-gray-500">Deep pressure rinse & premium foam scrub.</p>
+                                    </div>
+                                </div>
+                                <!-- Step 3 -->
+                                <div class="relative flex items-start space-x-3.5 pt-2">
+                                    <div id="stepDot_3" class="absolute -left-[14px] top-[14px] w-2 h-2 rounded-full bg-gray-600 ring-4 ring-black"></div>
+                                    <div>
+                                        <h5 id="stepText_3" class="text-xs font-bold text-gray-500">3. Active: Hand Polishing</h5>
+                                        <p class="text-[10px] text-gray-500">Paint protective waxing & micro-abrasive shine.</p>
+                                    </div>
+                                </div>
+                                <!-- Step 4 -->
+                                <div class="relative flex items-start space-x-3.5 pt-2">
+                                    <div id="stepDot_4" class="absolute -left-[14px] top-[14px] w-2 h-2 rounded-full bg-gray-600 ring-4 ring-black"></div>
+                                    <div>
+                                        <h5 id="stepText_4" class="text-xs font-bold text-gray-500">4. Completed & Ready</h5>
+                                        <p class="text-[10px] text-gray-500">Final handover approval & card swipe complete.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Update Log Input -->
+                        <div class="space-y-2 pt-2">
+                            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Operative Progress Update (Pushed Live)</label>
+                            <div class="flex gap-2">
+                                <input type="text" id="workerNotesInput" placeholder="Stain removal finished. Wax starting..."
+                                       class="flex-1 px-3 py-2.5 glass-input text-xs">
+                                <button onclick="updateWorkerNotes()" class="px-3.5 py-2.5 bg-brand-accentBlue hover:bg-brand-accentBlue/80 text-black font-bold text-xs rounded-xl shadow-[0_0_10px_rgba(0,216,255,0.25)] transition-all">
+                                    Send
+                                </button>
+                            </div>
+                        </div>
+
+                        <button id="progressTriggerBtn" onclick="advanceStep()" class="w-full shine-effect bg-gradient-to-r from-brand-accentBlue to-indigo-500 text-white font-bold py-3.5 rounded-2xl shadow-[0_4px_15px_rgba(0,216,255,0.2)] transition-all flex items-center justify-center gap-2">
+                            <i data-lucide="arrow-right-circle" class="w-5 h-5"></i>
+                            <span id="progressTriggerBtnText">Initiate Foam Wash (Step 2)</span>
+                        </button>
+
+                        <button onclick="openChat()" class="w-full py-3 bg-brand-accentBlue/10 hover:bg-brand-accentBlue/20 text-brand-accentBlue border border-brand-accentBlue/20 rounded-2xl font-bold text-xs flex items-center justify-center gap-2 transition-all">
+                            <i data-lucide="message-circle" class="w-5 h-5"></i>
+                            Open Client Chat
+                        </button>
+
+                    </div>
+                </section>
+
+            </div>
+
+        </main>
+
+    </div>
+
+        <!-- DYNAMIC CORE SCRIPT -->
+    <script>
+        lucide.createIcons();
+
+        // 1. Retrieve the active logged in worker details from dynamic session
+        const activeWorker = JSON.parse(localStorage.getItem('apex_active_worker')) || { name: 'Worker Justin', email: 'worker@apexdetail.com' };
+        
+        // Update header UI to display the active Operative's name dynamically
+        document.getElementById('workerName').innerText = 'Operator: ' + activeWorker.name.replace('Worker ', '');
+
+        let activeJob = null; // Holds the current active claimed booking object
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadWorkerDashboard();
+            
+            // Sync dynamically across tabs
+            window.addEventListener('storage', (e) => {
+                if (e.key === 'apex_bookings') {
+                    loadWorkerDashboard();
+                    if (chatModalOpen) renderChat();
+                }
+            });
+            // 3 second poll for single tab preview
+            setInterval(() => {
+                loadWorkerDashboard();
+                if (chatModalOpen) renderChat();
+            }, 3000);
+        });
+
+        // Load all pipelines
+        function loadWorkerDashboard() {
+            let bookings = JSON.parse(localStorage.getItem('apex_bookings')) || [];
+            
+            // Calculate completed numbers & commissions for THIS specific operative
+            let completedCount = 0;
+            let totalEarnings = 0;
+            
+            bookings.forEach(b => {
+                const assigned = b.workerAssigned || '';
+                const activeName = activeWorker.name;
+                const cleanActiveName = activeName.replace('Worker ', '');
+                
+                if (b.status === 'Completed' && (assigned === activeName || assigned === cleanActiveName)) {
+                    completedCount++;
+                    // Worker receives 70% commission
+                    totalEarnings += (b.total * 0.70);
+                }
+            });
+            
+            document.getElementById('completedJobsCount').innerText = completedCount;
+            document.getElementById('workerEarnings').innerText = 'R' + totalEarnings.toFixed(0);
+
+            // Synchronize active claimed job details in real-time from the database
+            if (activeJob) {
+                const refreshedJob = bookings.find(b => b.id === activeJob.id);
+                if (refreshedJob) {
+                    activeJob = refreshedJob;
+                    if (activeJob.status === 'Completed') {
+                        activeJob = null;
+                        document.getElementById('activeJobController').classList.add('hidden');
+                        document.getElementById('noActiveJobPlaceholder').classList.remove('hidden');
+                    } else {
+                        renderActiveJobTracker();
+                    }
+                }
+            }
+
+            renderPipeline(bookings);
+        }
+
+        // Render pipeline
+        function renderPipeline(bookings) {
+            const container = document.getElementById('pipelineList');
+            container.innerHTML = '';
+            
+            // Filter pipeline: Only show Pending or Approved bookings assigned to ME (or unassigned)
+            const pipelineJobs = bookings.filter(b => b.status !== 'Completed' && (!b.workerAssigned || b.workerAssigned === activeWorker.name || b.workerAssigned === activeWorker.name.replace('Worker ', '')));
+            
+            document.getElementById('pipelineCountBadge').innerText = pipelineJobs.length + ' Jobs';
+
+            if (pipelineJobs.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-2 p-8 rounded-3xl bg-white/5 border border-white/5 text-center space-y-2">
+                        <i data-lucide="inbox" class="w-8 h-8 text-gray-500 mx-auto"></i>
+                        <h4 class="font-bold text-gray-400 text-sm">No Jobs In Pipeline</h4>
+                        <p class="text-xs text-gray-500">All detailing requests completed or claimed by other operators.</p>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+
+            pipelineJobs.forEach(b => {
+                const card = document.createElement('div');
+                card.className = 'glass-card rounded-2xl p-5 flex flex-col justify-between space-y-4 border border-white/5';
+                
+                let actionBtnHtml = '';
+                if (b.status === 'Pending') {
+                    actionBtnHtml = `
+                        <button onclick="approveAndAssign('${b.id}')" class="shine-effect w-full bg-brand-accentBlue text-black font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 shadow-sm">
+                            <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                            <span>Approve & Assign Me</span>
+                        </button>
+                    `;
+                } else if (b.status === 'Approved' || b.status === 'Washing' || b.status === 'Polishing') {
+                    if (activeJob && activeJob.id === b.id) {
+                        actionBtnHtml = `
+                            <button disabled class="w-full bg-brand-accentBlue/20 text-brand-accentBlue border border-brand-accentBlue/30 font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 cursor-default">
+                                <span class="animate-pulse">Active Job Panel Opened</span>
+                            </button>
+                        `;
+                    } else {
+                        actionBtnHtml = `
+                            <button onclick="claimActiveJob('${b.id}')" class="shine-effect w-full bg-gradient-to-r from-brand-accentBlue to-indigo-500 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 shadow-md">
+                                <i data-lucide="play" class="w-3.5 h-3.5"></i>
+                                <span>Start Work Operations</span>
+                            </button>
+                        `;
+                    }
+                }
+
+                card.innerHTML = `
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h4 class="font-bold text-white text-sm">${b.name}</h4>
+                                <span class="text-[10px] text-gray-500 block font-mono">Car: ${b.car}</span>
+                            </div>
+                            <span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase ${b.status === 'Pending' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'bg-brand-accentBlue/10 text-brand-accentBlue border border-brand-accentBlue/20'}">
+                                ${b.status}
+                            </span>
+                        </div>
+                        
+                        <div class="text-xs text-gray-400 pt-2 border-t border-white/5 space-y-1">
+                            <div class="flex items-center gap-1 justify-between">
+                                <span class="text-[9px] text-gray-600 block uppercase font-mono">Location</span>
+                                <span class="truncate max-w-[150px]">${b.location} (${b.distance}km)</span>
+                            </div>
+                            <div class="flex items-center gap-1 justify-between">
+                                <span class="text-[9px] text-gray-600 block uppercase font-mono">Schedule</span>
+                                <span>${b.date} at ${b.time}</span>
+                            </div>
+                            <div class="flex items-center gap-1 justify-between">
+                                <span class="text-[9px] text-gray-600 block uppercase font-mono">Package Plan</span>
+                                <span class="font-bold text-brand-gold text-[10px]">${b.service}</span>
+                            </div>
+                            ${b.products && b.products.length > 0 ? `
+                            <div class="flex items-center gap-1 justify-between">
+                                <span class="text-[9px] text-gray-600 block uppercase font-mono">Add-ons</span>
+                                <span class="text-[10px] text-amber-400 font-medium truncate max-w-[150px] text-right">${b.products.map(p => p.name).join(', ')}</span>
+                            </div>` : ''}
+                        </div>
+                    </div>
+
+                    <div class="pt-3 mt-2 border-t border-white/5 space-y-2">
+                        <div class="flex justify-between items-center text-xs">
+                            <button onclick="triggerDispatchGPS('${b.location}')" class="text-[10px] text-brand-accentBlue hover:underline flex items-center gap-1">
+                                <i data-lucide="navigation" class="w-3 h-3"></i>
+                                <span>Get Route GPS</span>
+                            </button>
+                            <span class="font-bold text-white">Rate: R${b.total}</span>
+                        </div>
+                        ${actionBtnHtml}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+            lucide.createIcons();
+        }
+
+        // Action: Approve & Assign
+        function approveAndAssign(id) {
+            let bookings = JSON.parse(localStorage.getItem('apex_bookings')) || [];
+            const index = bookings.findIndex(b => b.id === id);
+            
+            if (index !== -1) {
+                bookings[index].status = 'Approved';
+                bookings[index].workerAssigned = activeWorker.name;
+                bookings[index].workerNotes = 'Operative ' + activeWorker.name + ' assigned. Preparing transit to site.';
+                
+                localStorage.setItem('apex_bookings', JSON.stringify(bookings));
+                loadWorkerDashboard();
+                
+                alert(`📋 Job approved successfully! You are assigned as Operator ${activeWorker.name.replace('Worker ', '')}. Dispatch map trigger available.`);
+            }
+        }
+
+        // Action: Load claimed job to Operative progress tracking panel
+        function claimActiveJob(id) {
+            let bookings = JSON.parse(localStorage.getItem('apex_bookings')) || [];
+            const job = bookings.find(b => b.id === id);
+            
+            if (job) {
+                activeJob = job;
+                
+                document.getElementById('noActiveJobPlaceholder').classList.add('hidden');
+                document.getElementById('activeJobController').classList.remove('hidden');
+                
+                renderActiveJobTracker();
+                loadWorkerDashboard();
+            }
+        }
+
+        // Render detailed step tracker block
+        function renderActiveJobTracker() {
+            document.getElementById('activeClientName').innerText = activeJob.name;
+            document.getElementById('activeCarModel').innerText = activeJob.car;
+            document.getElementById('activeJobLocation').innerText = activeJob.location;
+            document.getElementById('activeJobPrice').innerText = 'R' + activeJob.total;
+
+            const stepDots = [
+                document.getElementById('stepDot_1'),
+                document.getElementById('stepDot_2'),
+                document.getElementById('stepDot_3'),
+                document.getElementById('stepDot_4')
+            ];
+
+            const stepTexts = [
+                document.getElementById('stepText_1'),
+                document.getElementById('stepText_2'),
+                document.getElementById('stepText_3'),
+                document.getElementById('stepText_4')
+            ];
+
+            const btn = document.getElementById('progressTriggerBtn');
+            const btnText = document.getElementById('progressTriggerBtnText');
+
+            // Reset steps styling
+            for (let i = 0; i < 4; i++) {
+                stepDots[i].className = "absolute -left-[14px] top-1.5 w-2 h-2 rounded-full bg-gray-600 ring-4 ring-black";
+                stepTexts[i].className = "text-xs font-bold text-gray-500";
+            }
+
+            // Sync status mapping to active visual step
+            if (activeJob.status === 'Approved') {
+                // Step 1 active
+                stepDots[0].className = "absolute -left-[14px] top-1.5 w-2 h-2 rounded-full bg-brand-accentBlue ring-4 ring-brand-accentBlue/20";
+                stepTexts[0].className = "text-xs font-bold text-brand-accentBlue";
+                btnText.innerText = "Initiate Foam Wash (Step 2)";
+                btn.onclick = () => advanceActiveJobStatus('Washing', 'Washing exterior body using high-foam snow treatment.');
+            } else if (activeJob.status === 'Washing') {
+                // Step 1 and 2 completed/active
+                stepDots[0].className = "absolute -left-[14px] top-1.5 w-2 h-2 rounded-full bg-emerald-500";
+                stepTexts[0].className = "text-xs font-medium text-emerald-400";
+                
+                stepDots[1].className = "absolute -left-[14px] top-1.5 w-2 h-2 rounded-full bg-brand-accentBlue ring-4 ring-brand-accentBlue/20 animate-pulse";
+                stepTexts[1].className = "text-xs font-bold text-brand-accentBlue";
+                btnText.innerText = "Start Paint Polishing (Step 3)";
+                btn.onclick = () => advanceActiveJobStatus('Polishing', 'Foam scrub complete. Commencing machine protective wax buffing.');
+            } else if (activeJob.status === 'Polishing') {
+                // Step 1, 2 completed, 3 active
+                stepDots[0].className = "absolute -left-[14px] top-1.5 w-2 h-2 rounded-full bg-emerald-500";
+                stepTexts[0].className = "text-xs font-medium text-emerald-400";
+                stepDots[1].className = "absolute -left-[14px] top-1.5 w-2 h-2 rounded-full bg-emerald-500";
+                stepTexts[1].className = "text-xs font-medium text-emerald-400";
+
+                stepDots[2].className = "absolute -left-[14px] top-1.5 w-2 h-2 rounded-full bg-brand-accentBlue ring-4 ring-brand-accentBlue/20 animate-pulse";
+                stepTexts[2].className = "text-xs font-bold text-brand-accentBlue";
+                btnText.innerText = "Complete Work & Collect (Step 4)";
+                btn.onclick = () => advanceActiveJobStatus('Completed', 'Polishing and cabin refreshes complete. Showroom wax coat finalized!');
+            }
+            lucide.createIcons();
+        }
+
+        // Action: Advance job status in database
+        function advanceActiveJobStatus(nextStatus, autoNotes) {
+            let bookings = JSON.parse(localStorage.getItem('apex_bookings')) || [];
+            const index = bookings.findIndex(b => b.id === activeJob.id);
+            
+            if (index !== -1) {
+                bookings[index].status = nextStatus;
+                bookings[index].workerNotes = autoNotes;
+                
+                localStorage.setItem('apex_bookings', JSON.stringify(bookings));
+                
+                if (nextStatus === 'Completed') {
+                    activeJob = null;
+                    document.getElementById('activeJobController').classList.add('hidden');
+                    document.getElementById('noActiveJobPlaceholder').classList.remove('hidden');
+                    alert("🎉 Detailing completed! Great job operative. Billing registered under company stats.");
+                } else {
+                    activeJob = bookings[index];
+                    renderActiveJobTracker();
+                }
+                loadWorkerDashboard();
+            }
+        }
+
+        // Action: Push a custom live status note to client dashboard
+        function updateWorkerNotes() {
+            const input = document.getElementById('workerNotesInput');
+            const customNotes = input.value.trim();
+            
+            if (!customNotes) return;
+
+            let bookings = JSON.parse(localStorage.getItem('apex_bookings')) || [];
+            const index = bookings.findIndex(b => b.id === activeJob.id);
+            
+            if (index !== -1) {
+                bookings[index].workerNotes = customNotes;
+                localStorage.setItem('apex_bookings', JSON.stringify(bookings));
+                
+                activeJob = bookings[index];
+                input.value = '';
+                alert("💬 Operational notes pushed directly to client's dashboard!");
+                loadWorkerDashboard();
+            }
+        }
+
+        // Route GPS simulation triggers
+        function triggerDispatchGPS(locationAddress) {
+            document.getElementById('mockMapSection').classList.remove('hidden');
+            document.getElementById('mapDestinationText').innerText = locationAddress;
+            document.getElementById('mockMapSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function closeMap() {
+            document.getElementById('mockMapSection').classList.add('hidden');
+        }
+
+        let chatModalOpen = false;
+
+        function openChat() {
+            if (!activeJob) {
+                alert("⚠️ You must have an active job to use the chat.");
+                return;
+            }
+            chatModalOpen = true;
+            document.getElementById('chatModal').classList.remove('hidden');
+            renderChat();
+        }
+
+        function closeChat() {
+            chatModalOpen = false;
+            document.getElementById('chatModal').classList.add('hidden');
+        }
+
+        function renderChat() {
+            if (!activeJob) return;
+            
+            const bookings = JSON.parse(localStorage.getItem('apex_bookings')) || [];
+            const booking = bookings.find(b => b.id === activeJob.id);
+            
+            if (!booking) return;
+
+            document.getElementById('chatClientName').innerText = booking.name || 'Client';
+            
+            const messagesContainer = document.getElementById('chatMessages');
+            const isScrolledToBottom = messagesContainer.scrollHeight - messagesContainer.clientHeight <= messagesContainer.scrollTop + 10;
+            
+            let html = '';
+            const chat = booking.chat || [];
+            
+            if (chat.length === 0) {
+                html = `<div class="text-center text-xs text-gray-500 py-4">No messages yet. Say hello to the client!</div>`;
+            } else {
+                chat.forEach(msg => {
+                    const isWorker = msg.sender === 'Worker';
+                    html += `
+                        <div class="flex ${isWorker ? 'justify-end' : 'justify-start'}">
+                            <div class="max-w-[80%] rounded-2xl px-4 py-2 ${isWorker ? 'bg-brand-accentBlue text-black rounded-tr-sm' : 'bg-white/10 text-white border border-white/10 rounded-tl-sm'}">
+                                <p class="text-sm font-medium">${msg.message}</p>
+                                <span class="text-[9px] opacity-60 block text-right mt-1">${msg.timestamp}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            
+            messagesContainer.innerHTML = html;
+            lucide.createIcons();
+            
+            if (isScrolledToBottom || chat.length === 0) {
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+        }
+
+        function sendChatMessage() {
+            if (!activeJob) return;
+            
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            if (!text) return;
+            
+            let bookings = JSON.parse(localStorage.getItem('apex_bookings')) || [];
+            const index = bookings.findIndex(b => b.id === activeJob.id);
+            
+            if (index !== -1) {
+                if (!bookings[index].chat) bookings[index].chat = [];
+                
+                const now = new Date();
+                const timeStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+                
+                bookings[index].chat.push({
+                    sender: 'Worker',
+                    message: text,
+                    timestamp: timeStr
+                });
+                
+                localStorage.setItem('apex_bookings', JSON.stringify(bookings));
+                input.value = '';
+                
+                // Update local activeJob ref
+                activeJob = bookings[index];
+                renderChat();
+                
+                const messagesContainer = document.getElementById('chatMessages');
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+        }
+    </script>
+
+    <!-- Chat Modal -->
+    <div id="chatModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm px-4">
+        <div class="glass-card rounded-3xl w-full max-w-lg overflow-hidden flex flex-col h-[500px] max-h-[85vh]">
+            <!-- Header -->
+            <div class="p-4 border-b border-white/10 flex justify-between items-center bg-brand-charcoal/50">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-brand-accentBlue/20 flex items-center justify-center text-brand-accentBlue">
+                        <i data-lucide="message-square" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-white">Client Chat</h3>
+                        <p id="chatClientName" class="text-xs text-gray-400">Loading...</p>
+                    </div>
+                </div>
+                <button onclick="closeChat()" class="p-2 bg-white/5 hover:bg-rose-500/20 text-gray-400 hover:text-rose-400 rounded-full transition-colors">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            
+            <!-- Messages Area -->
+            <div id="chatMessages" class="flex-1 overflow-y-auto p-4 space-y-3 bg-black/40">
+                <!-- Messages populated by JS -->
+            </div>
+
+            <!-- Input Area -->
+            <div class="p-4 border-t border-white/10 bg-brand-charcoal/50 flex gap-2">
+                <input type="text" id="chatInput" placeholder="Type a message..." class="flex-1 px-4 py-2 bg-black/60 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-accentBlue/50" onkeypress="if(event.key === 'Enter') sendChatMessage()">
+                <button onclick="sendChatMessage()" class="px-4 py-2 bg-brand-accentBlue hover:bg-brand-accentBlue/80 text-black font-bold rounded-xl transition-all shadow-[0_0_10px_rgba(0,216,255,0.2)]">
+                    <i data-lucide="send" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

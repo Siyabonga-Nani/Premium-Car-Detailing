@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apex Auto Studio | Premium Dashboard</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            gold: '#D4AF37',
+                            darkGold: '#AA7C11',
+                            charcoal: '#0C0D0E',
+                            accentBlue: '#00D8FF',
+                        }
+                    },
+                    fontFamily: {
+                        outfit: ['Outfit', 'sans-serif'],
+                        inter: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons via CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* Modern Premium Animations & Layout Utilities */
+        @keyframes float-slow {
+            0%, 100% { transform: translate(0px, 0px) scale(1); }
+            50% { transform: translate(40px, -60px) scale(1.15); }
+        }
+        @keyframes pulse-ring {
+            0% { transform: scale(0.95); opacity: 0.5; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+            100% { transform: scale(0.95); opacity: 0.5; }
+        }
+        @keyframes border-glow {
+            0%, 100% { border-color: rgba(212, 175, 55, 0.2); }
+            50% { border-color: rgba(0, 216, 255, 0.5); }
+        }
+
+        .animate-float-slow-1 {
+            animation: float-slow 18s infinite ease-in-out;
+        }
+        .animate-float-slow-2 {
+            animation: float-slow 22s infinite ease-in-out reverse;
+        }
+        .animate-pulse-ring {
+            animation: pulse-ring 3s infinite ease-in-out;
+        }
+        .animate-border-glow {
+            animation: border-glow 4s infinite ease-in-out;
+        }
+
+        .glass-card {
+            background: rgba(18, 20, 22, 0.65);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .glass-card:hover {
+            border-color: rgba(0, 216, 255, 0.2);
+            background: rgba(22, 25, 28, 0.8);
+            transform: translateY(-4px);
+            box-shadow: 0 15px 45px -5px rgba(0, 216, 255, 0.05);
+        }
+
+        .glass-input {
+            background: rgba(10, 11, 12, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 1rem;
+            color: #ffffff;
+            transition: all 0.3s ease;
+        }
+        .glass-input:focus {
+            border-color: rgba(0, 216, 255, 0.5);
+            box-shadow: 0 0 15px rgba(0, 216, 255, 0.15);
+            outline: none;
+            background: rgba(5, 6, 7, 0.8);
+        }
+
+        .premium-tab-active {
+            background: linear-gradient(135deg, rgba(0, 216, 255, 0.15), rgba(99, 102, 241, 0.15));
+            border-color: rgba(0, 216, 255, 0.3);
+            color: #00D8FF;
+        }
+
+        /* Shine effect on premium elements */
+        .shine-effect {
+            position: relative;
+            overflow: hidden;
+        }
+        .shine-effect::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.08) 50%, rgba(255, 255, 255, 0) 100%);
+            transform: translateX(-100%);
+            transition: none;
+        }
+        .shine-effect:hover::after {
+            transform: translateX(100%);
+            transition: transform 1s ease-in-out;
+        }
+
+        /* Highlight border animations */
+        .neon-gold-border {
+            border: 1px solid rgba(212, 175, 55, 0.25);
+            box-shadow: inset 0 0 15px rgba(212, 175, 55, 0.03);
+        }
+        .neon-gold-border:hover {
+            border-color: rgba(212, 175, 55, 0.6);
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.08);
+        }
+
+        /* Styling lists scrollbars */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(18, 20, 22, 0.4);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 216, 255, 0.3);
+        }
+    </style>
+</head>
+<body class="h-full bg-[#070809] text-white font-inter overflow-y-auto overflow-x-hidden relative selection:bg-brand-accentBlue/30 selection:text-white">
+
+    <!-- Ambient Glowing Lights -->
+    <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+        <!-- Cyan glow top left -->
+        <div class="absolute top-10 -left-20 w-[500px] h-[500px] rounded-full bg-brand-accentBlue opacity-[0.12] filter blur-[120px] animate-float-slow-1"></div>
+        <!-- Indigo glow bottom right -->
+        <div class="absolute bottom-20 right-10 w-[600px] h-[600px] rounded-full bg-indigo-600 opacity-[0.1] filter blur-[150px] animate-float-slow-2"></div>
+        <!-- Amber glow middle left -->
+        <div class="absolute top-[40%] -left-40 w-[400px] h-[400px] rounded-full bg-amber-500 opacity-[0.06] filter blur-[100px] animate-float-slow-1"></div>
+    </div>
+
+    <!-- Parallax Top Banner Overlay -->
+    <div class="absolute top-0 left-0 right-0 h-[380px] bg-gradient-to-b from-brand-charcoal/20 via-[#070809]/90 to-[#070809] z-0 overflow-hidden">
+        <img src="../premium_detailing_bg.png" alt="Detailing Backdrop Banner" class="w-full h-full object-cover filter brightness-[0.25] blur-[1px]">
+        <div class="absolute inset-0 bg-gradient-to-t from-[#070809] via-transparent to-black/60"></div>
+    </div>
+
+    <!-- ================= DASHBOARD CORE CONTAINER ================= -->
+    <div class="max-w-7xl mx-auto px-4 md:px-8 py-6 relative z-10">
+
+        <!-- HEADER SECTION -->
+        <header class="flex flex-col md:flex-row justify-between items-center py-5 border-b border-white/5 mb-10 gap-4">
+            <div class="flex items-center space-x-3.5">
+                <div class="w-11 h-11 rounded-xl bg-brand-accentBlue/10 border border-brand-accentBlue/25 flex items-center justify-center text-brand-accentBlue shadow-[0_0_15px_rgba(0,216,255,0.2)]">
+                    <i data-lucide="shield-check" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold font-outfit tracking-tight flex items-center gap-2">
+                        <span>APEX</span><span class="text-brand-accentBlue font-light font-sans text-xl">AUTO STUDIO</span>
+                    </h1>
+                    <p class="text-xs text-gray-500 tracking-wider font-mono">CLIENT PORTAL v2.1</p>
+                </div>
+            </div>
+
+            <!-- Portal Status Badge -->
+            <div class="flex items-center space-x-4 bg-white/5 border border-white/5 rounded-2xl px-4 py-2 text-sm backdrop-blur-md">
+                <span class="flex h-2.5 w-2.5 relative">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                </span>
+                <span id="userStatus" class="font-medium text-gray-300">Logged in as Guest</span>
+                <a href="../index.html" class="text-xs font-semibold uppercase tracking-wider text-brand-accentBlue hover:text-white transition-colors border-l border-white/10 pl-3">
+                    Sign Out
+                </a>
+            </div>
+        </header>
+
+        <!-- HERO INTRODUCTION -->
+        <section class="mb-12 relative">
+            <div class="max-w-2xl">
+                <span class="px-3.5 py-1.5 text-xs font-bold font-outfit uppercase tracking-widest bg-brand-accentBlue/10 border border-brand-accentBlue/20 text-brand-accentBlue rounded-full shadow-[0_0_10px_rgba(0,216,255,0.05)]">
+                    Elite Automotive Care
+                </span>
+                <h2 class="text-4xl md:text-5xl font-extrabold font-outfit tracking-tight text-white mt-4 leading-tight">
+                    Elevate Your Driving <br class="hidden md:inline"><span class="bg-clip-text text-transparent bg-gradient-to-r from-amber-400 via-brand-gold to-amber-200">Experience Today.</span>
+                </h2>
+                <p class="text-gray-400 mt-4 leading-relaxed text-sm md:text-base">
+                    Welcome to Apex Auto Studio's digital dashboard. Select a luxury detailing package below, configure your custom wash plan, or request add-on detailing supplies. We bring the showroom-ready treatment to your location.
+                </p>
+            </div>
+
+            <!-- Scroll-to Action -->
+            <div class="mt-8 flex flex-wrap gap-4">
+                <a href="#bookingSection" class="shine-effect px-6 py-3.5 bg-gradient-to-r from-brand-accentBlue to-indigo-500 text-white text-sm font-semibold rounded-2xl shadow-[0_4px_25px_rgba(0,216,255,0.2)] hover:shadow-[0_4px_35px_rgba(0,216,255,0.3)] transition-all flex items-center gap-2">
+                    <span>Start Booking Today</span>
+                    <i data-lucide="arrow-down-right" class="w-4 h-4"></i>
+                </a>
+                <a href="#productsSection" class="px-6 py-3.5 bg-white/5 border border-white/5 text-gray-300 hover:text-white hover:bg-white/10 transition-all text-sm font-medium rounded-2xl flex items-center gap-2">
+                    <span>Browse Products</span>
+                    <i data-lucide="shopping-bag" class="w-4 h-4 text-brand-accentBlue"></i>
+                </a>
+            </div>
+        </section>
+
+        <!-- TRAVEL POLICY HERO BANNER -->
+        <section class="mb-16">
+            <div class="relative overflow-hidden rounded-3xl glass-card border-amber-500/20 bg-gradient-to-r from-amber-950/20 via-black/40 to-black/20 p-6 md:p-8 flex flex-col md:flex-row justify-between items-center gap-6 animate-border-glow">
+                <!-- Background Accent Glow -->
+                <div class="absolute -right-10 top-0 w-32 h-32 rounded-full bg-amber-500/10 filter blur-2xl"></div>
+                
+                <div class="flex items-start space-x-4">
+                    <div class="w-12 h-12 shrink-0 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+                        <i data-lucide="map-pin" class="w-6 h-6"></i>
+                    </div>
+                    <div class="space-y-1">
+                        <h3 class="text-lg font-bold font-outfit text-white flex items-center gap-2">
+                            <span>Flexible Mobile Booking Policy</span>
+                            <span class="px-2 py-0.5 text-[10px] font-semibold tracking-wider uppercase rounded bg-amber-500/10 text-amber-400 border border-amber-500/20">Mobile Valet</span>
+                        </h3>
+                        <p class="text-sm text-gray-400 leading-relaxed max-w-xl">
+                            We travel directly to your location! Within 14km of our core studio center, travel is <strong class="text-emerald-400">completely free</strong>. Beyond 14km, a subtle flat fee of only <strong class="text-amber-400">R50</strong> applies to cover transport costs.
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="flex flex-row md:flex-col gap-3 shrink-0 text-center w-full md:w-auto">
+                    <div class="bg-black/40 border border-white/5 rounded-2xl p-3 px-5 flex-1 md:flex-initial">
+                        <span class="text-[10px] text-gray-500 uppercase tracking-widest font-mono block">UNDER 14KM</span>
+                        <span class="text-xl font-black text-emerald-400 font-outfit">FREE</span>
+                    </div>
+                    <div class="bg-black/40 border border-white/5 rounded-2xl p-3 px-5 flex-1 md:flex-initial">
+                        <span class="text-[10px] text-gray-500 uppercase tracking-widest font-mono block">BEYOND 14KM</span>
+                        <span class="text-xl font-black text-amber-400 font-outfit">R50</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PORTAL CONTENT LAYOUT -->
+        <main class="grid lg:grid-cols-3 gap-8">
+            
+            <!-- LEFT 2 COLUMNS: PACKAGES & PRODUCTS -->
+            <div class="lg:col-span-2 space-y-16">
+                
+                <!-- DETAILING PACKAGES SECTION -->
+                <section id="packagesSection" class="space-y-6">
+                    <div class="flex justify-between items-end border-b border-white/5 pb-4">
+                        <div>
+                            <h3 class="text-2xl font-bold font-outfit text-white">Detailing Packages</h3>
+                            <p class="text-xs text-gray-500 mt-1">Select a core luxury treatment to automatically load it inside the booking portal</p>
+                        </div>
+                        <span class="text-xs text-brand-accentBlue uppercase tracking-wider font-semibold font-mono hidden md:inline">6 Treatments Available</span>
+                    </div>
+
+                    <!-- Grids -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        
+                        <!-- Card 1: Full Body Detail -->
+                        <div class="glass-card neon-gold-border rounded-3xl p-6 flex flex-col justify-between relative overflow-hidden group">
+                            <!-- Popular Tag -->
+                            <div class="absolute top-4 right-4 px-2.5 py-1 text-[10px] font-bold tracking-widest uppercase rounded bg-amber-500/10 text-brand-gold border border-brand-gold/20">
+                                Best Value
+                            </div>
+                            
+                            <div class="space-y-4">
+                                <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-brand-gold/20 flex items-center justify-center text-brand-gold">
+                                    <i data-lucide="sparkles" class="w-5 h-5"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-xl font-bold text-white font-outfit">Full Body Detail</h4>
+                                    <p class="text-xs text-gray-500 mt-1">Available 300+ working days a year</p>
+                                </div>
+                                <ul class="space-y-2 text-xs text-gray-400">
+                                    <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-brand-gold"></i> Premium Foam Exterior wash</li>
+                                    <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-brand-gold"></i> Microfiber active drying</li>
+                                    <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-brand-gold"></i> High gloss hand wax paint polish</li>
+                                    <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-brand-gold"></i> Cabin vacuum & dashboard wipe</li>
+                                </ul>
+                            </div>
+
+                            <div class="pt-6 mt-6 border-t border-white/5 flex items-center justify-between">
+                                <div class="space-y-0.5">
+                                    <span class="line-through text-xs text-gray-600 block">R600</span>
+                                    <span class="text-2xl font-black text-white font-outfit">R350</span>
+                                </div>
+                                <button onclick="selectPackage('Full Body Detail', 350)" class="shine-effect bg-brand-gold hover:bg-brand-darkGold text-[#0c0d0e] hover:text-white font-bold py-2.5 px-4 rounded-xl text-xs transition-all flex items-center gap-1">
+                                    <span>Select Plan</span>
+                                    <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Card 2: Deep Scrub Detail -->
+                        <div class="glass-card rounded-3xl p-6 flex flex-col justify-between relative overflow-hidden group">
+                            <!-- Tag -->
+                            <div class="absolute top-4 right-4 px-2.5 py-1 text-[10px] font-bold tracking-widest uppercase rounded bg-brand-accentBlue/10 text-brand-accentBlue border border-brand-accentBlue/20">
+                                Deep Clean
+                            </div>
+                            
+                            <div class="space-y-4">
+                                <div class="w-10 h-10 rounded-xl bg-brand-accentBlue/10 border border-brand-accentBlue/20 flex items-center justify-center text-brand-accentBlue">
+                                    <i data-lucide="brush" class="w-5 h-5"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-xl font-bold text-white font-outfit">Deep Scrub Detail</h4>
+                                    <p class="text-xs text-gray-500 mt-1">Available 300+ working days a year</p>
+                                </div>
+                                <ul class="space-y-2 text-xs text-gray-400">
+                                    <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-brand-accentBlue"></i> Heavy stain removal upholstery treatment</li>
+                                    <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-brand-accentBlue"></i> Steam cabin wash & sanitization</li>
+                                    <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-brand-accentBlue"></i> Engine bay wash & clean</li>
+                                    <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-brand-accentBlue"></i> Exhaust tip chrome polishing</li>
+                                </ul>
+                            </div>
+
+                            <div class="pt-6 mt-6 border-t border-white/5 flex items-center justify-between">
+                                <div class="space-y-0.5">
+                                    <span class="line-through text-xs text-gray-600 block">R1000</span>
+                                    <span class="text-2xl font-black text-white font-outfit">R500</span>
+                                </div>
+                                <button onclick="selectPackage('Deep Scrub Detail', 500)" class="shine-effect bg-brand-accentBlue hover:bg-brand-accentBlue/80 text-black font-bold py-2.5 px-4 rounded-xl text-xs transition-all flex items-center gap-1">
+                                    <span>Select Plan</span>
+                                    <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Card 3: Basic Wash -->
+                        <div class="glass-card rounded-3xl p-6 flex flex-col justify-between group">
+                            <div class="space-y-4">
+                                <div class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-gray-400">
+                                    <i data-lucide="droplet" class="w-5 h-5"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-xl font-bold text-white font-outfit">Basic Wash</h4>
+                                    <p class="text-xs text-gray-500 mt-1">Available daily</p>
+                                </div>
+                                <ul class="space-y-2 text-xs text-gray-400">
+                                    <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-brand-accentBlue"></i> Active foam pressure rinse</li>
+                                    <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-brand-accentBlue"></i> Exterior window wipe clean</li>
+                                    <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-brand-accentBlue"></i> Premium tire shine coat</li>
+                                    <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-brand-accentBlue"></i> Door jamb dust clean</li>
+                                </ul>
+                            </div>
+
+                            <div class="pt-6 mt-6 border-t border-white/5 flex items-center justify-between">
+                                <div class="space-y-0.5">
+                                    <span class="line-through text-xs text-gray-600 block">R200</span>
+                                    <span class="text-2xl font-black text-white font-outfit">R120</span>
+                                </div>
+                                <button onclick="selectPackage('Basic Wash', 120)" class="bg-white/5 hover:bg-white/10 border border-white/10 text-white font-semibold py-2.5 px-4 rounded-xl text-xs transition-all flex items-center gap-1">
+                                    <span>Select Plan</span>
+                                    <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Card 4: Interior Refresh -->
+                        <div class="glass-card rounded-3xl p-6 flex flex-col justify-between group">
+                            <div class="space-y-4">
+                                <div class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-gray-400">
+                                    <i data-lucide="wind" class="w-5 h-5"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-xl font-bold text-white font-outfit">Interior Refresh</h4>
+                                    <p class="text-xs text-gray-500 mt-1">Available all year</p>
+                                </div>
+                                <ul class="space-y-2 text-xs text-gray-400">
+                                    <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-brand-accentBlue"></i> Full vehicle deep vacuum</li>
+                                    <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-brand-accentBlue"></i> Leather conditioning & clean</li>
+                                    <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-brand-accentBlue"></i> Air vents dust sanitization</li>
+                                    <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-brand-accentBlue"></i> Deodorizing perfume scent</li>
+                                </ul>
+                            </div>
+
+                            <div class="pt-6 mt-6 border-t border-white/5 flex items-center justify-between">
+                                <div class="space-y-0.5">
+                                    <span class="line-through text-xs text-gray-600 block">R400</span>
+                                    <span class="text-2xl font-black text-white font-outfit">R250</span>
+                                </div>
+                                <button onclick="selectPackage('Interior Refresh', 250)" class="bg-white/5 hover:bg-white/10 border border-white/10 text-white font-semibold py-2.5 px-4 rounded-xl text-xs transition-all flex items-center gap-1">
+                                    <span>Select Plan</span>
+                                    <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Card 5: Weekly Subscription -->
+                        <div class="glass-card rounded-3xl p-6 flex flex-col justify-between group">
+                            <div class="space-y-4">
+                                <div class="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400">
+                                    <i data-lucide="calendar" class="w-5 h-5"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-xl font-bold text-white font-outfit">Weekly Subscription</h4>
+                                    <p class="text-xs text-gray-500 mt-1">4–5 washes per month</p>
+                                </div>
+                                <ul class="space-y-2 text-xs text-gray-400">
+                                    <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-purple-400"></i> Standard wash visit once per week</li>
+                                    <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-purple-400"></i> Interior sanitization included</li>
+                                    <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-purple-400"></i> Fast dispatch prioritization</li>
+                                </ul>
+                            </div>
+
+                            <div class="pt-6 mt-6 border-t border-white/5 flex items-center justify-between">
+                                <div class="space-y-0.5">
+                                    <span class="line-through text-xs text-gray-600 block">R800</span>
+                                    <span class="text-2xl font-black text-white font-outfit">R500</span>
+                                </div>
+                                <button onclick="selectPackage('Weekly Subscription', 500)" class="bg-white/5 hover:bg-white/10 border border-white/10 text-white font-semibold py-2.5 px-4 rounded-xl text-xs transition-all flex items-center gap-1">
+                                    <span>Select Plan</span>
+                                    <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Card 6: Premium Monthly Plan -->
+                        <div class="glass-card neon-gold-border rounded-3xl p-6 flex flex-col justify-between group">
+                            <div class="space-y-4">
+                                <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-brand-gold/25 flex items-center justify-center text-brand-gold shadow-[0_0_10px_rgba(212,175,55,0.2)]">
+                                    <i data-lucide="crown" class="w-5 h-5"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-xl font-bold text-white font-outfit">Premium Monthly Plan</h4>
+                                    <p class="text-xs text-gray-500 mt-1">4–6 washes + priority service</p>
+                                </div>
+                                <ul class="space-y-2 text-xs text-gray-400">
+                                    <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-brand-gold"></i> Standard wash visit once per week</li>
+                                    <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-brand-gold"></i> 2 Full Detail upgrades included</li>
+                                    <li class="flex items-center gap-2"><i data-lucide="check" class="w-3.5 h-3.5 text-brand-gold"></i> Top tier priority scheduling</li>
+                                </ul>
+                            </div>
+
+                            <div class="pt-6 mt-6 border-t border-white/5 flex items-center justify-between">
+                                <div class="space-y-0.5">
+                                    <span class="line-through text-xs text-gray-600 block">R1500</span>
+                                    <span class="text-2xl font-black text-white font-outfit">R900</span>
+                                </div>
+                                <button onclick="selectPackage('Premium Monthly Plan', 900)" class="shine-effect bg-brand-gold hover:bg-brand-darkGold text-[#0c0d0e] hover:text-white font-bold py-2.5 px-4 rounded-xl text-xs transition-all flex items-center gap-1">
+                                    <span>Select Plan</span>
+                                    <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+                <!-- DETAILING PRODUCTS SECTION -->
+                <section id="productsSection" class="space-y-6">
+                    <div class="flex justify-between items-end border-b border-white/5 pb-4">
+                        <div>
+                            <h3 class="text-2xl font-bold font-outfit text-white">Detailing Products</h3>
+                            <p class="text-xs text-gray-500 mt-1">Premium detailing formulas to maintain the studio shine at home</p>
+                        </div>
+                        <span class="text-xs text-brand-accentBlue uppercase tracking-wider font-semibold font-mono hidden md:inline">6 Premium formulas</span>
+                    </div>
+
+                    <!-- Products Grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                        
+                        <!-- Shampoo -->
+                        <div class="glass-card rounded-2xl p-5 flex flex-col justify-between group">
+                            <div class="space-y-3">
+                                <div class="w-9 h-9 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
+                                    <i data-lucide="package" class="w-4 h-4"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-white text-sm group-hover:text-brand-accentBlue transition-colors">Car Shampoo</h4>
+                                    <p class="text-xs text-gray-500 mt-1">High foaming deep cleaning solution</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between mt-4 pt-3 border-t border-white/5">
+                                <span class="font-bold text-white text-sm">R150</span>
+                                <button onclick="addProductToCart('Car Shampoo', 150)" class="p-2 rounded-lg bg-white/5 hover:bg-brand-accentBlue hover:text-[#0c0d0e] transition-all">
+                                    <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Tire Shine -->
+                        <div class="glass-card rounded-2xl p-5 flex flex-col justify-between group">
+                            <div class="space-y-3">
+                                <div class="w-9 h-9 rounded-lg bg-brand-gold/10 border border-brand-gold/20 flex items-center justify-center text-brand-gold">
+                                    <i data-lucide="package" class="w-4 h-4"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-white text-sm group-hover:text-brand-gold transition-colors">Tire Shine</h4>
+                                    <p class="text-xs text-gray-500 mt-1">Long lasting high gloss finish coat</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between mt-4 pt-3 border-t border-white/5">
+                                <span class="font-bold text-white text-sm">R120</span>
+                                <button onclick="addProductToCart('Tire Shine', 120)" class="p-2 rounded-lg bg-white/5 hover:bg-brand-gold hover:text-[#0c0d0e] transition-all">
+                                    <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Interior Cleaner -->
+                        <div class="glass-card rounded-2xl p-5 flex flex-col justify-between group">
+                            <div class="space-y-3">
+                                <div class="w-9 h-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-gray-400">
+                                    <i data-lucide="package" class="w-4 h-4"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-white text-sm group-hover:text-brand-accentBlue transition-colors">Interior Cleaner</h4>
+                                    <p class="text-xs text-gray-500 mt-1">Safe on leather, fabric, and plastic</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between mt-4 pt-3 border-t border-white/5">
+                                <span class="font-bold text-white text-sm">R180</span>
+                                <button onclick="addProductToCart('Interior Cleaner', 180)" class="p-2 rounded-lg bg-white/5 hover:bg-brand-accentBlue hover:text-[#0c0d0e] transition-all">
+                                    <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Microfiber Cloth -->
+                        <div class="glass-card rounded-2xl p-5 flex flex-col justify-between group">
+                            <div class="space-y-3">
+                                <div class="w-9 h-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-gray-400">
+                                    <i data-lucide="package" class="w-4 h-4"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-white text-sm group-hover:text-brand-accentBlue transition-colors">Microfiber Set</h4>
+                                    <p class="text-xs text-gray-500 mt-1">Ultra soft premium fiber cloths</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between mt-4 pt-3 border-t border-white/5">
+                                <span class="font-bold text-white text-sm">R100</span>
+                                <button onclick="addProductToCart('Microfiber Cloth Set', 100)" class="p-2 rounded-lg bg-white/5 hover:bg-brand-accentBlue hover:text-[#0c0d0e] transition-all">
+                                    <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Wax Polish -->
+                        <div class="glass-card rounded-2xl p-5 flex flex-col justify-between group">
+                            <div class="space-y-3">
+                                <div class="w-9 h-9 rounded-lg bg-amber-500/10 border border-brand-gold/20 flex items-center justify-center text-brand-gold">
+                                    <i data-lucide="package" class="w-4 h-4"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-white text-sm group-hover:text-brand-gold transition-colors">Wax Polish</h4>
+                                    <p class="text-xs text-gray-500 mt-1">UV paint protective shine wax</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between mt-4 pt-3 border-t border-white/5">
+                                <span class="font-bold text-white text-sm">R250</span>
+                                <button onclick="addProductToCart('Wax Polish', 250)" class="p-2 rounded-lg bg-white/5 hover:bg-brand-gold hover:text-[#0c0d0e] transition-all">
+                                    <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Glass Cleaner -->
+                        <div class="glass-card rounded-2xl p-5 flex flex-col justify-between group">
+                            <div class="space-y-3">
+                                <div class="w-9 h-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-gray-400">
+                                    <i data-lucide="package" class="w-4 h-4"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-white text-sm group-hover:text-brand-accentBlue transition-colors">Glass Cleaner</h4>
+                                    <p class="text-xs text-gray-500 mt-1">Streak free clarity window spray</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between mt-4 pt-3 border-t border-white/5">
+                                <span class="font-bold text-white text-sm">R130</span>
+                                <button onclick="addProductToCart('Glass Cleaner', 130)" class="p-2 rounded-lg bg-white/5 hover:bg-brand-accentBlue hover:text-[#0c0d0e] transition-all">
+                                    <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+            </div>
+
+            <!-- RIGHT 1 COLUMN: DYNAMIC BOOKING SYSTEM & LIVE QUOTE -->
+            <div class="lg:col-span-1 space-y-8">
+                
+                <!-- DYNAMIC BOOKING FORM -->
+                <section id="bookingSection" class="glass-card border-brand-accentBlue/25 rounded-3xl p-6 md:p-8 space-y-6 relative overflow-hidden">
+                    <!-- Glow header border -->
+                    <div class="absolute -top-10 -left-10 w-24 h-24 rounded-full bg-brand-accentBlue/10 filter blur-xl"></div>
+                    
+                    <div class="relative z-10 flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-xl bg-brand-accentBlue/15 border border-brand-accentBlue/30 flex items-center justify-center text-brand-accentBlue">
+                            <i data-lucide="calendar-days" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold font-outfit text-white">Book Detailing</h3>
+                            <p class="text-xs text-gray-500">Fast digital booking form</p>
+                        </div>
+                    </div>
+
+                    <form id="bookingForm" class="space-y-4 relative z-10">
+                        
+                        <!-- Full Name -->
+                        <div class="space-y-1">
+                            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider ml-1">Client Name</label>
+                            <input type="text" id="name" placeholder="John Doe" required
+                                   class="w-full px-4 py-3 glass-input text-sm">
+                        </div>
+
+                        <!-- Phone Number -->
+                        <div class="space-y-1">
+                            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider ml-1">Phone Number</label>
+                            <input type="tel" id="phone" placeholder="+27 72 123 4567" required
+                                   class="w-full px-4 py-3 glass-input text-sm">
+                        </div>
+
+                        <!-- Car Model -->
+                        <div class="space-y-1">
+                            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider ml-1">Vehicle Model</label>
+                            <input type="text" id="car" placeholder="Mercedes C-Class (Matte Dark)" required
+                                   class="w-full px-4 py-3 glass-input text-sm">
+                        </div>
+
+                        <!-- Location Address -->
+                        <div class="space-y-1">
+                            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider ml-1">Service Address</label>
+                            <input type="text" id="location" placeholder="12 Oak Avenue, Johannesburg" required
+                                   class="w-full px-4 py-3 glass-input text-sm">
+                        </div>
+
+                        <!-- Distance from center -->
+                        <div class="space-y-1">
+                            <div class="flex justify-between items-center px-1">
+                                <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Distance from Studio (km)</label>
+                                <span id="travelFeeBadge" class="hidden"></span>
+                            </div>
+                            <input type="number" id="distance" placeholder="12" required min="0" oninput="updateLiveQuote()"
+                                   class="w-full px-4 py-3 glass-input text-sm">
+                        </div>
+
+                        <!-- Booking Date & Time -->
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="space-y-1">
+                                <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider ml-1">Date</label>
+                                <input type="date" id="date" required
+                                       class="w-full px-4 py-3 glass-input text-sm">
+                            </div>
+                            <div class="space-y-1">
+                                <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider ml-1">Time</label>
+                                <input type="time" id="time" required
+                                       class="w-full px-4 py-3 glass-input text-sm">
+                            </div>
+                        </div>
+
+                        <!-- Dynamic Extra Date Additions -->
+                        <div class="space-y-2 pt-1">
+                            <div class="flex justify-between items-center">
+                                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Recurring/Extra wash days</span>
+                                <button type="button" onclick="addExtraDay()" class="px-2.5 py-1 bg-white/5 hover:bg-brand-accentBlue/20 text-brand-accentBlue hover:text-white rounded-lg text-[10px] font-bold transition-all flex items-center gap-1">
+                                    <i data-lucide="plus" class="w-3 h-3"></i>
+                                    <span>Add Day</span>
+                                </button>
+                            </div>
+                            <div id="extraDays" class="space-y-2 max-h-[160px] overflow-y-auto pr-1"></div>
+                        </div>
+
+                        <!-- Detailing Package dropdown -->
+                        <div class="space-y-1">
+                            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider ml-1">Detailing Package Selection</label>
+                            <select id="service" onchange="updateLiveQuote()" class="w-full px-4 py-3 bg-black/60 border border-white/8 rounded-2xl text-white text-sm focus:border-brand-accentBlue/50 focus:ring-1 focus:ring-brand-accentBlue/20 focus:outline-none">
+                                <option value="Full Body Detail" data-price="350">Full Body Detail (R350)</option>
+                                <option value="Deep Scrub Detail" data-price="500">Deep Scrub Detail (R500)</option>
+                                <option value="Basic Wash" data-price="120">Basic Wash (R120)</option>
+                                <option value="Interior Refresh" data-price="250">Interior Refresh (R250)</option>
+                                <option value="Weekly Subscription" data-price="500">Weekly Subscription (R500)</option>
+                                <option value="Premium Monthly Plan" data-price="900">Premium Monthly Plan (R900)</option>
+                                <option value="Product Delivery Only" data-price="0">Product Delivery Only (R0)</option>
+                            </select>
+                        </div>
+
+                        <!-- Payment Option selection -->
+                        <div class="space-y-1">
+                            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider ml-1">Payment Method</label>
+                            <select id="payment" class="w-full px-4 py-3 bg-black/60 border border-white/8 rounded-2xl text-white text-sm focus:border-brand-accentBlue/50 focus:outline-none">
+                                <option value="Cash">Cash (On Delivery)</option>
+                                <option value="Card">Secure Card (Swipe On-site)</option>
+                            </select>
+                        </div>
+
+                        <!-- Dynamic Live Quote Summary -->
+                        <div class="p-4 rounded-2xl bg-black/50 border border-white/5 space-y-3 mt-4">
+                            <span class="text-[10px] font-bold text-brand-accentBlue uppercase tracking-widest block font-mono">Live Price breakdown</span>
+                            
+                            <div class="flex justify-between text-xs">
+                                <span class="text-gray-500">Core Package rate</span>
+                                <span id="quoteBasePrice" class="font-bold text-white">R350</span>
+                            </div>
+                            <div class="flex justify-between text-xs">
+                                <span class="text-gray-500">Travel surcharge</span>
+                                <span id="quoteTravelFee" class="font-bold text-white">R0</span>
+                            </div>
+                            <div id="quoteProductsContainer" class="hidden space-y-2 pt-2 border-t border-white/5">
+                                <span class="text-[10px] text-gray-500 uppercase tracking-widest block font-mono">Product Add-ons</span>
+                                <div id="quoteProductsList" class="space-y-1"></div>
+                            </div>
+                            <div class="flex justify-between text-xs pt-2 border-t border-white/5">
+                                <span class="text-gray-400 font-medium">Estimated Total Price</span>
+                                <span id="quoteTotal" class="text-base font-black text-brand-gold font-outfit">R350</span>
+                            </div>
+                        </div>
+
+                        <!-- Book Now Button -->
+                        <button type="submit" class="w-full shine-effect bg-gradient-to-r from-brand-accentBlue to-indigo-500 text-white font-bold py-4 rounded-2xl shadow-[0_4px_20px_rgba(0,216,255,0.2)] hover:shadow-[0_4px_30px_rgba(0,216,255,0.35)] transition-all flex items-center justify-center gap-2">
+                            <i data-lucide="check-circle" class="w-5 h-5"></i>
+                            <span>Confirm Secure Booking</span>
+                        </button>
+
+                    </form>
+                </section>
+
+                <!-- DYNAMIC REGISTERED BOOKINGS LIST -->
+                <section class="glass-card rounded-3xl p-6 md:p-8 space-y-6">
+                    <div class="flex justify-between items-center border-b border-white/5 pb-4">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/25 flex items-center justify-center text-emerald-400">
+                                <i data-lucide="bookmark" class="w-4 h-4"></i>
+                            </div>
+                            <h3 class="text-lg font-bold font-outfit text-white">Active Studio Bookings</h3>
+                        </div>
+                        <span id="bookingCount" class="px-2.5 py-0.5 rounded-full bg-white/5 border border-white/10 text-xs font-semibold">1</span>
+                    </div>
+
+                    <!-- Bookings wrapper list -->
+                    <ul id="bookingList" class="space-y-3.5 max-h-[360px] overflow-y-auto pr-1">
+                        <!-- Placed dynamically via script. Includes a beautiful seeded item for visual premium impact -->
+                    </ul>
+                </section>
+
+            </div>
+
+        </main>
+
+        <!-- FOOTER BRANDING -->
+        <footer class="mt-20 py-8 border-t border-white/5 text-center space-y-4">
+            <div class="flex justify-center items-center space-x-2 text-gray-500">
+                <span class="text-xs uppercase tracking-widest font-mono font-bold">Apex Auto Detailing Studio</span>
+                <span>•</span>
+                <span class="text-xs text-gray-600">Luxury Treatment for Your Prestige Vehicle</span>
+            </div>
+            <p class="text-xs text-gray-600">
+                © 2026 Apex Auto Detailing Studio. All rights reserved. Operating under high quality standards and eco-wash guarantees.
+            </p>
+        </footer>
+
+    </div>
+
+    <!-- DYNAMIC CORE SCRIPTS -->
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        let selectedProducts = []; // To hold the user's cart items
+
+        // Bookings initialization on DOM load
+        window.addEventListener('DOMContentLoaded', () => {
+            loadBookings();
+            updateLiveQuote();
+            
+            // Set up real-time listener for worker status updates
+            window.addEventListener('storage', (e) => {
+                if (e.key === 'apex_bookings') {
+                    loadBookings();
+                    if (activeChatBookingId) renderChat();
+                }
+            });
+            // Also poll every 3 seconds for seamless single-page preview sync
+            setInterval(() => {
+                loadBookings();
+                if (activeChatBookingId) renderChat();
+            }, 3000);
+        });
+
+        // Load Bookings from localStorage
+        function loadBookings() {
+            let bookings = JSON.parse(localStorage.getItem('apex_bookings')) || [];
+            if (bookings.length === 0) {
+                // Seed initial bookings for visual premium demonstration
+                bookings = [
+                    {
+                        id: "booking_seed_1",
+                        name: "Marcus Aurelius",
+                        phone: "+27 72 123 4567",
+                        location: "42 Sandton Drive, GP",
+                        distance: 12,
+                        car: "Porsche 911 GT3 (Chalk Grey)",
+                        date: "2026-05-27",
+                        time: "09:30",
+                        service: "Deep Scrub Detail",
+                        basePrice: 500,
+                        travelFee: 0,
+                        total: 500,
+                        payment: "Cash",
+                        extraDays: [],
+                        status: "Approved", // Pending, Approved, Washing, Polishing, Completed
+                        workerAssigned: "Worker Justin",
+                        workerNotes: "Preparing high-end micro-abrasive polish."
+                    },
+                    {
+                        id: "booking_seed_2",
+                        name: "Cleopatra Philopator",
+                        phone: "+27 83 987 6543",
+                        location: "88 Riviera Road, Sandton",
+                        distance: 15,
+                        car: "Maserati Levante (Nero Ribelle)",
+                        date: "2026-05-28",
+                        time: "14:00",
+                        service: "Full Body Detail",
+                        basePrice: 350,
+                        travelFee: 50,
+                        total: 400,
+                        payment: "Card",
+                        extraDays: ["2026-06-05 at 14:00"],
+                        status: "Pending",
+                        workerAssigned: null,
+                        workerNotes: ""
+                    }
+                ];
+                localStorage.setItem('apex_bookings', JSON.stringify(bookings));
+            }
+            renderBookings(bookings);
+        }
+
+        // Render Bookings in the client list with dynamic statuses
+        function renderBookings(bookings) {
+            const list = document.getElementById('bookingList');
+            list.innerHTML = '';
+            
+            bookings.forEach(b => {
+                const item = document.createElement('li');
+                item.className = 'p-4 rounded-2xl bg-white/5 border border-white/5 hover:border-brand-accentBlue/20 space-y-2.5 relative group transition-all duration-300 shadow-md';
+
+                // Status configuration
+                let statusBadgeClass = "bg-gray-500/10 text-gray-400 border border-white/10";
+                let statusText = b.status || "Pending";
+                
+                if (statusText === 'Pending') {
+                    statusBadgeClass = "bg-amber-500/10 text-amber-400 border border-amber-500/20";
+                    statusText = "Pending Approval";
+                } else if (statusText === 'Approved') {
+                    statusBadgeClass = "bg-indigo-500/10 text-brand-accentBlue border border-brand-accentBlue/20";
+                    statusText = "Approved & Scheduled";
+                } else if (statusText === 'Washing') {
+                    statusBadgeClass = "bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 animate-pulse";
+                    statusText = "Active: Foam Washing";
+                } else if (statusText === 'Polishing') {
+                    statusBadgeClass = "bg-amber-500/10 text-amber-400 border border-amber-500/25 animate-pulse";
+                    statusText = "Active: Hand Polishing";
+                } else if (statusText === 'Completed') {
+                    statusBadgeClass = "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
+                    statusText = "Completed & Ready";
+                }
+
+                // Delete button
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'absolute top-3 right-3 p-1 bg-white/5 hover:bg-rose-500/20 text-gray-500 hover:text-rose-400 rounded-lg transition-all opacity-0 group-hover:opacity-100';
+                deleteBtn.innerHTML = '<i data-lucide="trash-2" class="w-3.5 h-3.5"></i>';
+                deleteBtn.onclick = () => {
+                    deleteBooking(b.id);
+                };
+
+                const extraDaysHtml = b.extraDays && b.extraDays.length > 0 
+                    ? `<div class="mt-1 text-[10px] text-brand-accentBlue bg-brand-accentBlue/5 border border-brand-accentBlue/10 p-1.5 rounded-lg">
+                        <strong>Extra wash days:</strong> ${b.extraDays.join(', ')}
+                       </div>`
+                    : '';
+
+                const workerNotesHtml = b.workerNotes 
+                    ? `<div class="mt-1 text-[10px] text-gray-400 italic bg-white/5 p-1.5 rounded-lg border border-white/5">
+                        <strong>Worker Update:</strong> ${b.workerNotes} ${b.workerAssigned ? `(${b.workerAssigned})` : ''}
+                       </div>`
+                    : '';
+
+                const productsHtml = (b.products && b.products.length > 0)
+                    ? `<div class="mt-1 text-[10px] text-amber-400/80 bg-amber-500/5 p-1.5 rounded-lg border border-amber-500/10">
+                        <strong>Add-ons:</strong> ${b.products.map(p => p.name).join(', ')}
+                       </div>`
+                    : '';
+
+                item.innerHTML = `
+                    <div class="flex justify-between items-start pr-6">
+                        <div>
+                            <strong class="text-sm text-white block">${b.name}</strong>
+                            <span class="text-[10px] font-mono text-gray-500">Car: ${b.car}</span>
+                        </div>
+                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold ${statusBadgeClass}">
+                            ${statusText}
+                        </span>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-2 text-xs text-gray-400 pt-1 border-t border-white/5">
+                        <div>
+                            <span class="text-[9px] text-gray-600 uppercase block font-mono">Location Address</span>
+                            <span>${b.location} (${b.distance}km)</span>
+                        </div>
+                        <div>
+                            <span class="text-[9px] text-gray-600 uppercase block font-mono">Service Date</span>
+                            <span>${b.date} at ${b.time}</span>
+                        </div>
+                    </div>
+
+                    ${extraDaysHtml}
+                    ${workerNotesHtml}
+                    ${productsHtml}
+
+                    <div class="flex justify-between items-center text-xs pt-1">
+                        <span class="text-[10px] text-brand-gold font-bold uppercase tracking-wider">${b.service} (${b.payment})</span>
+                        <strong class="text-white font-mono">Total: R${b.total}</strong>
+                    </div>
+                    ${b.workerAssigned && b.status !== 'Completed' ? `
+                    <div class="pt-2 mt-2 border-t border-white/5">
+                        <button onclick="openChat('${b.id}')" class="w-full py-2 bg-brand-accentBlue/10 hover:bg-brand-accentBlue/20 text-brand-accentBlue border border-brand-accentBlue/20 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all">
+                            <i data-lucide="message-circle" class="w-4 h-4"></i>
+                            Chat with Worker
+                        </button>
+                    </div>` : ''}
+                `;
+                
+                item.appendChild(deleteBtn);
+                list.appendChild(item);
+            });
+            
+            updateBookingCount();
+            lucide.createIcons();
+        }
+
+        // Delete Booking
+        function deleteBooking(id) {
+            let bookings = JSON.parse(localStorage.getItem('apex_bookings')) || [];
+            bookings = bookings.filter(b => b.id !== id);
+            localStorage.setItem('apex_bookings', JSON.stringify(bookings));
+            renderBookings(bookings);
+        }
+
+        // Live calculator updating prices dynamically
+        function updateLiveQuote() {
+            const serviceSelect = document.getElementById('service');
+            const selectedOpt = serviceSelect.options[serviceSelect.selectedIndex];
+            const basePrice = selectedOpt ? parseFloat(selectedOpt.dataset.price) : 0;
+            
+            const distanceInput = document.getElementById('distance');
+            const distanceVal = parseFloat(distanceInput.value) || 0;
+            const travelFee = distanceVal > 14 ? 50 : 0;
+            
+            let productsTotal = 0;
+            const quoteProductsList = document.getElementById('quoteProductsList');
+            const quoteProductsContainer = document.getElementById('quoteProductsContainer');
+            
+            if (selectedProducts.length > 0) {
+                quoteProductsList.innerHTML = '';
+                selectedProducts.forEach((prod, index) => {
+                    productsTotal += prod.price;
+                    const row = document.createElement('div');
+                    row.className = 'flex justify-between text-xs items-center';
+                    row.innerHTML = `
+                        <span class="text-gray-400 flex items-center gap-1">
+                            <button type="button" onclick="removeProduct(${index})" class="text-rose-500 hover:text-rose-400"><i data-lucide="x" class="w-3 h-3"></i></button>
+                            ${prod.name}
+                        </span>
+                        <span class="font-bold text-white">R${prod.price}</span>
+                    `;
+                    quoteProductsList.appendChild(row);
+                });
+                quoteProductsContainer.classList.remove('hidden');
+                lucide.createIcons();
+            } else {
+                quoteProductsContainer.classList.add('hidden');
+            }
+            
+            const total = basePrice + travelFee + productsTotal;
+            
+            document.getElementById('quoteBasePrice').innerText = 'R' + basePrice;
+            document.getElementById('quoteTravelFee').innerText = 'R' + travelFee;
+            document.getElementById('quoteTotal').innerText = 'R' + total;
+
+            // Travel policy badge rendering
+            const badge = document.getElementById('travelFeeBadge');
+            if (distanceVal > 0) {
+                badge.classList.remove('hidden');
+                if (distanceVal > 14) {
+                    badge.className = "px-2 py-0.5 text-[9px] font-bold tracking-wider rounded uppercase bg-rose-500/10 text-rose-400 border border-rose-500/20";
+                    badge.innerText = "+R50 Surcharge";
+                } else {
+                    badge.className = "px-2 py-0.5 text-[9px] font-bold tracking-wider rounded uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
+                    badge.innerText = "Free Travel";
+                }
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+
+        // Selection of a core plan directly from the detail cards
+        function selectPackage(packageName, price) {
+            const serviceSelect = document.getElementById('service');
+            
+            // Set select item
+            for (let i = 0; i < serviceSelect.options.length; i++) {
+                if (serviceSelect.options[i].value === packageName) {
+                    serviceSelect.selectedIndex = i;
+                    break;
+                }
+            }
+            
+            // Trigger Live update
+            updateLiveQuote();
+
+            // Guide attention by scrolling to booking form and adding a flashing visual highlight
+            const bookingSec = document.getElementById('bookingSection');
+            bookingSec.scrollIntoView({ behavior: 'smooth' });
+            
+            // Temporary glow feedback
+            bookingSec.classList.add('shadow-[0_0_30px_rgba(0,216,255,0.4)]', 'border-brand-accentBlue');
+            setTimeout(() => {
+                bookingSec.classList.remove('shadow-[0_0_30px_rgba(0,216,255,0.4)]', 'border-brand-accentBlue');
+            }, 1500);
+        }
+
+        // Fast item adding simulation for products section
+        function addProductToCart(productName, price) {
+            selectedProducts.push({ name: productName, price: price });
+            updateLiveQuote();
+            // Flash feedback that it was added to dashboard checkout
+            alert(`🛒 Added ${productName} (R${price}) to your booking add-on request! Fill in your details in the booking form to finalize.`);
+        }
+
+        function removeProduct(index) {
+            selectedProducts.splice(index, 1);
+            updateLiveQuote();
+        }
+
+        // Dynamically add a date/time row for wash days
+        function addExtraDay() {
+            const container = document.getElementById('extraDays');
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'grid grid-cols-2 gap-2 p-2 rounded-xl bg-black/40 border border-white/5 relative group';
+
+            const dateInput = document.createElement('input');
+            dateInput.type = 'date';
+            dateInput.className = 'w-full px-3 py-2 glass-input text-xs';
+            dateInput.required = true;
+
+            const timeInput = document.createElement('input');
+            timeInput.type = 'time';
+            timeInput.className = 'w-full px-3 py-2 glass-input text-xs';
+            timeInput.required = true;
+
+            // Remove button
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'absolute -top-1 -right-1 p-1 bg-rose-500/20 text-rose-400 hover:bg-rose-500 hover:text-white rounded-full border border-rose-500/30 transition-all';
+            removeBtn.innerHTML = '<i data-lucide="x" class="w-2.5 h-2.5"></i>';
+            removeBtn.onclick = () => {
+                wrapper.remove();
+                lucide.createIcons();
+            };
+
+            wrapper.appendChild(dateInput);
+            wrapper.appendChild(timeInput);
+            wrapper.appendChild(removeBtn);
+            container.appendChild(wrapper);
+            
+            // Re-render Lucide icons inside dynamic node
+            lucide.createIcons();
+        }
+
+        // Handle Booking Form Submit and add to view list
+        document.getElementById('bookingForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const name = document.getElementById('name').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const location = document.getElementById('location').value.trim();
+            const distance = parseFloat(document.getElementById('distance').value) || 0;
+            const car = document.getElementById('car').value.trim();
+            const date = document.getElementById('date').value;
+            const time = document.getElementById('time').value;
+            
+            const serviceSelect = document.getElementById('service');
+            const service = serviceSelect.value;
+            const basePrice = parseFloat(serviceSelect.options[serviceSelect.selectedIndex].dataset.price);
+            const payment = document.getElementById('payment').value;
+
+            if (service === "Product Delivery Only" && selectedProducts.length === 0) {
+                alert("⚠️ You must add at least one product to your cart to select 'Product Delivery Only'.");
+                return;
+            }
+
+            // Travel surcharge logic
+            let travelFee = 0;
+            if (distance > 14) travelFee = 50;
+
+            // Calculate products total and clone the array
+            let productsTotal = selectedProducts.reduce((sum, p) => sum + p.price, 0);
+            const bookingProducts = [...selectedProducts];
+            const total = basePrice + travelFee + productsTotal;
+
+            // Parse any dynamic recurring dates added
+            const extraInputs = document.querySelectorAll('#extraDays > div');
+            let extraDates = [];
+
+            extraInputs.forEach(div => {
+                const inputs = div.querySelectorAll('input');
+                const d = inputs[0].value;
+                const t = inputs[1].value;
+                if (d && t) extraDates.push(`${d} at ${t}`);
+            });
+
+            // Create New Booking Object
+            const newBooking = {
+                id: "booking_" + Date.now(),
+                name: name,
+                phone: phone,
+                location: location,
+                distance: distance,
+                car: car,
+                date: date,
+                time: time,
+                service: service,
+                basePrice: basePrice,
+                travelFee: travelFee,
+                productsTotal: productsTotal,
+                products: bookingProducts,
+                total: total,
+                payment: payment,
+                extraDays: extraDates,
+                status: "Pending", // default
+                workerAssigned: null,
+                workerNotes: ""
+            };
+
+            // Save in localStorage
+            let bookings = JSON.parse(localStorage.getItem('apex_bookings')) || [];
+            bookings.unshift(newBooking);
+            localStorage.setItem('apex_bookings', JSON.stringify(bookings));
+
+            // Load and render
+            loadBookings();
+
+            // Reset form completely & clean extra dates list
+            this.reset();
+            document.getElementById('extraDays').innerHTML = '';
+            selectedProducts = []; // clear cart after booking
+            updateLiveQuote();
+
+            // Flash beautiful notification of success
+            alert(`🎉 Congratulations! Your booking for the ${service} has been successfully registered and scheduled in the studio!`);
+        });
+
+        function updateBookingCount() {
+            const list = document.getElementById('bookingList');
+            document.getElementById('bookingCount').innerText = list.children.length;
+        }
+
+        let activeChatBookingId = null;
+
+        function openChat(bookingId) {
+            activeChatBookingId = bookingId;
+            document.getElementById('chatModal').classList.remove('hidden');
+            renderChat();
+        }
+
+        function closeChat() {
+            activeChatBookingId = null;
+            document.getElementById('chatModal').classList.add('hidden');
+        }
+
+        function renderChat() {
+            if (!activeChatBookingId) return;
+            
+            const bookings = JSON.parse(localStorage.getItem('apex_bookings')) || [];
+            const booking = bookings.find(b => b.id === activeChatBookingId);
+            
+            if (!booking) return;
+
+            document.getElementById('chatWorkerName').innerText = booking.workerAssigned || 'Worker';
+            
+            const messagesContainer = document.getElementById('chatMessages');
+            const isScrolledToBottom = messagesContainer.scrollHeight - messagesContainer.clientHeight <= messagesContainer.scrollTop + 10;
+            
+            let html = '';
+            const chat = booking.chat || [];
+            
+            if (chat.length === 0) {
+                html = `<div class="text-center text-xs text-gray-500 py-4">No messages yet. Send a message to the worker!</div>`;
+            } else {
+                chat.forEach(msg => {
+                    const isClient = msg.sender === 'Client';
+                    html += `
+                        <div class="flex ${isClient ? 'justify-end' : 'justify-start'}">
+                            <div class="max-w-[80%] rounded-2xl px-4 py-2 ${isClient ? 'bg-brand-accentBlue text-black rounded-tr-sm' : 'bg-white/10 text-white border border-white/10 rounded-tl-sm'}">
+                                <p class="text-sm font-medium">${msg.message}</p>
+                                <span class="text-[9px] opacity-60 block text-right mt-1">${msg.timestamp}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            
+            messagesContainer.innerHTML = html;
+            lucide.createIcons();
+            
+            if (isScrolledToBottom || chat.length === 0) {
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+        }
+
+        function sendChatMessage() {
+            if (!activeChatBookingId) return;
+            
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            if (!text) return;
+            
+            let bookings = JSON.parse(localStorage.getItem('apex_bookings')) || [];
+            const index = bookings.findIndex(b => b.id === activeChatBookingId);
+            
+            if (index !== -1) {
+                if (!bookings[index].chat) bookings[index].chat = [];
+                
+                const now = new Date();
+                const timeStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+                
+                bookings[index].chat.push({
+                    sender: 'Client',
+                    message: text,
+                    timestamp: timeStr
+                });
+                
+                localStorage.setItem('apex_bookings', JSON.stringify(bookings));
+                input.value = '';
+                renderChat();
+                
+                const messagesContainer = document.getElementById('chatMessages');
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
+        }
+    </script>
+
+    <!-- Chat Modal -->
+    <div id="chatModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm px-4">
+        <div class="glass-card rounded-3xl w-full max-w-lg overflow-hidden flex flex-col h-[500px]">
+            <!-- Header -->
+            <div class="p-4 border-b border-white/10 flex justify-between items-center bg-brand-charcoal/50">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-brand-accentBlue/20 flex items-center justify-center text-brand-accentBlue">
+                        <i data-lucide="message-square" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-white">Worker Chat</h3>
+                        <p id="chatWorkerName" class="text-xs text-gray-400">Loading...</p>
+                    </div>
+                </div>
+                <button onclick="closeChat()" class="p-2 bg-white/5 hover:bg-rose-500/20 text-gray-400 hover:text-rose-400 rounded-full transition-colors">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            
+            <!-- Messages Area -->
+            <div id="chatMessages" class="flex-1 overflow-y-auto p-4 space-y-3 bg-black/40">
+                <!-- Messages populated by JS -->
+            </div>
+
+            <!-- Input Area -->
+            <div class="p-4 border-t border-white/10 bg-brand-charcoal/50 flex gap-2">
+                <input type="text" id="chatInput" placeholder="Type a message..." class="flex-1 px-4 py-2 bg-black/60 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-accentBlue/50" onkeypress="if(event.key === 'Enter') sendChatMessage()">
+                <button onclick="sendChatMessage()" class="px-4 py-2 bg-brand-accentBlue hover:bg-brand-accentBlue/80 text-black font-bold rounded-xl transition-all shadow-[0_0_10px_rgba(0,216,255,0.2)]">
+                    <i data-lucide="send" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
