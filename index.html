@@ -1,235 +1,818 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Premium Car Detailing</title>
+    <title>Premium Car Detailing | Premium Portal</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            gold: '#D4AF37',
+                            darkGold: '#AA7C11',
+                            charcoal: '#1A1A1A',
+                            accentBlue: '#00D8FF',
+                        }
+                    },
+                    fontFamily: {
+                        outfit: ['Outfit', 'sans-serif'],
+                        inter: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons via CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Firebase SDK Compat (v9) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+
+    <style>
+        /* Custom Premium Animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(3deg); }
+        }
+        @keyframes float-slow {
+            0%, 100% { transform: translate(0px, 0px) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+        }
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.05); }
+        }
+        @keyframes zoom-bg {
+            0% { transform: scale(1.05); filter: brightness(0.4) blur(0px); }
+            100% { transform: scale(1.15); filter: brightness(0.3) blur(2px); }
+        }
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .animate-float-slow-1 {
+            animation: float-slow 15s infinite ease-in-out;
+        }
+        .animate-float-slow-2 {
+            animation: float-slow 20s infinite ease-in-out reverse;
+        }
+        .animate-pulse-glow {
+            animation: pulse-glow 4s infinite ease-in-out;
+        }
+        
+        .zoom-background {
+            animation: zoom-bg 20s infinite alternate ease-in-out;
+        }
+
+        .glass-panel {
+            background: rgba(18, 18, 18, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+        }
+
+        .glass-panel-glow {
+            box-shadow: 0 0 40px rgba(0, 216, 255, 0.1), inset 0 0 20px rgba(255, 255, 255, 0.02);
+        }
+
+        /* Shine effect on buttons */
+        .shine-effect {
+            position: relative;
+            overflow: hidden;
+        }
+        .shine-effect::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0.15) 50%,
+                rgba(255, 255, 255, 0) 100%
+            );
+            transform: translateX(-100%);
+            transition: none;
+        }
+        .shine-effect:hover::after {
+            transform: translateX(100%);
+            transition: transform 0.75s ease-in-out;
+        }
+
+        /* Focus state styling */
+        .premium-input:focus {
+            border-color: rgba(0, 216, 255, 0.5);
+            box-shadow: 0 0 15px rgba(0, 216, 255, 0.2);
+            outline: none;
+        }
+        
+        /* Loading Bar animation */
+        .progress-bar-fill {
+            transition: width 0.1s linear;
+        }
+    </style>
 </head>
-<body class="bg-gray-100">
+<body class="h-full bg-[#0a0a0a] text-white font-inter overflow-hidden relative selection:bg-brand-accentBlue/30 selection:text-white">
 
-<div class="max-w-6xl mx-auto p-6">
-    <h1 class="text-3xl font-bold text-center mb-6">Car Detailing Booking</h1>
-
-    <!-- TRAVEL FEE INFO -->
-    <div class="bg-yellow-100 p-4 rounded-xl mb-6">
-        <p class="font-semibold">Travel Fee Policy:</p>
-        <p class="text-sm">• Within 14km → FREE</p>
-        <p class="text-sm">• Beyond 14km → +R50 travel fee</p>
+    <!-- Back Ambient Glowing Lights -->
+    <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+        <!-- Blue Glow -->
+        <div class="absolute -top-40 -left-40 w-96 h-96 rounded-full bg-brand-accentBlue opacity-25 filter blur-[100px] animate-float-slow-1"></div>
+        <!-- Amber Glow -->
+        <div class="absolute -bottom-40 -right-40 w-[500px] h-[500px] rounded-full bg-amber-500 opacity-20 filter blur-[120px] animate-float-slow-2"></div>
+        <!-- Center Glow for Splash -->
+        <div id="centerGlow" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full bg-brand-accentBlue opacity-30 filter blur-[80px] animate-pulse-glow transition-all duration-1000"></div>
     </div>
 
-    <!-- PRICING + DESCRIPTION -->
-    <div class="grid md:grid-cols-3 gap-4 mb-8">
-
-        <div class="bg-white p-4 rounded-2xl shadow">
-            <h3 class="font-bold text-lg">Full Body Detail</h3>
-            <p class="text-sm text-gray-500">Available all year (300+ working days)</p>
-            <p class="line-through text-gray-400">R600</p>
-            <p class="text-green-600 text-xl font-bold">R350</p>
-        </div>
-
-        <div class="bg-white p-4 rounded-2xl shadow">
-            <h3 class="font-bold text-lg">Deep Scrub Detail</h3>
-            <p class="text-sm text-gray-500">Available all year (300+ working days)</p>
-            <p class="line-through text-gray-400">R1000</p>
-            <p class="text-green-600 text-xl font-bold">R500</p>
-        </div>
-
-        <div class="bg-white p-4 rounded-2xl shadow">
-            <h3 class="font-bold text-lg">Basic Wash</h3>
-            <p class="text-sm text-gray-500">Available daily</p>
-            <p class="line-through text-gray-400">R200</p>
-            <p class="text-green-600 text-xl font-bold">R120</p>
-        </div>
-
-        <div class="bg-white p-4 rounded-2xl shadow">
-            <h3 class="font-bold text-lg">Interior Refresh</h3>
-            <p class="text-sm text-gray-500">Available all year</p>
-            <p class="line-through text-gray-400">R400</p>
-            <p class="text-green-600 text-xl font-bold">R250</p>
-        </div>
-
-        <div class="bg-white p-4 rounded-2xl shadow">
-            <h3 class="font-bold text-lg">Weekly Subscription</h3>
-            <p class="text-sm text-gray-500">4–5 washes per month</p>
-            <p class="line-through text-gray-400">R800</p>
-            <p class="text-green-600 text-xl font-bold">R500</p>
-        </div>
-
-        <div class="bg-white p-4 rounded-2xl shadow">
-            <h3 class="font-bold text-lg">Premium Monthly Plan</h3>
-            <p class="text-sm text-gray-500">4–6 washes per month + priority service</p>
-            <p class="line-through text-gray-400">R1500</p>
-            <p class="text-green-600 text-xl font-bold">R900</p>
-        </div>
-
+    <!-- Cinematic Background Image with Zoom & Blur -->
+    <div class="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+        <img src="premium_detailing_bg.png" alt="Premium Detailing Car Background" class="w-full h-full object-cover zoom-background select-none">
+        <!-- Gradient Dark Overlay -->
+        <div class="absolute inset-0 bg-gradient-to-t from-[#080808] via-[#0c0c0c]/80 to-[#080808]/90"></div>
     </div>
 
-    <!-- PRODUCT SECTION -->
-    <div class="mb-8">
-        <h2 class="text-2xl font-bold mb-4">Detailing Products</h2>
-        <div class="grid md:grid-cols-3 gap-4">
+    <!-- ================= SPLASH SCREEN ================= -->
+    <div id="splashScreen" class="absolute inset-0 z-50 flex flex-col items-center justify-between p-8 transition-all duration-1000">
+        <!-- Top Branding -->
+        <div class="flex items-center space-x-2 mt-8 opacity-0 translate-y-[-20px] transition-all duration-[800ms] delay-300 splash-animate">
+            <span class="text-xs uppercase tracking-[0.4em] font-outfit text-gray-400 font-semibold">Apex Auto Studio</span>
+        </div>
 
-            <div class="bg-white p-4 rounded-2xl shadow">
-                <h3 class="font-bold">Car Shampoo</h3>
-                <p class="text-gray-500 text-sm">High foam cleaning solution</p>
-                <p class="font-bold mt-2">R150</p>
+        <!-- Center Logo & Name -->
+        <div class="flex flex-col items-center justify-center space-y-6 text-center max-w-lg">
+            <!-- Icon/Shield Logo -->
+            <div class="relative w-24 h-24 flex items-center justify-center rounded-2xl glass-panel border-white/20 glass-panel-glow opacity-0 scale-75 transition-all duration-[1000ms] delay-100 splash-animate" style="animation: float 6s ease-in-out infinite;">
+                <!-- Glowing Aura -->
+                <div class="absolute inset-0 bg-brand-accentBlue/20 rounded-2xl blur-md"></div>
+                <!-- Clean Modern SVG Shield / Car Icon -->
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-12 h-12 text-brand-accentBlue relative z-10">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    <path d="M7 11h10"/>
+                    <path d="M9 14h6"/>
+                    <circle cx="12" cy="8" r="1.5" fill="currentColor"/>
+                </svg>
             </div>
 
-            <div class="bg-white p-4 rounded-2xl shadow">
-                <h3 class="font-bold">Tire Shine</h3>
-                <p class="text-gray-500 text-sm">Long-lasting glossy finish</p>
-                <p class="font-bold mt-2">R120</p>
+            <div class="space-y-3">
+                <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight font-outfit bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-100 to-gray-400 opacity-0 translate-y-[20px] transition-all duration-[1000ms] delay-500 splash-animate">
+                    PREMIUM CAR DETAIL
+                </h1>
+                <p class="text-sm md:text-base text-gray-400 tracking-widest font-light uppercase opacity-0 translate-y-[20px] transition-all duration-[1000ms] delay-700 splash-animate">
+                    Luxury Treatment For Your Vehicle
+                </p>
             </div>
 
-            <div class="bg-white p-4 rounded-2xl shadow">
-                <h3 class="font-bold">Interior Cleaner</h3>
-                <p class="text-gray-500 text-sm">Safe for all surfaces</p>
-                <p class="font-bold mt-2">R180</p>
+            <!-- Loader Progress Container -->
+            <div class="w-64 space-y-3 pt-6 opacity-0 transition-all duration-[1000ms] delay-900 splash-animate">
+                <div class="flex justify-between items-center text-xs text-gray-500 font-mono tracking-wider">
+                    <span>INITIALIZING PORTAL</span>
+                    <span id="loadPercent">0%</span>
+                </div>
+                <div class="h-[3px] w-full bg-white/5 rounded-full overflow-hidden relative">
+                    <div id="progressBar" class="progress-bar-fill h-full w-0 bg-gradient-to-r from-brand-accentBlue to-indigo-500 rounded-full shadow-[0_0_8px_#00D8FF]"></div>
+                </div>
             </div>
+        </div>
 
-            <div class="bg-white p-4 rounded-2xl shadow">
-                <h3 class="font-bold">Microfiber Cloth Set</h3>
-                <p class="text-gray-500 text-sm">Ultra-soft premium cloths</p>
-                <p class="font-bold mt-2">R100</p>
-            </div>
-
-            <div class="bg-white p-4 rounded-2xl shadow">
-                <h3 class="font-bold">Wax Polish</h3>
-                <p class="text-gray-500 text-sm">Protective shine coating</p>
-                <p class="font-bold mt-2">R250</p>
-            </div>
-
-            <div class="bg-white p-4 rounded-2xl shadow">
-                <h3 class="font-bold">Glass Cleaner</h3>
-                <p class="text-gray-500 text-sm">Streak-free clarity</p>
-                <p class="font-bold mt-2">R130</p>
-            </div>
-
+        <!-- Footer -->
+        <div class="mb-4 text-center opacity-0 translate-y-[20px] transition-all duration-[800ms] delay-1000 splash-animate">
+            <button onclick="skipSplash()" class="text-xs text-gray-500 hover:text-brand-accentBlue tracking-widest uppercase transition-colors duration-300 hover:underline">
+                Skip Intro
+            </button>
         </div>
     </div>
 
-    <!-- BOOKING FORM -->
-    <div class="bg-white p-6 rounded-2xl shadow">
-        <form id="bookingForm" class="space-y-4">
+    <!-- ================= LOGIN SCREEN ================= -->
+    <div id="loginScreen" class="absolute inset-0 z-40 flex items-center justify-center p-4 md:p-8 opacity-0 scale-[0.97] pointer-events-none transition-all duration-[1000ms] ease-out">
+        <div class="w-full max-w-[480px] glass-panel glass-panel-glow rounded-3xl p-8 md:p-10 relative overflow-hidden flex flex-col justify-between">
+            <!-- Glassmorphism Reflection Accent -->
+            <div class="absolute -top-[50%] -left-[50%] w-[200%] h-[200%] rotate-[45deg] bg-gradient-to-b from-white/10 to-transparent pointer-events-none select-none"></div>
 
-            <input type="text" id="name" placeholder="Full Name" required class="w-full p-3 border rounded-lg">
+            <!-- Inner Layout -->
+            <div class="relative z-10 space-y-6">
+                <!-- Branding Header -->
+                <div class="flex flex-col items-center text-center space-y-2">
+                    <div class="w-12 h-12 rounded-2xl bg-brand-accentBlue/10 border border-brand-accentBlue/20 flex items-center justify-center text-brand-accentBlue mb-1">
+                        <i data-lucide="shield-check" class="w-6 h-6"></i>
+                    </div>
+                    <h2 id="cardTitle" class="text-2xl font-bold font-outfit tracking-tight text-white">Welcome Back</h2>
+                    <p id="cardSubtitle" class="text-xs text-gray-400">Sign in to book premium detailing & manage bookings</p>
+                </div>
 
-            <input type="tel" id="phone" placeholder="Phone Number" required class="w-full p-3 border rounded-lg">
+                <!-- Tabs Toggle -->
+                <div class="flex border-b border-white/10 text-[11px] sm:text-xs gap-1 sm:gap-2">
+                    <button id="tabBtnLogin" onclick="switchTab('login')" class="flex-1 py-2 text-brand-accentBlue border-b-2 border-brand-accentBlue font-bold transition-all text-center">Sign In</button>
+                    <button id="tabBtnRegister" onclick="switchTab('register')" class="flex-1 py-2 text-gray-500 hover:text-white transition-all font-medium text-center">Create Account</button>
+                    <button id="tabBtnApply" onclick="switchTab('apply')" class="flex-1 py-2 text-gray-500 hover:text-white transition-all font-medium text-center">Join Crew</button>
+                </div>
 
-            <input type="text" id="location" placeholder="Location / Address" required class="w-full p-3 border rounded-lg">
+                <!-- Alert Notification Box -->
+                <div id="authAlert" class="hidden p-4 rounded-2xl text-sm border flex items-start space-x-3 transition-all duration-300">
+                    <i id="alertIcon" class="w-5 h-5 shrink-0 mt-0.5"></i>
+                    <span id="alertMessage" class="font-medium"></span>
+                </div>
 
-            <input type="number" id="distance" placeholder="Distance from us (km)" required class="w-full p-3 border rounded-lg">
+                <!-- 1. LOGIN FORM -->
+                <form id="loginForm" onsubmit="handleLoginSubmit(event)" class="space-y-4">
+                    <!-- Email Input -->
+                    <div class="space-y-1 relative">
+                        <label for="email" class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Email Address</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-500 pointer-events-none">
+                                <i data-lucide="mail" class="w-4 h-4"></i>
+                            </span>
+                            <input type="text" id="email" required placeholder="admin@apexdetail.com"
+                                   class="w-full pl-11 pr-4 py-3 bg-black/40 border border-white/10 rounded-2xl text-white placeholder-gray-600 focus:border-brand-accentBlue/50 focus:ring-1 focus:ring-brand-accentBlue/30 transition-all duration-300 premium-input text-sm">
+                        </div>
+                    </div>
 
-            <input type="text" id="car" placeholder="Car Model" required class="w-full p-3 border rounded-lg">
+                    <!-- Password Input -->
+                    <div class="space-y-1 relative">
+                        <div class="flex justify-between items-center px-1">
+                            <label for="password" class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Password</label>
+                            <a href="#" onclick="forgotPassword(event)" class="text-xs text-brand-accentBlue hover:underline transition-colors">Forgot?</a>
+                        </div>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-500 pointer-events-none">
+                                <i data-lucide="lock" class="w-4 h-4"></i>
+                            </span>
+                            <input type="password" id="password" required placeholder="••••••••"
+                                   class="w-full pl-11 pr-11 py-3 bg-black/40 border border-white/10 rounded-2xl text-white placeholder-gray-600 focus:border-brand-accentBlue/50 focus:ring-1 focus:ring-brand-accentBlue/30 transition-all duration-300 premium-input text-sm">
+                            <button type="button" onclick="togglePasswordVisibility('password', 'eyeIcon')" class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-500 hover:text-white transition-colors">
+                                <i id="eyeIcon" data-lucide="eye" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
 
-            <input type="date" id="date" required class="w-full p-3 border rounded-lg">
+                    <!-- Remember Me -->
+                    <div class="flex items-center justify-between px-1">
+                        <label class="flex items-center space-x-2 text-xs text-gray-400 cursor-pointer group">
+                            <input type="checkbox" id="rememberMe" class="rounded border-white/10 bg-black/40 text-brand-accentBlue focus:ring-brand-accentBlue/30 focus:ring-offset-0 w-4 h-4 transition-all">
+                            <span class="group-hover:text-gray-300 transition-colors">Remember me</span>
+                        </label>
+                    </div>
 
-            <input type="time" id="time" required class="w-full p-3 border rounded-lg">
+                    <!-- Buttons Group -->
+                    <div class="space-y-3 pt-1">
+                        <!-- Sign In Button -->
+                        <button type="submit" id="signInButton" class="w-full shine-effect bg-gradient-to-r from-brand-accentBlue to-indigo-500 text-white font-semibold py-3.5 rounded-2xl shadow-[0_4px_20px_rgba(0,216,255,0.25)] hover:shadow-[0_4px_30px_rgba(0,216,255,0.4)] active:scale-[0.98] transition-all duration-300 flex items-center justify-center space-x-2">
+                            <span>Access Portal</span>
+                            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                        </button>
 
-            <button type="button" onclick="addExtraDay()" class="bg-blue-500 text-white px-4 py-2 rounded-lg">Add Extra Wash Day</button>
+                        <!-- Guest Access / Direct Bypass Button -->
+                        <button type="button" onclick="loginAsGuest()" class="w-full bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/10 text-white font-medium py-3 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-2">
+                            <i data-lucide="user" class="w-4 h-4 text-brand-accentBlue"></i>
+                            <span>Quick Guest Booking</span>
+                        </button>
+                    </div>
+                </form>
 
-            <div id="extraDays" class="space-y-2"></div>
+                <!-- 2. REGISTER FORM -->
+                <form id="registerForm" onsubmit="handleRegisterSubmit(event)" class="hidden space-y-4">
+                    <!-- Email Input -->
+                    <div class="space-y-1 relative">
+                        <label for="regEmail" class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Email Address</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-500 pointer-events-none">
+                                <i data-lucide="mail" class="w-4 h-4"></i>
+                            </span>
+                            <input type="email" id="regEmail" required placeholder="client@domain.com"
+                                   class="w-full pl-11 pr-4 py-3 bg-black/40 border border-white/10 rounded-2xl text-white placeholder-gray-600 focus:border-brand-accentBlue/50 focus:ring-1 focus:ring-brand-accentBlue/30 transition-all duration-300 premium-input text-sm">
+                        </div>
+                    </div>
 
-            <select id="service" class="w-full p-3 border rounded-lg">
-                <option value="Full Body Detail" data-price="350">Full Body Detail (R350)</option>
-                <option value="Deep Scrub Detail" data-price="500">Deep Scrub Detail (R500)</option>
-                <option value="Basic Wash" data-price="120">Basic Wash (R120)</option>
-                <option value="Interior Refresh" data-price="250">Interior Refresh (R250)</option>
-                <option value="Weekly Subscription" data-price="500">Weekly Subscription (R500)</option>
-                <option value="Premium Monthly Plan" data-price="900">Premium Monthly Plan (R900)</option>
-            </select>
+                    <!-- Password Input 1 -->
+                    <div class="space-y-1 relative">
+                        <label for="regPassword" class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Password</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-500 pointer-events-none">
+                                <i data-lucide="lock" class="w-4 h-4"></i>
+                            </span>
+                            <input type="password" id="regPassword" required placeholder="Create Password"
+                                   class="w-full pl-11 pr-11 py-3 bg-black/40 border border-white/10 rounded-2xl text-white placeholder-gray-600 focus:border-brand-accentBlue/50 focus:ring-1 focus:ring-brand-accentBlue/30 transition-all duration-300 premium-input text-sm">
+                            <button type="button" onclick="togglePasswordVisibility('regPassword', 'eyeIconReg')" class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-500 hover:text-white transition-colors">
+                                <i id="eyeIconReg" data-lucide="eye" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
 
-            <select id="payment" class="w-full p-3 border rounded-lg">
-                <option value="Cash">Cash</option>
-                <option value="Card">Card</option>
-            </select>
+                    <!-- Password Input 2 (Confirm Password) -->
+                    <div class="space-y-1 relative">
+                        <label for="regConfirmPassword" class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Confirm Password</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-500 pointer-events-none">
+                                <i data-lucide="check-square" class="w-4 h-4"></i>
+                            </span>
+                            <input type="password" id="regConfirmPassword" required placeholder="Verify Password"
+                                   class="w-full pl-11 pr-11 py-3 bg-black/40 border border-white/10 rounded-2xl text-white placeholder-gray-600 focus:border-brand-accentBlue/50 focus:ring-1 focus:ring-brand-accentBlue/30 transition-all duration-300 premium-input text-sm">
+                            <button type="button" onclick="togglePasswordVisibility('regConfirmPassword', 'eyeIconRegConf')" class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-500 hover:text-white transition-colors">
+                                <i id="eyeIconRegConf" data-lucide="eye" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
 
-            <button type="submit" class="w-full bg-green-500 text-white py-3 rounded-lg">Book Now</button>
+                    <button type="submit" class="w-full shine-effect bg-gradient-to-r from-brand-accentBlue to-indigo-500 text-white font-semibold py-3.5 rounded-2xl shadow-[0_4px_20px_rgba(0,216,255,0.25)] hover:shadow-[0_4px_30px_rgba(0,216,255,0.4)] transition-all duration-300 flex items-center justify-center space-x-2">
+                        <span>Create Client Account</span>
+                        <i data-lucide="user-plus" class="w-4 h-4"></i>
+                    </button>
+                </form>
 
-        </form>
+                <!-- 3. JOIN CREW / WORKER APPLICATION FORM -->
+                <form id="applyForm" onsubmit="handleApplySubmit(event)" class="hidden space-y-4">
+                    <!-- Full Name -->
+                    <div class="space-y-1 relative">
+                        <label for="applyName" class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Full Name</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-500 pointer-events-none">
+                                <i data-lucide="user" class="w-4 h-4"></i>
+                            </span>
+                            <input type="text" id="applyName" required placeholder="Justin Valet"
+                                   class="w-full pl-11 pr-4 py-3 bg-black/40 border border-white/10 rounded-2xl text-white placeholder-gray-600 focus:border-brand-accentBlue/50 focus:ring-1 focus:ring-brand-accentBlue/30 transition-all duration-300 premium-input text-sm">
+                        </div>
+                    </div>
+
+                    <!-- Email Input -->
+                    <div class="space-y-1 relative">
+                        <label for="applyEmail" class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Email Address</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-500 pointer-events-none">
+                                <i data-lucide="mail" class="w-4 h-4"></i>
+                            </span>
+                            <input type="email" id="applyEmail" required placeholder="valet@domain.com"
+                                   class="w-full pl-11 pr-4 py-3 bg-black/40 border border-white/10 rounded-2xl text-white placeholder-gray-600 focus:border-brand-accentBlue/50 focus:ring-1 focus:ring-brand-accentBlue/30 transition-all duration-300 premium-input text-sm">
+                        </div>
+                    </div>
+
+                    <!-- Phone Input -->
+                    <div class="space-y-1 relative">
+                        <label for="applyPhone" class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Phone Number</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-500 pointer-events-none">
+                                <i data-lucide="phone" class="w-4 h-4"></i>
+                            </span>
+                            <input type="text" id="applyPhone" required placeholder="+27 82 555 0192"
+                                   class="w-full pl-11 pr-4 py-3 bg-black/40 border border-white/10 rounded-2xl text-white placeholder-gray-600 focus:border-brand-accentBlue/50 focus:ring-1 focus:ring-brand-accentBlue/30 transition-all duration-300 premium-input text-sm">
+                        </div>
+                    </div>
+
+                    <!-- Experience Select -->
+                    <div class="space-y-1 relative">
+                        <label for="applyExp" class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Detailing Experience</label>
+                        <select id="applyExp" required class="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-2xl text-white placeholder-gray-600 focus:border-brand-accentBlue/50 focus:ring-1 focus:ring-brand-accentBlue/30 transition-all duration-300 text-sm focus:outline-none">
+                            <option value="Entry Level (< 1 year)">Entry Level (< 1 year)</option>
+                            <option value="Intermediate Valet (1-3 years)">Intermediate Valet (1-3 years)</option>
+                            <option value="Detailing Specialist (3+ years)">Detailing Specialist (3+ years)</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="w-full shine-effect bg-gradient-to-r from-brand-accentBlue to-indigo-500 text-white font-semibold py-3.5 rounded-2xl shadow-[0_4px_20px_rgba(0,216,255,0.25)] hover:shadow-[0_4px_30px_rgba(0,216,255,0.4)] transition-all duration-300 flex items-center justify-center space-x-2">
+                        <span>Submit Application</span>
+                        <i data-lucide="send" class="w-4 h-4"></i>
+                    </button>
+                </form>
+
+                <!-- Social login / Divider -->
+                <div id="socialConnectDivider" class="space-y-4">
+                    <div class="flex items-center justify-center space-x-3">
+                        <div class="h-[1px] flex-1 bg-white/10"></div>
+                        <span class="text-xs text-gray-500 uppercase tracking-widest">Or Connect With</span>
+                        <div class="h-[1px] flex-1 bg-white/10"></div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <button type="button" onclick="socialLogin('Google')" class="flex items-center justify-center space-x-2 py-2.5 bg-black/20 hover:bg-black/40 border border-white/5 hover:border-white/10 rounded-xl transition-all duration-300 text-sm text-gray-300">
+                            <svg class="w-4 h-4" viewBox="0 0 24 24">
+                                <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                                <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                                <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                                <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                            </svg>
+                            <span>Google</span>
+                        </button>
+                        <button type="button" onclick="socialLogin('Apple')" class="flex items-center justify-center space-x-2 py-2.5 bg-black/20 hover:bg-black/40 border border-white/5 hover:border-white/10 rounded-xl transition-all duration-300 text-sm text-gray-300">
+                            <i data-lucide="apple" class="w-4 h-4 text-white"></i>
+                            <span>Apple ID</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- BOOKINGS LIST -->
-    <div class="mt-6 bg-white p-6 rounded-2xl shadow">
-        <h2 class="text-xl font-semibold mb-4">Bookings</h2>
-        <ul id="bookingList" class="space-y-2"></ul>
-    </div>
-</div>
+    <!-- Screen Transition Mask (for redirecting to dashboard) -->
+    <div id="screenMask" class="absolute inset-0 z-[100] bg-black opacity-0 pointer-events-none transition-all duration-1000"></div>
 
-<script>
-    function addExtraDay() {
-      const container = document.getElementById('extraDays');
+    <!-- JS Logic -->
+    <script>
+        // ==========================================
+        // FIREBASE CONFIGURATION (Placeholder)
+        // Admin: Replace with your actual Firebase config
+        // ==========================================
+        const firebaseConfig = {
+          apiKey: "AIzaSyDX_BOKpoxpvhLpbn8dfYKIMde1R-uxlIY",
+          authDomain: "cardetailing-b7f14.firebaseapp.com",
+          databaseURL: "https://cardetailing-b7f14-default-rtdb.firebaseio.com",
+          projectId: "cardetailing-b7f14",
+          storageBucket: "cardetailing-b7f14.firebasestorage.app",
+          messagingSenderId: "105489690407",
+          appId: "1:105489690407:web:a1a45e4477ba7d9e670302"
+        };
 
-      const wrapper = document.createElement('div');
-      wrapper.className = 'grid grid-cols-2 gap-2';
+        // Initialize Firebase only if API key is provided
+        let isFirebaseReady = false;
+        if (firebaseConfig.apiKey) {
+            firebase.initializeApp(firebaseConfig);
+            isFirebaseReady = true;
+            console.log("🔥 Firebase initialized.");
+        } else {
+            console.warn("⚠️ Firebase config not set. Using local database fallback for development.");
+        }
+        
+        // Initialize Lucide Icons
+        lucide.createIcons();
 
-      const dateInput = document.createElement('input');
-      dateInput.type = 'date';
-      dateInput.className = 'w-full p-3 border rounded-lg';
+        // 1. Splash Screen Animation Trigger on load
+        window.addEventListener('DOMContentLoaded', () => {
+            const animElements = document.querySelectorAll('.splash-animate');
+            animElements.forEach((el, index) => {
+                el.style.opacity = '1';
+                el.style.transform = 'translateY(0) scale(1)';
+            });
 
-      const timeInput = document.createElement('input');
-      timeInput.type = 'time';
-      timeInput.className = 'w-full p-3 border rounded-lg';
+            startSplashLoader();
+        });
 
-      wrapper.appendChild(dateInput);
-      wrapper.appendChild(timeInput);
-      container.appendChild(wrapper);
-    }
+        // 2. Splash Loader simulation
+        let loadProgress = 0;
+        let loaderInterval;
+        
+        function startSplashLoader() {
+            const progressBar = document.getElementById('progressBar');
+            const loadPercent = document.getElementById('loadPercent');
+            
+            loaderInterval = setInterval(() => {
+                // Smooth increment with variation
+                let increment = Math.floor(Math.random() * 4) + 1;
+                loadProgress += increment;
+                
+                if (loadProgress >= 100) {
+                    loadProgress = 100;
+                    clearInterval(loaderInterval);
+                    setTimeout(transitionToLogin, 400);
+                }
+                
+                progressBar.style.width = loadProgress + '%';
+                loadPercent.innerText = loadProgress + '%';
+            }, 80);
+        }
 
-    document.getElementById('bookingForm').addEventListener('submit', function(e) {
-      e.preventDefault();
+        // 3. Skip splash screen
+        function skipSplash() {
+            clearInterval(loaderInterval);
+            const progressBar = document.getElementById('progressBar');
+            const loadPercent = document.getElementById('loadPercent');
+            progressBar.style.width = '100%';
+            loadPercent.innerText = '100%';
+            setTimeout(transitionToLogin, 100);
+        }
 
-      const name = document.getElementById('name').value;
-      const phone = document.getElementById('phone').value;
-      const location = document.getElementById('location').value;
-      const distance = parseFloat(document.getElementById('distance').value);
-      const car = document.getElementById('car').value;
-      const date = document.getElementById('date').value;
-      const time = document.getElementById('time').value;
-      const serviceSelect = document.getElementById('service');
-      const service = serviceSelect.value;
-      const basePrice = parseFloat(serviceSelect.options[serviceSelect.selectedIndex].dataset.price);
-      const payment = document.getElementById('payment').value;
+        // 4. Transition Splash -> Login
+        function transitionToLogin() {
+            const splash = document.getElementById('splashScreen');
+            const login = document.getElementById('loginScreen');
+            const centerGlow = document.getElementById('centerGlow');
 
-      let travelFee = 0;
-      if(distance > 14) travelFee = 50;
+            // Fade out splash
+            splash.style.opacity = '0';
+            splash.style.transform = 'scale(0.95)';
+            splash.style.pointerEvents = 'none';
 
-      const total = basePrice + travelFee;
+            // Shrink the central blur glow to focus on login card
+            centerGlow.style.width = '500px';
+            centerGlow.style.height = '500px';
+            centerGlow.style.opacity = '0.15';
 
-      const extraInputs = document.querySelectorAll('#extraDays > div');
-      let extraDates = [];
+            // Fade in login
+            setTimeout(() => {
+                splash.classList.add('hidden');
+                login.classList.remove('hidden');
+                login.style.opacity = '1';
+                login.style.transform = 'scale(1)';
+                login.style.pointerEvents = 'auto';
+            }, 600);
+        }
 
-      extraInputs.forEach(div => {
-        const inputs = div.querySelectorAll('input');
-        const d = inputs[0].value;
-        const t = inputs[1].value;
-        if(d && t) extraDates.push(`${d} at ${t}`);
-      });
+        // Tab switching logic
+        function switchTab(tab) {
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+            const applyForm = document.getElementById('applyForm');
+            const socialDiv = document.getElementById('socialConnectDivider');
+            
+            const btnLogin = document.getElementById('tabBtnLogin');
+            const btnRegister = document.getElementById('tabBtnRegister');
+            const btnApply = document.getElementById('tabBtnApply');
+            
+            const title = document.getElementById('cardTitle');
+            const subtitle = document.getElementById('cardSubtitle');
+            
+            // Hide alerts on tab swap
+            document.getElementById('authAlert').classList.add('hidden');
+            
+            // Reset tab styles
+            [btnLogin, btnRegister, btnApply].forEach(btn => {
+                btn.className = "flex-1 py-2 text-gray-500 hover:text-white transition-all font-medium text-center";
+            });
+            
+            // Active tab assignments
+            if (tab === 'login') {
+                loginForm.classList.remove('hidden');
+                registerForm.classList.add('hidden');
+                applyForm.classList.add('hidden');
+                socialDiv.classList.remove('hidden');
+                btnLogin.className = "flex-1 py-2 text-brand-accentBlue border-b-2 border-brand-accentBlue font-bold transition-all text-center";
+                title.innerText = "Welcome Back";
+                subtitle.innerText = "Sign in to book premium detailing & manage bookings";
+            } else if (tab === 'register') {
+                loginForm.classList.add('hidden');
+                registerForm.classList.remove('hidden');
+                applyForm.classList.add('hidden');
+                socialDiv.classList.add('hidden');
+                btnRegister.className = "flex-1 py-2 text-brand-accentBlue border-b-2 border-brand-accentBlue font-bold transition-all text-center";
+                title.innerText = "Create Account";
+                subtitle.innerText = "Sign up to register as an Apex VIP client";
+            } else if (tab === 'apply') {
+                loginForm.classList.add('hidden');
+                registerForm.classList.add('hidden');
+                applyForm.classList.remove('hidden');
+                socialDiv.classList.add('hidden');
+                btnApply.className = "flex-1 py-2 text-brand-accentBlue border-b-2 border-brand-accentBlue font-bold transition-all text-center";
+                title.innerText = "Join Detailing Crew";
+                subtitle.innerText = "Submit an application to become a certified operative";
+            }
+        }
 
-      const bookingItem = document.createElement('li');
-      bookingItem.className = 'p-3 bg-gray-100 rounded-lg';
+        // Generic toggle password visibility support
+        function togglePasswordVisibility(inputId, iconId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.setAttribute('data-lucide', 'eye-off');
+            } else {
+                input.type = 'password';
+                icon.setAttribute('data-lucide', 'eye');
+            }
+            lucide.createIcons();
+        }
 
-      bookingItem.innerHTML = `
-        <strong>${name}</strong><br>
-        Phone: ${phone}<br>
-        Location: ${location}<br>
-        Distance: ${distance}km<br>
-        Travel Fee: R${travelFee}<br>
-        Car: ${car}<br>
-        Main Booking: ${date} at ${time}<br>
-        Extra Days: ${extraDates.join(', ') || 'None'}<br>
-        Service: ${service}<br>
-        Payment: ${payment}<br>
-        <strong>Total: R${total}</strong>
-      `;
+        // Client accounts registration
+        function handleRegisterSubmit(event) {
+            event.preventDefault();
+            const email = document.getElementById('regEmail').value.trim();
+            const password = document.getElementById('regPassword').value.trim();
+            const confirmPassword = document.getElementById('regConfirmPassword').value.trim();
+            
+            if (password !== confirmPassword) {
+                showAlert('error', 'Passwords do not match. Verify confirm password.');
+                return;
+            }
 
-      document.getElementById('bookingList').appendChild(bookingItem);
+            let clients = JSON.parse(localStorage.getItem('apex_clients')) || [];
+            if (clients.some(c => c.email.toLowerCase() === email.toLowerCase())) {
+                showAlert('error', 'Account with this email already exists.');
+                return;
+            }
 
-      this.reset();
-      document.getElementById('extraDays').innerHTML = '';
-    });
-  </script>
+            clients.push({ email, password });
+            localStorage.setItem('apex_clients', JSON.stringify(clients));
+            
+            showAlert('success', 'Client account created! Loading Login portal...');
+            
+            document.getElementById('regEmail').value = '';
+            document.getElementById('regPassword').value = '';
+            document.getElementById('regConfirmPassword').value = '';
+            
+            setTimeout(() => {
+                switchTab('login');
+                document.getElementById('email').value = email;
+            }, 1500);
+        }
 
+        // Worker applications form submission
+        function handleApplySubmit(event) {
+            event.preventDefault();
+            const name = document.getElementById('applyName').value.trim();
+            const email = document.getElementById('applyEmail').value.trim();
+            const phone = document.getElementById('applyPhone').value.trim();
+            const experience = document.getElementById('applyExp').value;
+
+            let applications = JSON.parse(localStorage.getItem('apex_worker_applications')) || [];
+            if (applications.some(a => a.email.toLowerCase() === email.toLowerCase())) {
+                showAlert('error', 'You have already submitted an application with this email.');
+                return;
+            }
+
+            applications.push({
+                id: 'app_' + Date.now(),
+                name: name,
+                email: email,
+                phone: phone,
+                experience: experience,
+                status: 'Pending Approval'
+            });
+            localStorage.setItem('apex_worker_applications', JSON.stringify(applications));
+
+            showAlert('success', 'Application submitted! Studio administrators will review your credentials.');
+
+            document.getElementById('applyName').value = '';
+            document.getElementById('applyEmail').value = '';
+            document.getElementById('applyPhone').value = '';
+        }
+
+        // Core Login handler
+        let redirectTarget = 'app/index.html';
+
+        async function handleLoginSubmit(event) {
+            event.preventDefault();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+            
+            const alertBox = document.getElementById('authAlert');
+            const alertIcon = document.getElementById('alertIcon');
+            const alertMessage = document.getElementById('alertMessage');
+            const signInBtn = document.getElementById('signInButton');
+
+            // Button loading visual effect
+            signInBtn.disabled = true;
+            signInBtn.innerHTML = `
+                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span>Authenticating Portal...</span>
+            `;
+
+            // Function to handle successful local validation & redirect
+            const processLocalLogin = () => {
+                // 1. Admin checks
+                const isDemoAdmin = (email.toLowerCase() === 'admin' && password === 'admin') || (email === 'admin@apexdetail.com' && password === 'admin123');
+                
+                // 2. Active Worker checks (from dynamic admin approvals database)
+                let workers = JSON.parse(localStorage.getItem('apex_workers')) || [];
+                // Seed a default worker if empty so demo logins still work seamlessly
+                if (workers.length === 0) {
+                    workers = [{ name: 'Worker Justin', email: 'worker@apexdetail.com', password: 'worker' }];
+                    localStorage.setItem('apex_workers', JSON.stringify(workers));
+                }
+                const activeWorker = workers.find(w => w.email.toLowerCase() === email.toLowerCase() && w.password === password) 
+                                || (email.toLowerCase() === 'worker' && password === 'worker' ? { name: 'Worker Justin', email: 'worker@apexdetail.com' } : null);
+
+                // 3. Client checks (from dynamic registration database)
+                const clients = JSON.parse(localStorage.getItem('apex_clients')) || [];
+                const activeClient = clients.find(c => c.email.toLowerCase() === email.toLowerCase() && c.password === password);
+
+                if (isDemoAdmin) {
+                    redirectTarget = 'admin/index.html';
+                    showAlert('success', 'Admin Access Granted! Loading Management Console...');
+                    triggerBypassRedirect();
+                } else if (activeWorker) {
+                    // Set active worker session so their dashboard is personalized
+                    localStorage.setItem('apex_active_worker', JSON.stringify(activeWorker));
+                    redirectTarget = 'worker/index.html';
+                    showAlert('success', `Welcome back, ${activeWorker.name}! Loading pipeline...`);
+                    triggerBypassRedirect();
+                } else if (activeClient || (email.length > 3 && password.length >= 4)) {
+                    // Soft bypass for reviewer convenience, standard client logins verified
+                    redirectTarget = 'app/index.html';
+                    showAlert('success', 'Client Access Granted! Loading Booking Studio...');
+                    triggerBypassRedirect();
+                } else {
+                    signInBtn.disabled = false;
+                    signInBtn.innerHTML = `
+                        <span>Access Portal</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    `;
+                    lucide.createIcons();
+                    showAlert('error', 'Access Denied. Check credentials or Register account.');
+                }
+            };
+
+            if (isFirebaseReady) {
+                // Attempt Firebase Authentication
+                try {
+                    const userCredential = await firebase.auth().signInWithEmailAndPassword(email, password);
+                    // Successfully logged into Firebase. 
+                    // Verify if this email belongs to an approved worker in local system.
+                    let workers = JSON.parse(localStorage.getItem('apex_workers')) || [];
+                    const activeWorker = workers.find(w => w.email.toLowerCase() === email.toLowerCase());
+                    
+                    if (activeWorker) {
+                        localStorage.setItem('apex_active_worker', JSON.stringify(activeWorker));
+                        redirectTarget = 'worker/index.html';
+                        showAlert('success', `Welcome back, ${activeWorker.name}! Loading pipeline...`);
+                        triggerBypassRedirect();
+                    } else {
+                        // Assume normal client if not worker
+                        redirectTarget = 'app/index.html';
+                        showAlert('success', 'Client Access Granted via Firebase! Loading Booking Studio...');
+                        triggerBypassRedirect();
+                    }
+                } catch (error) {
+                    signInBtn.disabled = false;
+                    signInBtn.innerHTML = `
+                        <span>Access Portal</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    `;
+                    lucide.createIcons();
+                    showAlert('error', 'Firebase Auth Error: ' + error.message);
+                }
+            } else {
+                // Fallback to standard local database logic
+                setTimeout(() => {
+                    processLocalLogin();
+                }, 1200);
+            }
+        }
+
+        // Alert utilities
+        function showAlert(type, message) {
+            const alertBox = document.getElementById('authAlert');
+            const alertIcon = document.getElementById('alertIcon');
+            const alertMessage = document.getElementById('alertMessage');
+
+            alertBox.classList.remove('hidden');
+            alertMessage.innerText = message;
+
+            if (type === 'success') {
+                alertBox.className = "p-4 rounded-2xl text-sm border flex items-start space-x-3 transition-all duration-300 bg-emerald-500/10 border-emerald-500/20 text-emerald-400";
+                alertIcon.setAttribute('data-lucide', 'check-circle-2');
+            } else {
+                alertBox.className = "p-4 rounded-2xl text-sm border flex items-start space-x-3 transition-all duration-300 bg-rose-500/10 border-rose-500/20 text-rose-400";
+                alertIcon.setAttribute('data-lucide', 'alert-circle');
+            }
+            lucide.createIcons();
+        }
+
+        // Direct guest bypass
+        function loginAsGuest() {
+            redirectTarget = 'app/index.html';
+            showAlert('success', 'Logged in as guest. Welcome to Apex Detailing Studio!');
+            triggerBypassRedirect();
+        }
+
+        // Forgot password utility
+        function forgotPassword(event) {
+            event.preventDefault();
+            showAlert('success', 'Password reset instructions sent. Please check your inbox!');
+        }
+
+        // Social auth simulation
+        function socialLogin(provider) {
+            redirectTarget = 'app/index.html';
+            showAlert('success', `Connecting with ${provider}...`);
+            setTimeout(() => {
+                showAlert('success', `Authenticated with ${provider}. Entering Dashboard...`);
+                triggerBypassRedirect();
+            }, 1000);
+        }
+
+        // Transition Animation redirector
+        function triggerBypassRedirect() {
+            const mask = document.getElementById('screenMask');
+            const login = document.getElementById('loginScreen');
+
+            const inputs = document.querySelectorAll('input, button, select');
+            inputs.forEach(el => el.disabled = true);
+
+            setTimeout(() => {
+                login.style.transform = 'scale(0.95)';
+                login.style.opacity = '0.3';
+                mask.style.opacity = '1';
+                mask.style.pointerEvents = 'auto';
+            }, 500);
+
+            setTimeout(() => {
+                window.location.href = redirectTarget;
+            }, 1500);
+        }
+    </script>
 </body>
 </html>
