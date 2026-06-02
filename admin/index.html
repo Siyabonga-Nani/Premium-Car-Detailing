@@ -34,6 +34,10 @@
     <!-- Lucide Icons via CDN -->
     <script src="https://unpkg.com/lucide@latest"></script>
 
+    <!-- LeafletJS for Maps -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
     <style>
         /* Modern Premium Animations & Layout Utilities */
         @keyframes float-slow {
@@ -90,6 +94,9 @@
 </head>
 <body class="h-full bg-[#070809] text-white font-inter overflow-y-auto overflow-x-hidden relative selection:bg-brand-accentBlue/30 selection:text-white">
 
+    <!-- Global Notification Container -->
+    <div id="notificationContainer" class="fixed top-20 right-4 z-[9999] w-80 flex flex-col items-end pointer-events-none"></div>
+
     <!-- Ambient Glowing Lights -->
     <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none">
         <!-- Blue glow top left -->
@@ -135,7 +142,7 @@
         </header>
 
         <!-- CORE FINANCIAL METRICS BOARD -->
-        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7 gap-4 mb-12">
             <!-- Gross Revenue -->
             <div class="glass-card rounded-2xl p-6 flex items-center justify-between relative overflow-hidden">
                 <div class="space-y-1">
@@ -158,6 +165,28 @@
                 </div>
             </div>
 
+            <!-- Products Sold Quantity -->
+            <div class="glass-card rounded-2xl p-6 flex items-center justify-between relative overflow-hidden">
+                <div class="space-y-1">
+                    <span class="text-xs text-gray-500 uppercase tracking-wider font-mono">Products Sold</span>
+                    <h3 id="productsSoldText" class="text-3xl font-black font-outfit text-white">0</h3>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-fuchsia-500/10 border border-fuchsia-500/25 flex items-center justify-center text-fuchsia-400">
+                    <i data-lucide="package" class="w-6 h-6"></i>
+                </div>
+            </div>
+
+            <!-- Product Sales Revenue -->
+            <div class="glass-card rounded-2xl p-6 flex items-center justify-between relative overflow-hidden">
+                <div class="space-y-1">
+                    <span class="text-xs text-gray-500 uppercase tracking-wider font-mono">Product Revenue</span>
+                    <h3 id="productRevenueText" class="text-3xl font-black font-outfit text-white">R0</h3>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/25 flex items-center justify-center text-purple-400">
+                    <i data-lucide="shopping-bag" class="w-6 h-6"></i>
+                </div>
+            </div>
+
             <!-- Cash Surcharges / Cash Collections -->
             <div class="glass-card rounded-2xl p-6 flex items-center justify-between relative overflow-hidden">
                 <div class="space-y-1">
@@ -169,10 +198,21 @@
                 </div>
             </div>
 
+            <!-- Pending Worker Deposits -->
+            <div class="glass-card rounded-2xl p-6 flex items-center justify-between relative overflow-hidden">
+                <div class="space-y-1">
+                    <span class="text-xs text-gray-500 uppercase tracking-wider font-mono">Pending Worker Deposits</span>
+                    <h3 id="pendingDepositsText" class="text-3xl font-black font-outfit text-rose-400">R0</h3>
+                </div>
+                <div class="w-12 h-12 rounded-xl bg-rose-500/10 border border-rose-500/25 flex items-center justify-center text-rose-400">
+                    <i data-lucide="download" class="w-6 h-6"></i>
+                </div>
+            </div>
+
             <!-- Franchise Share (70%) -->
             <div class="glass-card rounded-2xl p-6 flex items-center justify-between relative overflow-hidden">
                 <div class="space-y-1">
-                    <span class="text-xs text-gray-500 uppercase tracking-wider font-mono">Franchise Profit (70%)</span>
+                    <span class="text-xs text-gray-500 uppercase tracking-wider font-mono">Franchise Profit (Variable)</span>
                     <h3 id="companyProfitText" class="text-3xl font-black font-outfit text-purple-400">R0</h3>
                 </div>
                 <div class="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/25 flex items-center justify-center text-purple-400">
@@ -181,19 +221,24 @@
             </div>
         </section>
 
-        <!-- SUB LAYOUT -->
+        <!-- MAIN LAYOUT -->
         <main class="space-y-12">
             
             <!-- SECTION 1: WORKERS COMMISSION & CASH LIABILITIES -->
             <section class="glass-card rounded-3xl p-6 md:p-8 space-y-6">
-                <div class="flex items-center gap-3 border-b border-white/5 pb-4">
-                    <div class="w-9 h-9 rounded-xl bg-brand-gold/15 border border-brand-gold/30 flex items-center justify-center text-brand-gold">
-                        <i data-lucide="users" class="w-5 h-5"></i>
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-white/5 pb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-xl bg-brand-gold/15 border border-brand-gold/30 flex items-center justify-center text-brand-gold">
+                            <i data-lucide="users" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold font-outfit text-white">Operatives Commission & Settlements</h3>
+                            <p class="text-xs text-gray-500">Live summary of completed washes, operative payouts (30%), and company cuts</p>
+                        </div>
                     </div>
-                    <div>
-                        <h3 class="text-xl font-bold font-outfit text-white">Operatives Commission & Settlements</h3>
-                        <p class="text-xs text-gray-500">Live summary of completed washes, operative payouts (30%), and company cuts</p>
-                    </div>
+                    <button onclick="openAddWorkerModal()" class="px-4 py-2 bg-brand-gold/10 hover:bg-brand-gold/20 text-brand-gold border border-brand-gold/30 rounded-xl text-sm font-bold transition-all flex items-center gap-2 whitespace-nowrap">
+                        <i data-lucide="plus" class="w-4 h-4"></i> Add Operative
+                    </button>
                 </div>
 
                 <!-- Table -->
@@ -202,11 +247,13 @@
                         <thead>
                             <tr class="border-b border-white/10 text-gray-500 text-xs uppercase tracking-wider font-mono whitespace-nowrap">
                                 <th class="py-3 px-4">Worker Name</th>
-                                <th class="py-3 px-4">Cars Detailed</th>
-                                <th class="py-3 px-4">Total Revenue Generated</th>
-                                <th class="py-3 px-4">Operative Payout (30%)</th>
-                                <th class="py-3 px-4">Company Cut Due (70%)</th>
-                                <th class="py-3 px-4">Cash Handover Surcharges</th>
+                                <th class="py-3 px-4 text-center">Cars Detailed</th>
+                                <th class="py-3 px-4 text-center">Deliveries</th>
+                                <th class="py-3 px-4 text-right">Gross Revenue</th>
+                                <th class="py-3 px-4 text-right">Payout Due</th>
+                                <th class="py-3 px-4 text-right">Co. Cut Due</th>
+                                <th class="py-3 px-4 text-right">Cash Held</th>
+                                <th class="py-3 px-4 text-right">Tips</th>
                                 <th class="py-3 px-4 text-center">Manage</th>
                             </tr>
                         </thead>
@@ -259,6 +306,27 @@
                 </div>
             </section>
 
+            <!-- SECTION 4: PRODUCT ORDERS PIPELINE -->
+            <section class="glass-card rounded-3xl p-6 md:p-8 space-y-6">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-white/5 pb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400">
+                            <i data-lucide="package" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold font-outfit text-white">Product Orders Pipeline</h3>
+                            <p class="text-xs text-gray-500 font-normal">Manage standalone detailing product orders and delivery assignments</p>
+                        </div>
+                    </div>
+                    <span id="productOrdersCountBadge" class="px-3.5 py-1 text-xs font-semibold rounded-full bg-white/5 border border-white/10">0 Product Orders</span>
+                </div>
+
+                <!-- Product Orders Grid -->
+                <div id="productOrdersGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+                    <!-- Populated dynamically -->
+                </div>
+            </section>
+
         </main>
 
         <!-- FOOTER BRANDING -->
@@ -274,6 +342,32 @@
     <script>
         lucide.createIcons();
 
+        let notifiedBookings = {};
+
+        function showNotification(title, message) {
+            const container = document.getElementById('notificationContainer');
+            const toast = document.createElement('div');
+            toast.className = 'glass-card border-brand-accentBlue/30 p-4 rounded-xl shadow-2xl flex items-start gap-3 mb-3 translate-x-[120%] transition-transform duration-500 z-50 pointer-events-auto';
+            toast.innerHTML = `
+                <div class="w-8 h-8 rounded-full bg-brand-accentBlue/20 flex items-center justify-center text-brand-accentBlue shrink-0">
+                    <i data-lucide="bell" class="w-4 h-4"></i>
+                </div>
+                <div>
+                    <h4 class="font-bold text-white text-sm">${title}</h4>
+                    <p class="text-xs text-gray-400 mt-0.5">${message}</p>
+                </div>
+            `;
+            container.appendChild(toast);
+            lucide.createIcons();
+            
+            setTimeout(() => { toast.style.transform = 'translateX(0)'; }, 50);
+            
+            setTimeout(() => {
+                toast.style.transform = 'translateX(120%)';
+                setTimeout(() => toast.remove(), 500);
+            }, 5000);
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
             loadAdminDashboard();
             
@@ -284,7 +378,10 @@
                 }
             });
             // 3 second poll for single tab preview
-            setInterval(loadAdminDashboard, 3000);
+            setInterval(() => {
+                loadAdminDashboard();
+                if (activeLogBookingId) renderChatLogs();
+            }, 3000);
         });
 
         // Load all metrics, approved workers database, and onboarding requests
@@ -296,6 +393,8 @@
             let grossRevenue = 0;
             let completedCount = 0;
             let cashCollections = 0;
+            let totalProductSales = 0;
+            let totalProductsSold = 0;
 
             // Base tracking list from approved workers database
             let workersList = JSON.parse(localStorage.getItem('apex_workers'));
@@ -311,14 +410,31 @@
                 workersList = [];
             }
 
-            const workerMap = { 'Unassigned': { completed: 0, revenue: 0, cash: 0, isWorker: false } };
+            const workerMap = { 'Unassigned': { completed: 0, deliveriesCompleted: 0, revenue: 0, productRevenue: 0, cash: 0, pendingCash: 0, pendingPayoutRevenue: 0, pendingTips: 0, tips: 0, isWorker: false, experience: 0 } };
             workersList.forEach(w => {
-                workerMap[w.name] = { completed: 0, revenue: 0, cash: 0, isWorker: true, warnings: w.warnings || 0, suspended: w.suspended || false };
+                workerMap[w.name] = { completed: 0, deliveriesCompleted: 0, revenue: 0, productRevenue: 0, cash: 0, pendingCash: 0, pendingPayoutRevenue: 0, pendingTips: 0, tips: 0, isWorker: true, warnings: w.warnings || 0, suspended: w.suspended || false, email: w.email, phone: w.phone || 'N/A', password: w.password, experience: w.experience !== undefined ? w.experience : 1 };
             });
 
             bookings.forEach(b => {
+                // Check notifications
+                if (b.unreadAdmin && !notifiedBookings[b.id] && activeLogBookingId !== b.id) {
+                    showNotification('New Chat Message', `New message on booking: ${b.name}`);
+                    notifiedBookings[b.id] = true;
+                }
+                
                 if (b.status === 'Completed') {
                     const totalAmt = parseFloat(b.total) || 0;
+                    
+                    let productTotal = 0;
+                    if (b.products && b.products.length > 0) {
+                        b.products.forEach(p => { 
+                            productTotal += parseFloat(p.price) || 0; 
+                            totalProductsSold++;
+                        });
+                        totalProductSales += productTotal;
+                    }
+                    const serviceTotal = totalAmt - productTotal;
+
                     grossRevenue += totalAmt;
                     completedCount++;
                     
@@ -326,33 +442,87 @@
                         cashCollections += totalAmt;
                     }
 
-                    // Assign stats to appropriate worker
-                    let workerKey = b.workerAssigned || 'Unassigned';
-                    if (workerKey === 'Justin') workerKey = 'Worker Justin';
+                    // Assign stats to appropriate workers
+                    let assignedWorkersStr = b.workerAssigned || 'Unassigned';
+                    let assignedWorkers = assignedWorkersStr.split(',').map(w => w.trim()).filter(w => w !== '');
                     
-                    if (!workerMap[workerKey]) {
-                        workerMap[workerKey] = { completed: 0, revenue: 0, cash: 0, isWorker: false };
+                    if (assignedWorkers.length === 0) {
+                        assignedWorkers = ['Unassigned'];
                     }
+
+                    assignedWorkers = assignedWorkers.map(w => w === 'Justin' ? 'Worker Justin' : w);
+
+                    let splitServiceAmt = serviceTotal / assignedWorkers.length;
+                    let splitProductAmt = productTotal / assignedWorkers.length;
+                    let splitCash = b.payment === 'Cash' ? (totalAmt / assignedWorkers.length) : 0;
                     
-                    workerMap[workerKey].completed++;
-                    workerMap[workerKey].revenue += totalAmt;
-                    if (b.payment === 'Cash') {
-                        workerMap[workerKey].cash += totalAmt;
+                    let splitDeliveryAmt = 0;
+                    if (b.service === 'Product Delivery Only') {
+                        splitDeliveryAmt = splitServiceAmt;
+                        splitServiceAmt = 0;
                     }
+
+                    assignedWorkers.forEach(workerKey => {
+                        if (!workerMap[workerKey]) {
+                            workerMap[workerKey] = { completed: 0, deliveriesCompleted: 0, revenue: 0, deliveryRevenue: 0, productRevenue: 0, cash: 0, tips: 0, pendingPayoutRevenue: 0, pendingDeliveryRevenue: 0, pendingTips: 0, pendingCash: 0, isWorker: false };
+                        }
+                        
+                        if (b.service === 'Product Delivery Only') {
+                            workerMap[workerKey].deliveriesCompleted = (workerMap[workerKey].deliveriesCompleted || 0) + 1;
+                        } else {
+                            workerMap[workerKey].completed++;
+                        }
+                        workerMap[workerKey].revenue += splitServiceAmt;
+                        workerMap[workerKey].deliveryRevenue = (workerMap[workerKey].deliveryRevenue || 0) + splitDeliveryAmt;
+                        workerMap[workerKey].productRevenue = (workerMap[workerKey].productRevenue || 0) + splitProductAmt;
+                        workerMap[workerKey].cash += splitCash;
+                        if (b.tip) {
+                            workerMap[workerKey].tips = (workerMap[workerKey].tips || 0) + (b.tip / assignedWorkers.length);
+                        }
+
+                        if (!b.payoutSettled) {
+                            workerMap[workerKey].pendingPayoutRevenue += splitServiceAmt;
+                            workerMap[workerKey].pendingDeliveryRevenue = (workerMap[workerKey].pendingDeliveryRevenue || 0) + splitDeliveryAmt;
+                            if (b.tip) {
+                                workerMap[workerKey].pendingTips += (b.tip / assignedWorkers.length);
+                            }
+                        }
+                        if (b.payment === 'Cash' && !b.cashSettled) {
+                            workerMap[workerKey].pendingCash += splitCash;
+                        }
+                    });
                 }
             });
 
-            const companyShare = grossRevenue * 0.70;
+            let totalCompanyShare = 0;
+            let globalPendingCash = 0;
+            Object.keys(workerMap).forEach(name => {
+                const w = workerMap[name];
+                let commissionRate = 0.30; // Flat 30% commission
+                if (!w.isWorker) commissionRate = 0;
+
+                totalCompanyShare += (w.revenue * (1 - commissionRate)) + (w.productRevenue || 0);
+                if (w.isWorker) globalPendingCash += w.pendingCash;
+            });
 
             // Display metrics cards
             document.getElementById('grossRevenueText').innerText = 'R' + grossRevenue.toFixed(0);
             document.getElementById('completedDetailsCount').innerText = completedCount;
             document.getElementById('cashCollectionsText').innerText = 'R' + cashCollections.toFixed(0);
-            document.getElementById('companyProfitText').innerText = 'R' + companyShare.toFixed(0);
+            if (document.getElementById('pendingDepositsText')) {
+                document.getElementById('pendingDepositsText').innerText = 'R' + globalPendingCash.toFixed(0);
+            }
+            document.getElementById('companyProfitText').innerText = 'R' + totalCompanyShare.toFixed(0);
+            
+            if (document.getElementById('productRevenueText')) {
+                document.getElementById('productRevenueText').innerText = 'R' + totalProductSales.toFixed(0);
+                document.getElementById('productsSoldText').innerText = totalProductsSold;
+            }
 
             renderWorkerStatsTable(workerMap);
             renderMasterBookingsGrid(bookings);
             renderWorkerApplications();
+            renderProductOrdersPipeline(bookings);
         }
 
         // Render pending operative applications
@@ -386,7 +556,7 @@
                         <div class="flex justify-between items-start">
                             <div>
                                 <h4 class="font-bold text-white text-sm">${app.name}</h4>
-                                <span class="text-[10px] text-brand-accentBlue block font-mono">Exp: ${app.experience}</span>
+                                <span class="text-[10px] text-brand-accentBlue block font-mono">Years Detailing: ${app.experience} | Equip: ${app.equipment || 'Unknown'}</span>
                             </div>
                             <span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-amber-500/10 text-amber-400 border border-amber-500/20">
                                 Pending
@@ -410,6 +580,9 @@
                             <div class="flex gap-2">
                                 <input type="text" id="pw_${app.id}" placeholder="Create Password" 
                                        class="flex-1 px-3 py-2 bg-black/60 border border-white/10 rounded-xl text-[11px] text-white focus:outline-none focus:border-brand-accentBlue/40">
+                                <button onclick="autoGenerateWorkerPassword('${app.id}')" title="Auto Generate" class="px-2 py-2 bg-white/5 hover:bg-white/10 text-brand-accentBlue border border-white/10 rounded-xl transition-all flex items-center justify-center">
+                                    <i data-lucide="zap" class="w-4 h-4"></i>
+                                </button>
                                 <button onclick="adminOnboardWorker('${app.id}')" class="px-3 py-2 bg-brand-accentBlue hover:bg-brand-accentBlue/80 text-black font-bold text-[10px] rounded-xl shadow-md transition-all">
                                     Approve
                                 </button>
@@ -451,7 +624,10 @@
                 workers.push({
                     name: workerName,
                     email: app.email,
-                    password: password
+                    phone: app.phone,
+                    password: password,
+                    experience: app.experience !== undefined ? app.experience : 1,
+                    equipment: app.equipment || 'Unknown'
                 });
                 localStorage.setItem('apex_workers', JSON.stringify(workers));
 
@@ -470,6 +646,23 @@
             }
         }
 
+        function autoGenerateWorkerPassword(appId) {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%';
+            let password = '';
+            for (let i = 0; i < 8; i++) {
+                password += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            document.getElementById('pw_' + appId).value = password;
+        }
+
+        function adminViewCredentials(nameEnc, emailEnc, phoneEnc, passwordEnc) {
+            const name = decodeURIComponent(nameEnc);
+            const email = decodeURIComponent(emailEnc);
+            const phone = decodeURIComponent(phoneEnc);
+            const password = decodeURIComponent(passwordEnc);
+            alert(`--- Worker Credentials ---\nName: ${name}\nEmail: ${email}\nPhone: ${phone}\nPassword: ${password}`);
+        }
+
         // Render operative performance table
         function renderWorkerStatsTable(workerMap) {
             const tbody = document.getElementById('workerStatsTable');
@@ -485,13 +678,25 @@
                     tr.classList.add('opacity-40');
                 }
                 
-                const operativePayout = w.revenue * 0.30;
-                const companyCut = w.revenue * 0.70;
+                let commissionRate = 0.30; // Flat 30% commission
+                if (!w.isWorker) commissionRate = 0;
+
+                const operativePayout = (w.pendingPayoutRevenue * commissionRate) + (w.pendingTips || 0) + (w.pendingDeliveryRevenue || 0);
+                const companyCut = w.revenue * (1 - commissionRate);
                 
                 let actionsHtml = '';
                 if (w.isWorker) {
                     actionsHtml = `
                         <div class="flex items-center justify-center gap-1.5">
+                            <button onclick="adminProcessPayout('${name}')" title="Process Payout" class="w-7 h-7 rounded bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 flex items-center justify-center transition-all">
+                                <i data-lucide="banknote" class="w-3.5 h-3.5"></i>
+                            </button>
+                            <button onclick="adminViewCredentials('${encodeURIComponent(name)}', '${encodeURIComponent(w.email)}', '${encodeURIComponent(w.phone)}', '${encodeURIComponent(w.password || '')}')" title="View Credentials" class="w-7 h-7 rounded bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border border-indigo-500/20 flex items-center justify-center transition-all">
+                                <i data-lucide="key" class="w-3.5 h-3.5"></i>
+                            </button>
+                            <button onclick="adminViewRouteHistory('${name}')" title="View Route History" class="w-7 h-7 rounded bg-brand-accentBlue/10 hover:bg-brand-accentBlue/20 text-brand-accentBlue border border-brand-accentBlue/20 flex items-center justify-center transition-all">
+                                <i data-lucide="map-pin" class="w-3.5 h-3.5"></i>
+                            </button>
                             <button onclick="adminWarnWorker('${name}')" title="Send Warning" class="w-7 h-7 rounded bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/20 flex items-center justify-center transition-all">
                                 <i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i>
                             </button>
@@ -511,14 +716,22 @@
                         ${name}
                         ${w.suspended ? '<span class="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase bg-orange-500/10 text-orange-400 border border-orange-500/20">Suspended</span>' : ''}
                     </td>
-                    <td class="py-3.5 px-4 font-mono whitespace-nowrap">${w.completed}</td>
-                    <td class="py-3.5 px-4 font-mono font-semibold text-brand-accentBlue whitespace-nowrap">R${w.revenue.toFixed(0)}</td>
-                    <td class="py-3.5 px-4 font-mono text-emerald-400 whitespace-nowrap">R${operativePayout.toFixed(0)}</td>
-                    <td class="py-3.5 px-4 font-mono text-purple-400 whitespace-nowrap">R${companyCut.toFixed(0)}</td>
-                    <td class="py-3.5 px-4 whitespace-nowrap">
-                        <span class="px-2.5 py-1 rounded-lg font-mono text-xs ${w.cash > 0 ? 'bg-amber-500/10 text-brand-gold border border-brand-gold/20 font-bold' : 'bg-white/5 text-gray-500'}">
-                            R${w.cash.toFixed(0)}
-                        </span>
+                    <td class="py-3.5 px-4 font-mono text-center whitespace-nowrap">${w.completed}</td>
+                    <td class="py-3.5 px-4 font-mono text-center whitespace-nowrap">${w.deliveriesCompleted || 0}</td>
+                    <td class="py-3.5 px-4 font-mono text-right whitespace-nowrap">R${(w.revenue + (w.deliveryRevenue || 0)).toFixed(0)}</td>
+                    <td class="py-3.5 px-4 font-mono text-right text-emerald-400 font-bold whitespace-nowrap">R${operativePayout.toFixed(0)} <span class="text-[9px] text-gray-500 uppercase ml-1 block sm:inline">(Pending)</span></td>
+                    <td class="py-3.5 px-4 font-mono text-right text-purple-400 whitespace-nowrap">R${companyCut.toFixed(0)}</td>
+                    <td class="py-3.5 px-4 font-mono text-right text-brand-gold whitespace-nowrap">
+                        <div class="flex flex-col items-end justify-center">
+                            <span>R${w.pendingCash.toFixed(0)}</span>
+                            <span class="text-[9px] text-gray-500 uppercase">(Total: R${w.cash.toFixed(0)})</span>
+                        </div>
+                    </td>
+                    <td class="py-3.5 px-4 font-mono text-right text-brand-accentBlue whitespace-nowrap">
+                        <div class="flex flex-col items-end justify-center">
+                            <span>R${(w.pendingTips || 0).toFixed(0)}</span>
+                            <span class="text-[9px] text-gray-500 uppercase">(Total: R${(w.tips || 0).toFixed(0)})</span>
+                        </div>
                     </td>
                     <td class="py-3.5 px-4 whitespace-nowrap">
                         ${actionsHtml}
@@ -534,7 +747,10 @@
             const grid = document.getElementById('masterBookingsGrid');
             grid.innerHTML = '';
 
-            if (bookings.length === 0) {
+            const detailingBookings = bookings.filter(b => b.service !== 'Product Delivery Only (R0)' && b.service !== 'Product Delivery Only');
+            document.getElementById('globalCountBadge').innerText = detailingBookings.length + ' Global Bookings';
+
+            if (detailingBookings.length === 0) {
                 grid.innerHTML = `
                     <div class="col-span-3 p-12 rounded-3xl bg-white/5 border border-white/5 text-center space-y-2">
                         <i data-lucide="alert-circle" class="w-8 h-8 text-gray-500 mx-auto"></i>
@@ -546,7 +762,7 @@
                 return;
             }
 
-            bookings.forEach(b => {
+            detailingBookings.forEach(b => {
                 const card = document.createElement('div');
                 card.className = 'glass-card rounded-2xl p-5 flex flex-col justify-between space-y-4 border border-white/5 relative group';
 
@@ -584,23 +800,37 @@
                                 Cancel booking
                             </button>
                         </div>
-                        ${b.chat && b.chat.length > 0 ? `
-                        <button onclick="openChatLogs('${b.id}')" class="w-full mt-2 py-2 bg-brand-accentBlue/10 hover:bg-brand-accentBlue/20 text-brand-accentBlue border border-brand-accentBlue/20 rounded-xl text-[10px] font-bold transition-all flex items-center justify-center gap-1">
-                            <i data-lucide="message-square" class="w-3 h-3"></i> View Chat Logs (${b.chat.length})
+                        <button onclick="openChatLogs('${b.id}')" class="relative w-full mt-2 py-2 bg-brand-accentBlue/10 hover:bg-brand-accentBlue/20 text-brand-accentBlue border border-brand-accentBlue/20 rounded-xl text-[10px] font-bold transition-all flex items-center justify-center gap-1">
+                            <i data-lucide="message-square" class="w-3 h-3"></i> Open Live Chat ${b.chat ? `(${b.chat.length})` : ''}
+                            ${b.unreadAdmin ? '<span class="absolute -top-1 -right-1 w-3 h-3 bg-rose-500 rounded-full border border-black animate-pulse"></span>' : ''}
                         </button>
-                        ` : ''}
                     `;
                 } else {
                     adminControlsHtml = `
                         <div class="p-2 rounded-xl bg-emerald-500/5 border border-emerald-500/10 text-center text-[10px] font-bold text-emerald-400">
                             Billing Finalized • Payout Paid
                         </div>
-                        ${b.chat && b.chat.length > 0 ? `
-                        <button onclick="openChatLogs('${b.id}')" class="w-full mt-2 py-2 bg-brand-accentBlue/10 hover:bg-brand-accentBlue/20 text-brand-accentBlue border border-brand-accentBlue/20 rounded-xl text-[10px] font-bold transition-all flex items-center justify-center gap-1">
-                            <i data-lucide="message-square" class="w-3 h-3"></i> View Chat Logs (${b.chat.length})
+                        <button onclick="openChatLogs('${b.id}')" class="relative w-full mt-2 py-2 bg-brand-accentBlue/10 hover:bg-brand-accentBlue/20 text-brand-accentBlue border border-brand-accentBlue/20 rounded-xl text-[10px] font-bold transition-all flex items-center justify-center gap-1">
+                            <i data-lucide="message-square" class="w-3 h-3"></i> Open Live Chat ${b.chat ? `(${b.chat.length})` : ''}
+                            ${b.unreadAdmin ? '<span class="absolute -top-1 -right-1 w-3 h-3 bg-rose-500 rounded-full border border-black animate-pulse"></span>' : ''}
                         </button>
-                        ` : ''}
                     `;
+                    if (b.review) {
+                        adminControlsHtml += `
+                        <div class="mt-2 p-3 rounded-xl bg-brand-gold/10 border border-brand-gold/20 flex flex-col space-y-1">
+                            <div class="flex justify-between items-center">
+                                <span class="text-[9px] font-bold text-brand-gold uppercase tracking-widest font-mono">Client Review</span>
+                                <div class="flex items-center gap-2 text-brand-gold">
+                                    ${b.tip ? `<span class="text-[10px] font-bold text-emerald-400">+R${b.tip} Tip</span>` : ''}
+                                    <div class="flex items-center gap-0.5 text-brand-gold">
+                                        ${Array(5).fill(0).map((_, i) => `<i data-lucide="star" class="w-3 h-3 ${i < b.review.rating ? 'fill-current' : 'opacity-30'}"></i>`).join('')}
+                                    </div>
+                                </div>
+                            </div>
+                            ${b.review.text ? `<p class="text-[10px] text-gray-300 italic">"${b.review.text}"</p>` : ''}
+                        </div>
+                        `;
+                    }
                 }
 
                 // Worker selector options dynamically queried from approved local database
@@ -616,8 +846,19 @@
                         workersList = [];
                     }
                 }
+                // Handle multi-worker assignment strings
+                const assignedWorkers = b.workerAssigned ? b.workerAssigned.split(',').map(w => w.trim()).filter(w => w !== 'Unassigned' && w !== '') : [];
+                
+                const assignedTagsHtml = assignedWorkers.length > 0 ? assignedWorkers.map(w => `
+                    <div class="flex items-center justify-between bg-brand-accentBlue/10 border border-brand-accentBlue/20 px-2 py-1 rounded text-[10px] text-brand-accentBlue">
+                        <span>${w}</span>
+                        ${b.status !== 'Completed' ? `<button onclick="adminRemoveWorker('${b.id}', '${w}')" class="text-brand-accentBlue hover:text-white ml-2"><i data-lucide="x" class="w-3 h-3"></i></button>` : ''}
+                    </div>
+                `).join('') : '<span class="text-[10px] text-gray-500 italic">Unassigned</span>';
+
                 const workerOptions = workersList
-                    .map(w => `<option value="${w.name}" ${b.workerAssigned === w.name || (b.workerAssigned === w.name.replace('Worker ', '')) ? 'selected' : ''}>${w.name}</option>`)
+                    .filter(w => !assignedWorkers.includes(w.name) && !assignedWorkers.includes(w.name.replace('Worker ', '')))
+                    .map(w => `<option value="${w.name}">${w.name}</option>`)
                     .join('');
 
                 card.innerHTML = `
@@ -657,13 +898,18 @@
                         </div>
 
                         <!-- Operative manual assignment -->
-                        <div class="space-y-1 pt-1.5 border-t border-white/5">
-                            <label class="text-[9px] font-bold text-gray-500 uppercase tracking-widest font-mono">Operative Assignment</label>
-                            <select onchange="adminAssignWorker('${b.id}', this.value)" ${b.status === 'Completed' ? 'disabled' : ''} 
-                                    class="w-full px-2.5 py-2 bg-black/60 border border-white/10 rounded-xl text-white text-xs focus:outline-none">
-                                <option value="" ${!b.workerAssigned ? 'selected' : ''}>Unassigned</option>
+                        <div class="space-y-1.5 pt-1.5 border-t border-white/5">
+                            <label class="text-[9px] font-bold text-gray-500 uppercase tracking-widest font-mono">Assigned Team</label>
+                            <div class="flex flex-wrap gap-1 mb-1">
+                                ${assignedTagsHtml}
+                            </div>
+                            ${b.status !== 'Completed' && workerOptions.length > 0 ? `
+                            <select onchange="adminAssignWorker('${b.id}', this.value)" 
+                                    class="w-full px-2.5 py-1.5 bg-black/60 border border-white/10 rounded-xl text-white text-xs focus:outline-none">
+                                <option value="">+ Add Operative</option>
                                 ${workerOptions}
                             </select>
+                            ` : ''}
                         </div>
                     </div>
 
@@ -678,6 +924,137 @@
                 grid.appendChild(card);
             });
             lucide.createIcons();
+        }
+
+        // Render product orders pipeline
+        function renderProductOrdersPipeline(bookings) {
+            const grid = document.getElementById('productOrdersGrid');
+            const badge = document.getElementById('productOrdersCountBadge');
+            grid.innerHTML = '';
+            
+            const productOrders = bookings.filter(b => b.products && b.products.length > 0);
+            badge.innerText = productOrders.length + ' Product Orders';
+
+            if (productOrders.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-3 p-12 rounded-3xl bg-white/5 border border-white/5 text-center space-y-2">
+                        <i data-lucide="package-x" class="w-10 h-10 text-gray-600 mx-auto"></i>
+                        <h4 class="font-bold text-gray-400 text-sm">No Active Product Orders</h4>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+
+            productOrders.forEach(b => {
+                const card = document.createElement('div');
+                card.className = 'glass-card border border-amber-500/20 p-5 rounded-2xl relative overflow-hidden group hover:border-amber-400/50 transition-all shadow-lg';
+                
+                // Delivery Apps & Workers combined list
+                let workersList = JSON.parse(localStorage.getItem('apex_workers')) || [];
+                const deliveryApps = ['Uber Direct', 'Mr D Delivery', 'Bolt Food', 'In-House Delivery'];
+                
+                const assignedWorkers = b.workerAssigned ? b.workerAssigned.split(',').map(w => w.trim()).filter(w => w !== 'Unassigned' && w !== '') : [];
+                
+                let workerOptions = deliveryApps.map(app => `<option value="${app}">🚀 App: ${app}</option>`).join('');
+                workerOptions += '<optgroup label="Operatives">';
+                workerOptions += workersList.filter(w => !assignedWorkers.includes(w.name)).map(w => `<option value="${w.name}">👤 ${w.name}</option>`).join('');
+                workerOptions += '</optgroup>';
+
+                const assignedTagsHtml = assignedWorkers.length > 0 ? assignedWorkers.map(w => `
+                    <div class="flex items-center justify-between bg-amber-500/10 border border-amber-500/20 px-2 py-1 rounded text-[10px] text-amber-400">
+                        <span>${w}</span>
+                        ${b.status !== 'Completed' ? `<button onclick="adminRemoveWorker('${b.id}', '${w}')" class="text-amber-400 hover:text-white ml-2"><i data-lucide="x" class="w-3 h-3"></i></button>` : ''}
+                    </div>
+                `).join('') : '<span class="text-[10px] text-gray-500 italic">No Delivery Assigned</span>';
+
+                let productTotal = 0;
+                b.products.forEach(p => productTotal += parseFloat(p.price));
+
+                card.innerHTML = `
+                    <div class="space-y-3.5">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h4 class="font-bold text-white text-sm">${b.name}</h4>
+                                <span class="text-[10px] text-gray-500 block font-mono">Client ID: ${b.id.substring(0,6)}</span>
+                            </div>
+                            <span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase ${b.status === 'Completed' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'}">
+                                ${b.status}
+                            </span>
+                        </div>
+
+                        <div class="text-xs text-gray-400 pt-2 border-t border-white/5 space-y-1.5">
+                            <div class="flex items-center justify-between text-[10px]">
+                                <span class="text-gray-600 uppercase font-mono">Delivery Address</span>
+                                <span class="font-semibold text-white truncate max-w-[170px]">${b.location}</span>
+                            </div>
+                            <div class="flex items-center justify-between text-[10px]">
+                                <span class="text-gray-600 uppercase font-mono">Products</span>
+                                <span class="font-semibold text-amber-400 max-w-[150px] text-right truncate">${b.products.map(p => p.name).join(', ')}</span>
+                            </div>
+                            <div class="flex items-center justify-between text-[10px]">
+                                <span class="text-gray-600 uppercase font-mono">Service Attached</span>
+                                <span class="font-bold text-gray-300">${b.service}</span>
+                            </div>
+                        </div>
+
+                        <!-- Delivery Assignment -->
+                        <div class="space-y-1.5 pt-1.5 border-t border-white/5">
+                            <label class="text-[9px] font-bold text-gray-500 uppercase tracking-widest font-mono">Delivery Agent</label>
+                            <div class="flex flex-wrap gap-1 mb-1">
+                                ${assignedTagsHtml}
+                            </div>
+                            ${b.status !== 'Completed' ? `
+                            <select onchange="adminAssignWorker('${b.id}', this.value)" 
+                                    class="w-full px-2.5 py-1.5 bg-black/60 border border-white/10 rounded-xl text-white text-xs focus:outline-none">
+                                <option value="">+ Assign Courier / Worker</option>
+                                ${workerOptions}
+                            </select>
+                            ` : ''}
+                        </div>
+                    </div>
+                    
+                    <div class="pt-3.5 mt-3 border-t border-white/5 space-y-2">
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="text-gray-500">Product Total:</span>
+                            <span class="font-black text-amber-400 font-mono">R${productTotal}</span>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+            lucide.createIcons();
+        }
+
+        // Action: Add Worker to Job
+        function adminAssignWorker(id, workerName) {
+            if (!workerName) return;
+            let bookings = JSON.parse(localStorage.getItem('apex_bookings')) || [];
+            const index = bookings.findIndex(b => b.id === id);
+            
+            if (index !== -1) {
+                let assigned = bookings[index].workerAssigned ? bookings[index].workerAssigned.split(',').map(w => w.trim()).filter(w => w !== 'Unassigned' && w !== '') : [];
+                if (!assigned.includes(workerName)) {
+                    assigned.push(workerName);
+                    bookings[index].workerAssigned = assigned.join(', ');
+                    localStorage.setItem('apex_bookings', JSON.stringify(bookings));
+                    loadAdminDashboard();
+                }
+            }
+        }
+
+        // Action: Remove Worker from Job
+        function adminRemoveWorker(id, workerName) {
+            let bookings = JSON.parse(localStorage.getItem('apex_bookings')) || [];
+            const index = bookings.findIndex(b => b.id === id);
+            
+            if (index !== -1) {
+                let assigned = bookings[index].workerAssigned ? bookings[index].workerAssigned.split(',').map(w => w.trim()).filter(w => w !== 'Unassigned' && w !== '') : [];
+                assigned = assigned.filter(w => w !== workerName);
+                bookings[index].workerAssigned = assigned.length > 0 ? assigned.join(', ') : '';
+                localStorage.setItem('apex_bookings', JSON.stringify(bookings));
+                loadAdminDashboard();
+            }
         }
 
         // Action: Approve Job
@@ -727,6 +1104,16 @@
         function openChatLogs(bookingId) {
             activeLogBookingId = bookingId;
             document.getElementById('chatLogsModal').classList.remove('hidden');
+            
+            let bookings = JSON.parse(localStorage.getItem('apex_bookings')) || [];
+            const index = bookings.findIndex(b => b.id === bookingId);
+            if (index !== -1 && bookings[index].unreadAdmin) {
+                bookings[index].unreadAdmin = false;
+                notifiedBookings[bookingId] = false;
+                localStorage.setItem('apex_bookings', JSON.stringify(bookings));
+                loadAdminDashboard();
+            }
+            
             renderChatLogs();
         }
 
@@ -746,17 +1133,31 @@
             document.getElementById('chatLogTitle').innerText = 'Logs: ' + booking.name + ' & ' + (booking.workerAssigned || 'Worker');
             
             const messagesContainer = document.getElementById('chatLogsMessages');
+            const isScrolledToBottom = messagesContainer.scrollHeight - messagesContainer.clientHeight <= messagesContainer.scrollTop + 10;
+            
             let html = '';
             const chat = booking.chat || [];
             
             if (chat.length === 0) {
-                html = `<div class="text-center text-xs text-gray-500 py-4">No communication logs found.</div>`;
+                html = `<div class="text-center text-xs text-gray-500 py-4">No communication logs found. Say hello!</div>`;
             } else {
                 chat.forEach(msg => {
+                    const isAdmin = msg.sender === 'Admin';
                     const isClient = msg.sender === 'Client';
+                    
+                    let bgClass = 'bg-white/10 text-white border border-white/10 rounded-tl-sm';
+                    let align = 'justify-start';
+                    if (isAdmin) {
+                        bgClass = 'bg-brand-gold/20 text-brand-gold border border-brand-gold/30 rounded-tr-sm';
+                        align = 'justify-end';
+                    } else if (isClient) {
+                        bgClass = 'bg-brand-accentBlue/20 text-brand-accentBlue border border-brand-accentBlue/30 rounded-tr-sm';
+                        align = 'justify-end';
+                    }
+
                     html += `
-                        <div class="flex ${isClient ? 'justify-end' : 'justify-start'}">
-                            <div class="max-w-[80%] rounded-2xl px-4 py-2 ${isClient ? 'bg-brand-accentBlue/20 text-brand-accentBlue border border-brand-accentBlue/30 rounded-tr-sm' : 'bg-white/10 text-white border border-white/10 rounded-tl-sm'}">
+                        <div class="flex ${align}">
+                            <div class="max-w-[80%] rounded-2xl px-4 py-2 ${bgClass}">
                                 <span class="text-[9px] font-bold uppercase block mb-1 opacity-70">${msg.sender}</span>
                                 <p class="text-sm font-medium">${msg.message}</p>
                                 <span class="text-[9px] opacity-60 block text-right mt-1">${msg.timestamp}</span>
@@ -768,6 +1169,10 @@
             
             messagesContainer.innerHTML = html;
             lucide.createIcons();
+            
+            if (isScrolledToBottom || chat.length === 0) {
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
         }
 
         // Action: Assign worker
@@ -840,11 +1245,204 @@
                 loadAdminDashboard();
             }
         }
+        function openAddWorkerModal() {
+            document.getElementById('newWorkerName').value = '';
+            document.getElementById('newWorkerEmail').value = '';
+            document.getElementById('newWorkerPassword').value = '';
+            document.getElementById('addWorkerModal').classList.remove('hidden');
+        }
+
+        function closeAddWorkerModal() {
+            document.getElementById('addWorkerModal').classList.add('hidden');
+        }
+
+        function adminManualAddWorker() {
+            const name = document.getElementById('newWorkerName').value.trim();
+            const email = document.getElementById('newWorkerEmail').value.trim();
+            const password = document.getElementById('newWorkerPassword').value.trim();
+
+            if (!name || !email || !password) {
+                alert('⚠️ Please fill in all fields.');
+                return;
+            }
+
+            if (password.length < 4) {
+                alert('⚠️ Please set a secure password (minimum 4 characters).');
+                return;
+            }
+
+            let workers = JSON.parse(localStorage.getItem('apex_workers')) || [];
+            
+            // Format name clean
+            const workerName = name.startsWith('Worker ') ? name : 'Worker ' + name;
+            
+            // Check if worker already exists
+            if (workers.some(w => w.name.toLowerCase() === workerName.toLowerCase())) {
+                alert('⚠️ A worker with this name already exists.');
+                return;
+            }
+
+            workers.push({
+                name: workerName,
+                email: email,
+                password: password,
+                warnings: 0,
+                suspended: false
+            });
+            
+            localStorage.setItem('apex_workers', JSON.stringify(workers));
+            
+            alert(`🎉 Operative ${workerName} added successfully!`);
+            closeAddWorkerModal();
+            loadAdminDashboard();
+        }
+
+        // Route History Map Logic
+        let historyMap = null;
+        let routeMarkers = [];
+
+        function adminViewRouteHistory(workerName) {
+            document.getElementById('routeHistoryModal').classList.remove('hidden');
+            document.getElementById('routeHistoryTitle').innerText = 'Route History: ' + workerName;
+            
+            // Get completed bookings for this worker
+            const bookings = JSON.parse(localStorage.getItem('apex_bookings')) || [];
+            const completedJobs = bookings.filter(b => b.workerAssigned === workerName && b.status === 'Completed');
+            
+            const listContainer = document.getElementById('routeHistoryList');
+            if (completedJobs.length === 0) {
+                listContainer.innerHTML = '<div class="text-xs text-gray-500 p-4">No completed routes found for this operative.</div>';
+            } else {
+                listContainer.innerHTML = completedJobs.map(b => `
+                    <div class="bg-black/40 p-3 rounded-xl border border-white/5 text-xs text-gray-400 space-y-1">
+                        <div class="flex justify-between items-center text-white font-bold">
+                            <span>${b.location}</span>
+                            <span class="text-[10px] text-emerald-400 font-mono">${b.date}</span>
+                        </div>
+                        <div>Client: ${b.name} (${b.distance}km)</div>
+                    </div>
+                `).join('');
+            }
+            
+            // Initialize or reset map
+            setTimeout(() => {
+                if (!historyMap) {
+                    historyMap = L.map('historyMapContainer').setView([-26.2041, 28.0473], 11);
+                    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                        attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+                        subdomains: 'abcd',
+                        maxZoom: 20
+                    }).addTo(historyMap);
+                } else {
+                    historyMap.invalidateSize();
+                }
+
+                // Clear old markers
+                routeMarkers.forEach(m => historyMap.removeLayer(m));
+                routeMarkers = [];
+
+                if (completedJobs.length > 0) {
+                    // Create simulated markers for each location
+                    const baseLat = -26.2041;
+                    const baseLng = 28.0473;
+                    const bounds = [];
+                    
+                    completedJobs.forEach((job, index) => {
+                        // Deterministic offset based on name length to spread them out slightly in Johannesburg area
+                        const latOffset = (Math.sin(job.location.length) * 0.1) - 0.05;
+                        const lngOffset = (Math.cos(job.location.length) * 0.1) - 0.05;
+                        const lat = baseLat + latOffset;
+                        const lng = baseLng + lngOffset;
+                        
+                        const marker = L.marker([lat, lng]).addTo(historyMap)
+                            .bindPopup(`<b>${job.location}</b><br>Client: ${job.name}<br>Date: ${job.date}`);
+                        routeMarkers.push(marker);
+                        bounds.push([lat, lng]);
+                    });
+                    
+                    historyMap.fitBounds(bounds, { padding: [30, 30] });
+                } else {
+                    historyMap.setView([-26.2041, 28.0473], 11);
+                }
+            }, 200);
+        }
+
+        function closeRouteHistory() {
+            document.getElementById('routeHistoryModal').classList.add('hidden');
+        }
+
+        let activePayoutWorker = null;
+
+        function adminProcessPayout(name) {
+            let workers = JSON.parse(localStorage.getItem('apex_workers')) || [];
+            const w = workers.find(wk => wk.name === name);
+            if (!w) return;
+            
+            activePayoutWorker = name;
+            
+            // Calculate what is owed
+            let bookings = JSON.parse(localStorage.getItem('apex_bookings')) || [];
+            let owed = 0;
+            const cleanName = name.replace('Worker ', '');
+            
+            bookings.forEach(b => {
+                const assignedWorkers = (b.workerAssigned || '').split(',').map(aw => aw.trim()).filter(aw => aw !== '');
+                if (b.status === 'Completed' && !b.payoutSettled && (assignedWorkers.includes(name) || assignedWorkers.includes(cleanName))) {
+                    let splitAmt = b.total / assignedWorkers.length;
+                    owed += (splitAmt * 0.30);
+                    if (b.tip) {
+                        owed += (b.tip / assignedWorkers.length);
+                    }
+                }
+            });
+            
+            document.getElementById('payoutModalWorkerName').innerText = name;
+            document.getElementById('payoutModalAmount').innerText = 'R' + owed.toFixed(0);
+            
+            const method = w.payoutMethod || 'None Selected';
+            const details = w.payoutDetails || 'No details provided by worker';
+            document.getElementById('payoutModalMethod').innerText = method;
+            document.getElementById('payoutModalDetails').innerText = details;
+            
+            document.getElementById('payoutModal').classList.remove('hidden');
+        }
+
+        function closePayoutModal() {
+            document.getElementById('payoutModal').classList.add('hidden');
+            activePayoutWorker = null;
+        }
+
+        function confirmAdminPayout() {
+            if (!activePayoutWorker) return;
+            
+            let bookings = JSON.parse(localStorage.getItem('apex_bookings')) || [];
+            const name = activePayoutWorker;
+            const cleanName = name.replace('Worker ', '');
+            
+            let modified = false;
+            bookings.forEach(b => {
+                const assignedWorkers = (b.workerAssigned || '').split(',').map(aw => aw.trim()).filter(aw => aw !== '');
+                if (b.status === 'Completed' && !b.payoutSettled && (assignedWorkers.includes(name) || assignedWorkers.includes(cleanName))) {
+                    b.payoutSettled = true;
+                    modified = true;
+                }
+            });
+            
+            if (modified) {
+                localStorage.setItem('apex_bookings', JSON.stringify(bookings));
+                alert('💸 Payout confirmed and worker balance settled.');
+                loadAdminDashboard();
+            } else {
+                alert('No pending payout found.');
+            }
+            
+            closePayoutModal();
+        }
     </script>
 
     <!-- Chat Logs Modal -->
     <div id="chatLogsModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm px-4">
-        <div class="glass-card rounded-3xl w-full max-w-lg overflow-hidden flex flex-col h-[500px]">
+        <div class="glass-card rounded-3xl w-full max-w-lg overflow-hidden flex flex-col h-[500px] max-h-[85vh]">
             <!-- Header -->
             <div class="p-4 border-b border-white/10 flex justify-between items-center bg-brand-charcoal/50">
                 <div class="flex items-center gap-3">
@@ -852,7 +1450,7 @@
                         <i data-lucide="shield" class="w-5 h-5"></i>
                     </div>
                     <div>
-                        <h3 class="font-bold text-white">Communication Audit</h3>
+                        <h3 class="font-bold text-white">Live Communication</h3>
                         <p id="chatLogTitle" class="text-xs text-gray-400">Loading...</p>
                     </div>
                 </div>
@@ -864,6 +1462,124 @@
             <!-- Messages Area -->
             <div id="chatLogsMessages" class="flex-1 overflow-y-auto p-4 space-y-3 bg-black/40">
                 <!-- Messages populated by JS -->
+            </div>
+            
+            <!-- Admin Chat Input Removed -->
+        </div>
+    </div>
+    <!-- Add Worker Modal -->
+    <div id="addWorkerModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm px-4">
+        <div class="glass-card rounded-3xl w-full max-w-md overflow-hidden flex flex-col max-h-[85vh] overflow-y-auto">
+            <!-- Header -->
+            <div class="p-4 border-b border-white/10 flex justify-between items-center bg-brand-charcoal/50">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-brand-gold/20 flex items-center justify-center text-brand-gold">
+                        <i data-lucide="user-plus" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-white">Add New Operative</h3>
+                        <p class="text-xs text-gray-400">Manually add a worker to the system.</p>
+                    </div>
+                </div>
+                <button onclick="closeAddWorkerModal()" class="p-2 bg-white/5 hover:bg-rose-500/20 text-gray-400 hover:text-rose-400 rounded-full transition-colors">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            
+            <!-- Body -->
+            <div class="p-6 space-y-4 bg-black/40">
+                <div class="space-y-1">
+                    <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest font-mono">Full Name</label>
+                    <input type="text" id="newWorkerName" placeholder="e.g. John Doe" class="w-full px-3 py-2 bg-black/60 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-gold/50">
+                </div>
+                <div class="space-y-1">
+                    <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest font-mono">Email Address</label>
+                    <input type="email" id="newWorkerEmail" placeholder="e.g. john@apexdetail.com" class="w-full px-3 py-2 bg-black/60 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-gold/50">
+                </div>
+                <div class="space-y-1">
+                    <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest font-mono">Password</label>
+                    <input type="text" id="newWorkerPassword" placeholder="Set a secure password" class="w-full px-3 py-2 bg-black/60 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-gold/50">
+                </div>
+                <button onclick="adminManualAddWorker()" class="w-full py-3 mt-2 bg-brand-gold hover:bg-brand-gold/90 text-black font-bold rounded-xl transition-all shine-effect">
+                    Create Operative
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Route History Modal -->
+    <div id="routeHistoryModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm px-4">
+        <div class="glass-card rounded-3xl w-full max-w-4xl overflow-hidden flex flex-col h-[600px] max-h-[90vh] md:flex-row">
+            <!-- Sidebar: List -->
+            <div class="w-full md:w-1/3 bg-brand-charcoal/50 border-r border-white/5 flex flex-col">
+                <div class="p-4 border-b border-white/10 flex justify-between items-center">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-brand-accentBlue/20 flex items-center justify-center text-brand-accentBlue">
+                            <i data-lucide="map" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-white text-sm" id="routeHistoryTitle">Route History</h3>
+                            <p class="text-[10px] text-gray-400 uppercase tracking-widest">Completed Jobs</p>
+                        </div>
+                    </div>
+                </div>
+                <div id="routeHistoryList" class="flex-1 overflow-y-auto p-4 space-y-3">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+            
+            <!-- Map Area -->
+            <div class="w-full md:w-2/3 relative bg-black/40 flex flex-col">
+                <div class="absolute top-4 right-4 z-[60]">
+                    <button onclick="closeRouteHistory()" class="p-2 bg-black/50 border border-white/10 hover:bg-rose-500/20 text-white hover:text-rose-400 rounded-full backdrop-blur-md transition-colors">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+                <div id="historyMapContainer" class="w-full h-full" style="z-index: 0;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payout Modal -->
+    <div id="payoutModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm px-4">
+        <div class="glass-card rounded-3xl w-full max-w-sm overflow-hidden flex flex-col">
+            <div class="p-4 border-b border-white/10 flex justify-between items-center bg-brand-charcoal/50">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400">
+                        <i data-lucide="banknote" class="w-4 h-4"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-white text-sm">Process Payout</h3>
+                    </div>
+                </div>
+                <button onclick="closePayoutModal()" class="p-1.5 bg-white/5 hover:bg-rose-500/20 text-gray-400 hover:text-rose-400 rounded-full transition-colors">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+            <div class="p-6 space-y-5 bg-black/40">
+                <div class="text-center space-y-1">
+                    <p class="text-[10px] text-gray-500 uppercase tracking-widest font-mono">Total Owed to <span id="payoutModalWorkerName">Worker</span></p>
+                    <h2 id="payoutModalAmount" class="text-4xl font-black text-white font-outfit">R0</h2>
+                </div>
+                
+                <div class="p-4 rounded-xl bg-black/60 border border-white/10 space-y-3">
+                    <div>
+                        <span class="block text-[10px] text-gray-500 uppercase font-bold mb-1">Requested Method</span>
+                        <span id="payoutModalMethod" class="text-sm font-medium text-brand-gold">Loading...</span>
+                    </div>
+                    <div>
+                        <span class="block text-[10px] text-gray-500 uppercase font-bold mb-1">Destination Details</span>
+                        <span id="payoutModalDetails" class="text-sm font-mono text-gray-300 break-all">Loading...</span>
+                    </div>
+                </div>
+
+                <div class="p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl text-xs text-rose-400 text-center">
+                    Clicking Confirm simulates a successful real-world transfer and zeros out the worker's pending balance.
+                </div>
+
+                <button onclick="confirmAdminPayout()" class="w-full py-3 bg-emerald-500 hover:bg-emerald-400 text-black font-bold rounded-xl transition-all shine-effect">
+                    Confirm Transfer
+                </button>
             </div>
         </div>
     </div>
