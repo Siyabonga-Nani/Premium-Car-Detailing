@@ -34,6 +34,10 @@
     <!-- Lucide Icons via CDN -->
     <script src="https://unpkg.com/lucide@latest"></script>
 
+    <!-- LeafletJS for Maps -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
     <style>
         /* Modern Premium Animations & Layout Utilities */
         @keyframes float-slow {
@@ -109,6 +113,9 @@
 </head>
 <body class="h-full bg-[#070809] text-white font-inter overflow-y-auto overflow-x-hidden relative selection:bg-brand-accentBlue/30 selection:text-white">
 
+    <!-- Global Notification Container -->
+    <div id="notificationContainer" class="fixed top-20 right-4 z-[9999] w-80 flex flex-col items-end pointer-events-none"></div>
+
     <!-- Ambient Glowing Lights -->
     <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none">
         <!-- Cyan glow top left -->
@@ -167,13 +174,23 @@
             </div>
 
             <!-- Metric 2: Personal Commission -->
-            <div class="glass-card rounded-2xl p-6 flex items-center justify-between relative overflow-hidden">
-                <div class="space-y-1 relative z-10">
-                    <span class="text-xs text-gray-500 uppercase tracking-wider font-mono">My Earnings (70%)</span>
-                    <h3 id="workerEarnings" class="text-4xl font-extrabold font-outfit text-brand-gold">R0</h3>
+            <div class="glass-card rounded-2xl p-6 flex flex-col relative overflow-hidden space-y-3">
+                <div class="flex items-center justify-between">
+                    <div class="space-y-1 relative z-10">
+                        <span id="workerEarningsTitle" class="text-[10px] text-gray-500 uppercase tracking-wider font-mono">Pending Payout</span>
+                        <h3 id="workerEarnings" class="text-3xl font-extrabold font-outfit text-brand-gold">R0</h3>
+                    </div>
+                    <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-brand-gold/20 flex items-center justify-center text-brand-gold relative z-10 shrink-0">
+                        <i data-lucide="dollar-sign" class="w-5 h-5"></i>
+                    </div>
                 </div>
-                <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-brand-gold/20 flex items-center justify-center text-brand-gold relative z-10">
-                    <i data-lucide="dollar-sign" class="w-6 h-6"></i>
+                <div class="flex gap-2 relative z-10">
+                    <button onclick="openWalletModal()" class="flex-1 text-[9px] font-bold text-brand-gold bg-brand-gold/10 px-2 py-1.5 rounded border border-brand-gold/20 hover:bg-brand-gold/20 transition-colors flex items-center justify-center gap-1">
+                        <i data-lucide="wallet" class="w-3 h-3"></i> Wallet Settings
+                    </button>
+                    <button id="depositCashBtn" onclick="depositCash()" class="hidden flex-1 text-[9px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-1.5 rounded border border-emerald-500/20 hover:bg-emerald-500/20 transition-colors flex items-center justify-center gap-1">
+                        <i data-lucide="download" class="w-3 h-3"></i> Deposit Cash
+                    </button>
                 </div>
             </div>
 
@@ -181,7 +198,10 @@
             <div class="glass-card rounded-2xl p-6 flex items-center justify-between relative overflow-hidden">
                 <div class="space-y-1 relative z-10">
                     <span class="text-xs text-gray-500 uppercase tracking-wider font-mono">Operative Rank</span>
-                    <h3 class="text-2xl font-bold font-outfit text-white">Senior Valet</h3>
+                    <h3 id="workerRankDisplay" class="text-2xl font-bold font-outfit text-white">Senior Valet</h3>
+                    <div id="workerRatingDisplay" class="text-xs font-bold text-brand-gold flex items-center gap-1 mt-1">
+                        <span>No Ratings Yet</span>
+                    </div>
                 </div>
                 <div class="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 relative z-10">
                     <i data-lucide="award" class="w-6 h-6"></i>
@@ -212,36 +232,7 @@
                 </section>
 
                 <!-- MAP / GPS ROUTE SIMULATION -->
-                <section id="mockMapSection" class="hidden glass-card rounded-3xl p-6 space-y-4">
-                    <div class="flex justify-between items-center">
-                        <div class="flex items-center gap-2">
-                            <i data-lucide="navigation" class="w-5 h-5 text-brand-accentBlue animate-pulse"></i>
-                            <h4 class="font-bold text-white font-outfit">Operative Dispatch Route</h4>
-                        </div>
-                        <button onclick="closeMap()" class="text-xs text-gray-500 hover:text-white transition-colors">Close GPS</button>
-                    </div>
-                    
-                    <!-- Beautiful Vector Mock Map -->
-                    <div class="h-64 rounded-2xl bg-black/80 border border-white/5 relative overflow-hidden flex items-center justify-center">
-                        <!-- Grid lines -->
-                        <div class="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:20px_20px] pointer-events-none"></div>
-                        <!-- Cybernetic Route -->
-                        <svg class="absolute inset-0 w-full h-full opacity-60" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M 50,50 Q 200,100 250,180 T 500,220" fill="none" stroke="#00D8FF" stroke-width="4" stroke-linecap="round" stroke-dasharray="10 5" />
-                            <circle cx="50" cy="50" r="8" fill="#AA7C11" />
-                            <circle cx="500" cy="220" r="10" fill="#00D8FF" class="animate-pulse" />
-                        </svg>
-                        
-                        <div class="absolute top-4 left-4 bg-black/70 border border-white/10 px-3.5 py-1.5 rounded-xl text-xs space-y-0.5">
-                            <span class="text-gray-500 block text-[9px] uppercase font-mono">NAVIGATING TO</span>
-                            <span id="mapDestinationText" class="font-bold text-white">Sandton Drive</span>
-                        </div>
-                        
-                        <div class="absolute bottom-4 right-4 bg-brand-accentBlue text-black px-4 py-2 rounded-xl text-xs font-bold shadow-[0_0_15px_rgba(0,216,255,0.3)]">
-                            Route Dispatch Active • 12 mins
-                        </div>
-                    </div>
-                </section>
+                <!-- Removed mock map: Now using real Google Maps redirection -->
 
             </div>
 
@@ -287,6 +278,22 @@
                             <div class="text-[10px] text-gray-400 pt-2 border-t border-white/5 flex items-center gap-1">
                                 <i data-lucide="map-pin" class="w-3 h-3 text-brand-accentBlue"></i>
                                 <span id="activeJobLocation">42 Sandton Drive</span>
+                            </div>
+                        </div>
+
+                        <!-- Worker Team (Multi-assignment display and Invite) -->
+                        <div class="p-4 rounded-2xl bg-brand-accentBlue/5 border border-brand-accentBlue/20 space-y-2">
+                            <div class="flex justify-between items-center">
+                                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Job Team</span>
+                            </div>
+                            <div id="activeJobTeamContainer" class="flex flex-wrap gap-1.5 mb-2">
+                                <!-- Tags will be dynamically populated -->
+                            </div>
+                            <div class="relative pt-1 border-t border-white/5">
+                                <select id="inviteWorkerSelect" onchange="inviteWorker(this.value)" class="w-full px-2.5 py-1.5 bg-black/40 border border-white/10 rounded-xl text-[10px] text-gray-300 focus:outline-none">
+                                    <option value="">+ Invite Co-Worker</option>
+                                    <!-- Options generated dynamically -->
+                                </select>
                             </div>
                         </div>
 
@@ -347,9 +354,10 @@
                             <span id="progressTriggerBtnText">Initiate Foam Wash (Step 2)</span>
                         </button>
 
-                        <button onclick="openChat()" class="w-full py-3 bg-brand-accentBlue/10 hover:bg-brand-accentBlue/20 text-brand-accentBlue border border-brand-accentBlue/20 rounded-2xl font-bold text-xs flex items-center justify-center gap-2 transition-all">
+                        <button onclick="openChat()" class="relative w-full py-3 bg-brand-accentBlue/10 hover:bg-brand-accentBlue/20 text-brand-accentBlue border border-brand-accentBlue/20 rounded-2xl font-bold text-xs flex items-center justify-center gap-2 transition-all">
                             <i data-lucide="message-circle" class="w-5 h-5"></i>
                             Open Client Chat
+                            <span id="workerChatBadge" class="hidden absolute -top-1 -right-1 w-3 h-3 bg-rose-500 rounded-full border border-black animate-pulse"></span>
                         </button>
 
                     </div>
@@ -365,8 +373,34 @@
     <script>
         lucide.createIcons();
 
+        let notifiedBookings = {};
+
+        function showNotification(title, message) {
+            const container = document.getElementById('notificationContainer');
+            const toast = document.createElement('div');
+            toast.className = 'glass-card border-brand-accentBlue/30 p-4 rounded-xl shadow-2xl flex items-start gap-3 mb-3 translate-x-[120%] transition-transform duration-500 z-50 pointer-events-auto';
+            toast.innerHTML = `
+                <div class="w-8 h-8 rounded-full bg-brand-accentBlue/20 flex items-center justify-center text-brand-accentBlue shrink-0">
+                    <i data-lucide="bell" class="w-4 h-4"></i>
+                </div>
+                <div>
+                    <h4 class="font-bold text-white text-sm">${title}</h4>
+                    <p class="text-xs text-gray-400 mt-0.5">${message}</p>
+                </div>
+            `;
+            container.appendChild(toast);
+            lucide.createIcons();
+            
+            setTimeout(() => { toast.style.transform = 'translateX(0)'; }, 50);
+            
+            setTimeout(() => {
+                toast.style.transform = 'translateX(120%)';
+                setTimeout(() => toast.remove(), 500);
+            }, 5000);
+        }
+
         // 1. Retrieve the active logged in worker details from dynamic session
-        const activeWorker = JSON.parse(localStorage.getItem('apex_active_worker')) || { name: 'Worker Justin', email: 'worker@apexdetail.com' };
+        const activeWorker = JSON.parse(localStorage.getItem('apex_active_worker')) || { name: 'Worker Justin', email: 'worker@apexdetail.com', experience: 3 };
         
         // Update header UI to display the active Operative's name dynamically
         document.getElementById('workerName').innerText = 'Operator: ' + activeWorker.name.replace('Worker ', '');
@@ -394,30 +428,135 @@
         function loadWorkerDashboard() {
             let bookings = JSON.parse(localStorage.getItem('apex_bookings')) || [];
             
-            // Calculate completed numbers & commissions for THIS specific operative
             let completedCount = 0;
             let totalEarnings = 0;
+            let totalStars = 0;
+            let reviewCount = 0;
             
             bookings.forEach(b => {
-                const assigned = b.workerAssigned || '';
+                const assignedStr = b.workerAssigned || '';
+                const assignedWorkers = assignedStr.split(',').map(w => w.trim()).filter(w => w !== '');
+                
                 const activeName = activeWorker.name;
                 const cleanActiveName = activeName.replace('Worker ', '');
                 
-                if (b.status === 'Completed' && (assigned === activeName || assigned === cleanActiveName)) {
+                if (b.status === 'Completed' && (assignedWorkers.includes(activeName) || assignedWorkers.includes(cleanActiveName))) {
                     completedCount++;
-                    // Worker receives 70% commission
-                    totalEarnings += (b.total * 0.70);
+                    
+                    if (b.review) {
+                        totalStars += b.review.rating;
+                        reviewCount++;
+                    }
+                }
+            });
+
+            // Calculate Dynamic Rank & Exp
+            let avgRating = reviewCount > 0 ? (totalStars / reviewCount).toFixed(1) : 0;
+            let dynamicExp = 1;
+            let rankText = "Junior Valet";
+            
+            if (reviewCount >= 1 && avgRating >= 4.0) {
+                dynamicExp = 2; // Unlocks > 300 jobs
+                rankText = "Senior Valet";
+            }
+            if (reviewCount >= 3 && avgRating >= 4.5) {
+                dynamicExp = 5; // Max commission rate
+                rankText = "Master Detailer";
+            }
+            
+            // Save updated experience
+            activeWorker.experience = dynamicExp;
+            localStorage.setItem('apex_active_worker', JSON.stringify(activeWorker));
+
+            // Apply flat 30% commission on everything
+            let commissionRate = 0.30;
+
+            // Recalculate earnings with new commission
+            totalEarnings = 0;
+            let totalTips = 0;
+            let pendingCashLiabilities = 0;
+            
+            bookings.forEach(b => {
+                const assignedStr = b.workerAssigned || '';
+                const assignedWorkers = assignedStr.split(',').map(w => w.trim()).filter(w => w !== '');
+                const activeName = activeWorker.name;
+                const cleanActiveName = activeName.replace('Worker ', '');
+                
+                if (b.status === 'Completed' && (assignedWorkers.includes(activeName) || assignedWorkers.includes(cleanActiveName))) {
+                    const totalAmt = parseFloat(b.total) || 0;
+                    let productTotal = 0;
+                    if (b.products && b.products.length > 0) {
+                        b.products.forEach(p => { productTotal += parseFloat(p.price) || 0; });
+                    }
+                    let serviceTotal = totalAmt - productTotal;
+                    
+                    let deliveryTotal = 0;
+                    if (b.service === 'Product Delivery Only') {
+                        deliveryTotal = serviceTotal;
+                        serviceTotal = 0;
+                    }
+
+                    if (!b.payoutSettled) {
+                        const splitServiceTotal = serviceTotal / assignedWorkers.length;
+                        const splitDeliveryTotal = deliveryTotal / assignedWorkers.length;
+                        
+                        totalEarnings += (splitServiceTotal * commissionRate) + splitDeliveryTotal;
+                        
+                        if (b.tip) {
+                            const splitTip = b.tip / assignedWorkers.length;
+                            totalTips += splitTip;
+                            totalEarnings += splitTip;
+                        }
+                    }
+                    if (b.payment === 'Cash' && !b.cashSettled) {
+                        pendingCashLiabilities += (totalAmt / assignedWorkers.length);
+                    }
                 }
             });
             
             document.getElementById('completedJobsCount').innerText = completedCount;
+            if (totalTips > 0) {
+                document.getElementById('workerEarningsTitle').innerText = 'Pending Payout (30% Split / Includes R' + totalTips.toFixed(0) + ' in Tips)';
+            } else {
+                document.getElementById('workerEarningsTitle').innerText = 'Pending Payout (30% Split)';
+            }
             document.getElementById('workerEarnings').innerText = 'R' + totalEarnings.toFixed(0);
+            
+            const depositBtn = document.getElementById('depositCashBtn');
+            if (pendingCashLiabilities > 0) {
+                depositBtn.classList.remove('hidden');
+                depositBtn.innerHTML = `<i data-lucide="download" class="w-3 h-3"></i> Deposit Cash (R${pendingCashLiabilities.toFixed(0)})`;
+            } else {
+                depositBtn.classList.add('hidden');
+            }
+            
+            document.getElementById('workerRankDisplay').innerText = rankText;
+            if (reviewCount > 0) {
+                document.getElementById('workerRatingDisplay').innerHTML = `<span>${avgRating}</span><i data-lucide="star" class="w-3.5 h-3.5 fill-current text-brand-gold"></i><span class="text-gray-500 ml-1">(${reviewCount})</span>`;
+            } else {
+                document.getElementById('workerRatingDisplay').innerHTML = `<span>No Ratings Yet</span>`;
+            }
+            lucide.createIcons();
 
             // Synchronize active claimed job details in real-time from the database
             if (activeJob) {
                 const refreshedJob = bookings.find(b => b.id === activeJob.id);
                 if (refreshedJob) {
                     activeJob = refreshedJob;
+                    // Check notifications
+                    if (activeJob.unreadWorker) {
+                        const badge = document.getElementById('workerChatBadge');
+                        if (badge) badge.classList.remove('hidden');
+                        
+                        if (!notifiedBookings[activeJob.id] && !chatModalOpen) {
+                            showNotification('New Client Message', `You have a new message regarding ${activeJob.name}'s car.`);
+                            notifiedBookings[activeJob.id] = true;
+                        }
+                    } else {
+                        const badge = document.getElementById('workerChatBadge');
+                        if (badge) badge.classList.add('hidden');
+                    }
+
                     if (activeJob.status === 'Completed') {
                         activeJob = null;
                         document.getElementById('activeJobController').classList.add('hidden');
@@ -437,7 +576,22 @@
             container.innerHTML = '';
             
             // Filter pipeline: Only show Pending or Approved bookings assigned to ME (or unassigned)
-            const pipelineJobs = bookings.filter(b => b.status !== 'Completed' && (!b.workerAssigned || b.workerAssigned === activeWorker.name || b.workerAssigned === activeWorker.name.replace('Worker ', '')));
+            // Also filter by experience: Exp 0-1 gets cheap jobs (basePrice <= 300), Exp 2-3 gets expensive jobs (basePrice > 300)
+            const pipelineJobs = bookings.filter(b => {
+                const isAvailable = b.status !== 'Completed' && (!b.workerAssigned || b.workerAssigned === activeWorker.name || b.workerAssigned === activeWorker.name.replace('Worker ', ''));
+                if (!isAvailable) return false;
+                
+                const exp = activeWorker.experience !== undefined ? activeWorker.experience : 1;
+                
+                // Allow bypassing exp filter if job is explicitly assigned to this worker by admin
+                if (b.workerAssigned) return true;
+
+                if (exp <= 1) {
+                    return b.basePrice <= 300;
+                } else {
+                    return b.basePrice > 300;
+                }
+            });
             
             document.getElementById('pipelineCountBadge').innerText = pipelineJobs.length + ' Jobs';
 
@@ -476,7 +630,7 @@
                         actionBtnHtml = `
                             <button onclick="claimActiveJob('${b.id}')" class="shine-effect w-full bg-gradient-to-r from-brand-accentBlue to-indigo-500 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 shadow-md">
                                 <i data-lucide="play" class="w-3.5 h-3.5"></i>
-                                <span>Start Work Operations</span>
+                                <span>${b.service === 'Product Delivery Only' ? 'Start Delivery' : 'Start Work Operations'}</span>
                             </button>
                         `;
                     }
@@ -517,7 +671,7 @@
 
                     <div class="pt-3 mt-2 border-t border-white/5 space-y-2">
                         <div class="flex justify-between items-center text-xs">
-                            <button onclick="triggerDispatchGPS('${b.location}')" class="text-[10px] text-brand-accentBlue hover:underline flex items-center gap-1">
+                            <button onclick="triggerDispatchGPS('${b.location}', '${b.id}')" class="text-[10px] text-brand-accentBlue hover:underline flex items-center gap-1">
                                 <i data-lucide="navigation" class="w-3 h-3"></i>
                                 <span>Get Route GPS</span>
                             </button>
@@ -570,6 +724,30 @@
             document.getElementById('activeCarModel').innerText = activeJob.car;
             document.getElementById('activeJobLocation').innerText = activeJob.location;
             document.getElementById('activeJobPrice').innerText = 'R' + activeJob.total;
+            
+            // Populate Job Team
+            const assignedWorkers = activeJob.workerAssigned ? activeJob.workerAssigned.split(',').map(w => w.trim()).filter(w => w !== 'Unassigned' && w !== '') : [];
+            const teamContainer = document.getElementById('activeJobTeamContainer');
+            if (assignedWorkers.length > 0) {
+                teamContainer.innerHTML = assignedWorkers.map(w => `<span class="bg-brand-accentBlue/10 border border-brand-accentBlue/20 px-2 py-0.5 rounded text-[10px] text-brand-accentBlue">${w}</span>`).join('');
+            } else {
+                teamContainer.innerHTML = `<span class="text-[10px] text-gray-500 italic">Just you</span>`;
+            }
+            
+            // Populate Invite Dropdown
+            let workersList = JSON.parse(localStorage.getItem('apex_workers')) || [
+                { name: 'Worker Justin' }, { name: 'Worker Marcus' }, { name: 'Worker Cleopatra' }
+            ];
+            const inviteSelect = document.getElementById('inviteWorkerSelect');
+            const availableWorkers = workersList.filter(w => !assignedWorkers.includes(w.name) && !assignedWorkers.includes(w.name.replace('Worker ', '')));
+            
+            if (availableWorkers.length > 0) {
+                inviteSelect.innerHTML = `<option value="">+ Invite Co-Worker</option>` + availableWorkers.map(w => `<option value="${w.name}">${w.name}</option>`).join('');
+                inviteSelect.classList.remove('hidden');
+            } else {
+                inviteSelect.classList.add('hidden');
+            }
+
 
             const stepDots = [
                 document.getElementById('stepDot_1'),
@@ -593,14 +771,41 @@
                 stepDots[i].className = "absolute -left-[14px] top-1.5 w-2 h-2 rounded-full bg-gray-600 ring-4 ring-black";
                 stepTexts[i].className = "text-xs font-bold text-gray-500";
             }
+            
+            const isDelivery = activeJob.service === 'Product Delivery Only';
+            
+            if (isDelivery) {
+                stepTexts[0].innerText = "1. Taken from Stock";
+                stepTexts[0].nextElementSibling.innerText = "Products picked up and packed.";
+                stepTexts[1].innerText = "2. Active: On the Way";
+                stepTexts[1].nextElementSibling.innerText = "Operative is en route to your location.";
+                stepTexts[2].innerText = "3. Active: Almost There";
+                stepTexts[2].nextElementSibling.innerText = "Approaching drop-off point.";
+                stepTexts[3].innerText = "4. At the Gate";
+                stepTexts[3].nextElementSibling.innerText = "Delivery has arrived at the location.";
+            } else {
+                stepTexts[0].innerText = "1. Arrived & Inspected";
+                stepTexts[0].nextElementSibling.innerText = "Operative arrived on site; paint/interior check.";
+                stepTexts[1].innerText = "2. Active: Foam Washing";
+                stepTexts[1].nextElementSibling.innerText = "Deep pressure rinse & premium foam scrub.";
+                stepTexts[2].innerText = "3. Active: Hand Polishing";
+                stepTexts[2].nextElementSibling.innerText = "Paint protective waxing & micro-abrasive shine.";
+                stepTexts[3].innerText = "4. Final Inspection";
+                stepTexts[3].nextElementSibling.innerText = "Quality check & handover to client.";
+            }
 
             // Sync status mapping to active visual step
             if (activeJob.status === 'Approved') {
                 // Step 1 active
                 stepDots[0].className = "absolute -left-[14px] top-1.5 w-2 h-2 rounded-full bg-brand-accentBlue ring-4 ring-brand-accentBlue/20";
                 stepTexts[0].className = "text-xs font-bold text-brand-accentBlue";
-                btnText.innerText = "Initiate Foam Wash (Step 2)";
-                btn.onclick = () => advanceActiveJobStatus('Washing', 'Washing exterior body using high-foam snow treatment.');
+                if (isDelivery) {
+                    btnText.innerText = "Mark On the Way (Step 2)";
+                    btn.onclick = () => advanceActiveJobStatus('Washing', 'Delivery has left the stockroom and is on the way.');
+                } else {
+                    btnText.innerText = "Initiate Foam Wash (Step 2)";
+                    btn.onclick = () => advanceActiveJobStatus('Washing', 'Washing exterior body using high-foam snow treatment.');
+                }
             } else if (activeJob.status === 'Washing') {
                 // Step 1 and 2 completed/active
                 stepDots[0].className = "absolute -left-[14px] top-1.5 w-2 h-2 rounded-full bg-emerald-500";
@@ -608,8 +813,14 @@
                 
                 stepDots[1].className = "absolute -left-[14px] top-1.5 w-2 h-2 rounded-full bg-brand-accentBlue ring-4 ring-brand-accentBlue/20 animate-pulse";
                 stepTexts[1].className = "text-xs font-bold text-brand-accentBlue";
-                btnText.innerText = "Start Paint Polishing (Step 3)";
-                btn.onclick = () => advanceActiveJobStatus('Polishing', 'Foam scrub complete. Commencing machine protective wax buffing.');
+                
+                if (isDelivery) {
+                    btnText.innerText = "Mark Almost There (Step 3)";
+                    btn.onclick = () => advanceActiveJobStatus('Polishing', 'Delivery is approaching your location.');
+                } else {
+                    btnText.innerText = "Start Paint Polishing (Step 3)";
+                    btn.onclick = () => advanceActiveJobStatus('Polishing', 'Foam scrub complete. Commencing machine protective wax buffing.');
+                }
             } else if (activeJob.status === 'Polishing') {
                 // Step 1, 2 completed, 3 active
                 stepDots[0].className = "absolute -left-[14px] top-1.5 w-2 h-2 rounded-full bg-emerald-500";
@@ -619,8 +830,13 @@
 
                 stepDots[2].className = "absolute -left-[14px] top-1.5 w-2 h-2 rounded-full bg-brand-accentBlue ring-4 ring-brand-accentBlue/20 animate-pulse";
                 stepTexts[2].className = "text-xs font-bold text-brand-accentBlue";
-                btnText.innerText = "Complete Work & Collect (Step 4)";
-                btn.onclick = () => advanceActiveJobStatus('Completed', 'Polishing and cabin refreshes complete. Showroom wax coat finalized!');
+                if (isDelivery) {
+                    btnText.innerText = "Mark At the Gate (Step 4)";
+                    btn.onclick = () => advanceActiveJobStatus('Completed', 'Delivery has arrived at the gate/door.');
+                } else {
+                    btnText.innerText = "Complete Work & Collect (Step 4)";
+                    btn.onclick = () => advanceActiveJobStatus('Completed', 'Polishing and cabin refreshes complete. Showroom wax coat finalized!');
+                }
             }
             lucide.createIcons();
         }
@@ -649,6 +865,28 @@
             }
         }
 
+        // Action: Invite a coworker to active job
+        function inviteWorker(workerName) {
+            if (!workerName || !activeJob) return;
+            
+            let bookings = JSON.parse(localStorage.getItem('apex_bookings')) || [];
+            const index = bookings.findIndex(b => b.id === activeJob.id);
+            
+            if (index !== -1) {
+                let assigned = bookings[index].workerAssigned ? bookings[index].workerAssigned.split(',').map(w => w.trim()).filter(w => w !== 'Unassigned' && w !== '') : [];
+                if (!assigned.includes(workerName)) {
+                    assigned.push(workerName);
+                    bookings[index].workerAssigned = assigned.join(', ');
+                    localStorage.setItem('apex_bookings', JSON.stringify(bookings));
+                    
+                    activeJob = bookings[index];
+                    renderActiveJobTracker();
+                    loadWorkerDashboard();
+                    alert(`✅ ${workerName} invited successfully! They will now see this job in their pipeline.`);
+                }
+            }
+        }
+
         // Action: Push a custom live status note to client dashboard
         function updateWorkerNotes() {
             const input = document.getElementById('workerNotesInput');
@@ -670,15 +908,125 @@
             }
         }
 
-        // Route GPS simulation triggers
-        function triggerDispatchGPS(locationAddress) {
-            document.getElementById('mockMapSection').classList.remove('hidden');
-            document.getElementById('mapDestinationText').innerText = locationAddress;
-            document.getElementById('mockMapSection').scrollIntoView({ behavior: 'smooth' });
+        // Real Route GPS trigger
+        let workerMap = null;
+        let mapRoutingLine = null;
+        let workerLocMarker = null;
+        let clientLocMarker = null;
+        let gpsWatchId = null;
+
+        async function triggerDispatchGPS(locationAddress, bookingId) {
+            document.getElementById('workerMapModal').classList.remove('hidden');
+            
+            setTimeout(async () => {
+                if (!workerMap) {
+                    workerMap = L.map('workerMapContainer').setView([-26.2041, 28.0473], 12);
+                    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                        attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+                        subdomains: 'abcd',
+                        maxZoom: 20
+                    }).addTo(workerMap);
+                } else {
+                    workerMap.invalidateSize();
+                }
+
+                // Clear old layers
+                if (mapRoutingLine) workerMap.removeLayer(mapRoutingLine);
+                if (workerLocMarker) workerMap.removeLayer(workerLocMarker);
+                if (clientLocMarker) workerMap.removeLayer(clientLocMarker);
+
+                // Default Johannesburg
+                let workerLat = -26.2041;
+                let workerLng = 28.0473;
+                let clientLat = -26.1041;
+                let clientLng = 28.0073;
+
+                document.getElementById('mapStatusText').innerText = "Locating GPS coordinates...";
+
+                try {
+                    // Try to get worker initial location
+                    const pos = await new Promise((resolve, reject) => {
+                        navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 5000 });
+                    });
+                    workerLat = pos.coords.latitude;
+                    workerLng = pos.coords.longitude;
+                    
+                    // Share initial location to client
+                    if (bookingId) {
+                        let bookings = JSON.parse(localStorage.getItem('apex_bookings')) || [];
+                        const bIndex = bookings.findIndex(b => b.id === bookingId);
+                        if (bIndex !== -1) {
+                            bookings[bIndex].workerLocation = { lat: workerLat, lng: workerLng };
+                            localStorage.setItem('apex_bookings', JSON.stringify(bookings));
+                        }
+                    }
+                    
+                    // Continuous tracking
+                    if (gpsWatchId) navigator.geolocation.clearWatch(gpsWatchId);
+                    gpsWatchId = navigator.geolocation.watchPosition((watchPos) => {
+                        workerLat = watchPos.coords.latitude;
+                        workerLng = watchPos.coords.longitude;
+                        if (workerLocMarker) workerLocMarker.setLatLng([workerLat, workerLng]);
+                        
+                        if (bookingId) {
+                            let bookings = JSON.parse(localStorage.getItem('apex_bookings')) || [];
+                            const bIndex = bookings.findIndex(b => b.id === bookingId);
+                            if (bIndex !== -1) {
+                                bookings[bIndex].workerLocation = { lat: workerLat, lng: workerLng };
+                                localStorage.setItem('apex_bookings', JSON.stringify(bookings));
+                            }
+                        }
+                    }, (e) => {
+                        console.log("GPS tracking lost.", e);
+                    }, { enableHighAccuracy: true });
+
+                } catch (e) {
+                    console.log("Using simulated worker location due to GPS error.", e);
+                }
+
+                try {
+                    // Geocode client location
+                    const geocodeRes = await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + encodeURIComponent(locationAddress));
+                    const geocodeData = await geocodeRes.json();
+                    if (geocodeData && geocodeData.length > 0) {
+                        clientLat = parseFloat(geocodeData[0].lat);
+                        clientLng = parseFloat(geocodeData[0].lon);
+                    } else {
+                        console.log("Geocoding failed, using simulated destination.");
+                    }
+                } catch (e) {
+                    console.log("Geocoding error", e);
+                }
+
+                document.getElementById('mapStatusText').innerText = "Route Mapped";
+
+                // Custom Icons
+                const clientIcon = L.divIcon({
+                    html: `<div class="w-8 h-8 bg-brand-accentBlue text-black rounded-full flex items-center justify-center shadow-[0_0_15px_rgba(0,216,255,0.5)]"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></div>`,
+                    className: '', iconSize: [32, 32], iconAnchor: [16, 32]
+                });
+
+                const workerIcon = L.divIcon({
+                    html: `<div class="w-8 h-8 bg-brand-gold text-black rounded-full flex items-center justify-center shadow-[0_0_15px_rgba(212,175,55,0.5)]"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="7" cy="11" r="2"/><circle cx="17" cy="11" r="2"/><path d="M14 11V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v4"/></svg></div>`,
+                    className: '', iconSize: [32, 32], iconAnchor: [16, 32]
+                });
+
+                workerLocMarker = L.marker([workerLat, workerLng], {icon: workerIcon}).addTo(workerMap).bindPopup("Your Location");
+                clientLocMarker = L.marker([clientLat, clientLng], {icon: clientIcon}).addTo(workerMap).bindPopup("Client Location");
+
+                mapRoutingLine = L.polyline([[workerLat, workerLng], [clientLat, clientLng]], {color: '#00D8FF', weight: 4, dashArray: '10, 10'}).addTo(workerMap);
+
+                workerMap.fitBounds(mapRoutingLine.getBounds(), { padding: [50, 50] });
+
+            }, 200);
         }
 
-        function closeMap() {
-            document.getElementById('mockMapSection').classList.add('hidden');
+        function closeWorkerMap() {
+            document.getElementById('workerMapModal').classList.add('hidden');
+            if (gpsWatchId) {
+                navigator.geolocation.clearWatch(gpsWatchId);
+                gpsWatchId = null;
+            }
         }
 
         let chatModalOpen = false;
@@ -690,6 +1038,16 @@
             }
             chatModalOpen = true;
             document.getElementById('chatModal').classList.remove('hidden');
+            
+            let bookings = JSON.parse(localStorage.getItem('apex_bookings')) || [];
+            const index = bookings.findIndex(b => b.id === activeJob.id);
+            if (index !== -1 && bookings[index].unreadWorker) {
+                bookings[index].unreadWorker = false;
+                notifiedBookings[activeJob.id] = false;
+                localStorage.setItem('apex_bookings', JSON.stringify(bookings));
+                loadWorkerDashboard(); // update badge
+            }
+            
             renderChat();
         }
 
@@ -760,6 +1118,9 @@
                     timestamp: timeStr
                 });
                 
+                bookings[index].unreadClient = true;
+                bookings[index].unreadAdmin = true;
+                
                 localStorage.setItem('apex_bookings', JSON.stringify(bookings));
                 input.value = '';
                 
@@ -770,6 +1131,58 @@
                 const messagesContainer = document.getElementById('chatMessages');
                 messagesContainer.scrollTop = messagesContainer.scrollHeight;
             }
+        }
+
+        function depositCash() {
+            if (confirm("You are about to securely transfer your collected physical cash to the studio's digital account. Proceed?")) {
+                let bookings = JSON.parse(localStorage.getItem('apex_bookings')) || [];
+                const activeName = activeWorker.name;
+                const cleanActiveName = activeName.replace('Worker ', '');
+                
+                let deposited = 0;
+                bookings.forEach(b => {
+                    const assignedStr = b.workerAssigned || '';
+                    const assignedWorkers = assignedStr.split(',').map(w => w.trim()).filter(w => w !== '');
+                    
+                    if (b.status === 'Completed' && b.payment === 'Cash' && !b.cashSettled && (assignedWorkers.includes(activeName) || assignedWorkers.includes(cleanActiveName))) {
+                        b.cashSettled = true;
+                        deposited += (b.total / assignedWorkers.length);
+                    }
+                });
+                
+                if (deposited > 0) {
+                    localStorage.setItem('apex_bookings', JSON.stringify(bookings));
+                    showNotification('Cash Deposited', `Successfully transferred R${deposited.toFixed(0)} to Apex Studio.`);
+                    loadWorkerDashboard();
+                }
+            }
+        }
+
+        function openWalletModal() {
+            document.getElementById('payoutMethod').value = activeWorker.payoutMethod || 'Card/Bank Transfer';
+            document.getElementById('payoutDetails').value = activeWorker.payoutDetails || '';
+            document.getElementById('walletModal').classList.remove('hidden');
+        }
+
+        function closeWalletModal() {
+            document.getElementById('walletModal').classList.add('hidden');
+        }
+
+        function saveWalletSettings() {
+            activeWorker.payoutMethod = document.getElementById('payoutMethod').value;
+            activeWorker.payoutDetails = document.getElementById('payoutDetails').value.trim();
+            localStorage.setItem('apex_active_worker', JSON.stringify(activeWorker));
+            
+            let workers = JSON.parse(localStorage.getItem('apex_workers')) || [];
+            const index = workers.findIndex(w => w.name === activeWorker.name);
+            if (index !== -1) {
+                workers[index].payoutMethod = activeWorker.payoutMethod;
+                workers[index].payoutDetails = activeWorker.payoutDetails;
+                localStorage.setItem('apex_workers', JSON.stringify(workers));
+            }
+            
+            closeWalletModal();
+            showNotification('Wallet Updated', 'Your preferred payout method has been saved.');
         }
     </script>
 
@@ -802,6 +1215,65 @@
                 <input type="text" id="chatInput" placeholder="Type a message..." class="flex-1 px-4 py-2 bg-black/60 border border-white/10 rounded-xl text-sm text-white focus:outline-none focus:border-brand-accentBlue/50" onkeypress="if(event.key === 'Enter') sendChatMessage()">
                 <button onclick="sendChatMessage()" class="px-4 py-2 bg-brand-accentBlue hover:bg-brand-accentBlue/80 text-black font-bold rounded-xl transition-all shadow-[0_0_10px_rgba(0,216,255,0.2)]">
                     <i data-lucide="send" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Worker Map Modal -->
+    <div id="workerMapModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm px-4">
+        <div class="glass-card rounded-3xl w-full max-w-2xl overflow-hidden flex flex-col h-[500px] max-h-[85vh]">
+            <div class="p-4 border-b border-white/10 flex justify-between items-center bg-brand-charcoal/50">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-brand-accentBlue/20 flex items-center justify-center text-brand-accentBlue">
+                        <i data-lucide="navigation" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-white">Route Preview</h3>
+                    </div>
+                </div>
+                <button onclick="closeWorkerMap()" class="p-2 bg-white/5 hover:bg-rose-500/20 text-gray-400 hover:text-rose-400 rounded-full transition-colors">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            
+            <div class="flex-1 relative bg-black/40">
+                <div id="workerMapContainer" class="w-full h-full" style="z-index: 0;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Wallet Modal -->
+    <div id="walletModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm px-4">
+        <div class="glass-card rounded-3xl w-full max-w-sm overflow-hidden flex flex-col">
+            <div class="p-4 border-b border-white/10 flex justify-between items-center bg-brand-charcoal/50">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-brand-gold/20 flex items-center justify-center text-brand-gold">
+                        <i data-lucide="wallet" class="w-4 h-4"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-white text-sm">Payout Settings</h3>
+                    </div>
+                </div>
+                <button onclick="closeWalletModal()" class="p-1.5 bg-white/5 hover:bg-rose-500/20 text-gray-400 hover:text-rose-400 rounded-full transition-colors">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+            <div class="p-5 space-y-4 bg-black/40">
+                <div class="space-y-1">
+                    <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest font-mono">Preferred Payout Method</label>
+                    <select id="payoutMethod" class="w-full px-3 py-2 bg-black/60 border border-white/10 rounded-xl text-xs text-white focus:outline-none focus:border-brand-gold/50">
+                        <option value="Card/Bank Transfer">Card/Bank Transfer</option>
+                        <option value="PayPal">PayPal</option>
+                        <option value="Crypto Wallet">Crypto Wallet</option>
+                    </select>
+                </div>
+                <div class="space-y-1">
+                    <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest font-mono">Account / Wallet Details</label>
+                    <input type="text" id="payoutDetails" placeholder="e.g. 0x... or email@paypal.com" class="w-full px-3 py-2 bg-black/60 border border-white/10 rounded-xl text-xs text-white focus:outline-none focus:border-brand-gold/50">
+                </div>
+                <button onclick="saveWalletSettings()" class="w-full py-2.5 mt-2 bg-brand-gold hover:bg-brand-darkGold text-[#0c0d0e] font-bold rounded-xl transition-all text-xs shine-effect">
+                    Save Wallet Data
                 </button>
             </div>
         </div>
