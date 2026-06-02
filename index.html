@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" class="h-full">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -29,11 +30,13 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
     <!-- Lucide Icons via CDN -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    
+
     <!-- Firebase SDK Compat (v9) -->
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
@@ -41,37 +44,81 @@
     <style>
         /* Custom Premium Animations */
         @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-15px) rotate(3deg); }
+
+            0%,
+            100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-15px) rotate(3deg);
+            }
         }
+
         @keyframes float-slow {
-            0%, 100% { transform: translate(0px, 0px) scale(1); }
-            33% { transform: translate(30px, -50px) scale(1.1); }
-            66% { transform: translate(-20px, 20px) scale(0.9); }
+
+            0%,
+            100% {
+                transform: translate(0px, 0px) scale(1);
+            }
+
+            33% {
+                transform: translate(30px, -50px) scale(1.1);
+            }
+
+            66% {
+                transform: translate(-20px, 20px) scale(0.9);
+            }
         }
+
         @keyframes pulse-glow {
-            0%, 100% { opacity: 0.3; transform: scale(1); }
-            50% { opacity: 0.6; transform: scale(1.05); }
+
+            0%,
+            100% {
+                opacity: 0.3;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.6;
+                transform: scale(1.05);
+            }
         }
+
         @keyframes zoom-bg {
-            0% { transform: scale(1.05); filter: brightness(0.4) blur(0px); }
-            100% { transform: scale(1.15); filter: brightness(0.3) blur(2px); }
+            0% {
+                transform: scale(1.05);
+                filter: brightness(0.4) blur(0px);
+            }
+
+            100% {
+                transform: scale(1.15);
+                filter: brightness(0.3) blur(2px);
+            }
         }
+
         @keyframes shimmer {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
+            0% {
+                transform: translateX(-100%);
+            }
+
+            100% {
+                transform: translateX(100%);
+            }
         }
 
         .animate-float-slow-1 {
             animation: float-slow 15s infinite ease-in-out;
         }
+
         .animate-float-slow-2 {
             animation: float-slow 20s infinite ease-in-out reverse;
         }
+
         .animate-pulse-glow {
             animation: pulse-glow 4s infinite ease-in-out;
         }
-        
+
         .zoom-background {
             animation: zoom-bg 20s infinite alternate ease-in-out;
         }
@@ -93,6 +140,7 @@
             position: relative;
             overflow: hidden;
         }
+
         .shine-effect::after {
             content: '';
             position: absolute;
@@ -100,15 +148,14 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(
-                90deg,
-                rgba(255, 255, 255, 0) 0%,
-                rgba(255, 255, 255, 0.15) 50%,
-                rgba(255, 255, 255, 0) 100%
-            );
+            background: linear-gradient(90deg,
+                    rgba(255, 255, 255, 0) 0%,
+                    rgba(255, 255, 255, 0.15) 50%,
+                    rgba(255, 255, 255, 0) 100%);
             transform: translateX(-100%);
             transition: none;
         }
+
         .shine-effect:hover::after {
             transform: translateX(100%);
             transition: transform 0.75s ease-in-out;
@@ -120,59 +167,76 @@
             box-shadow: 0 0 15px rgba(0, 216, 255, 0.2);
             outline: none;
         }
-        
+
         /* Loading Bar animation */
         .progress-bar-fill {
             transition: width 0.1s linear;
         }
     </style>
 </head>
-<body class="h-full bg-[#0a0a0a] text-white font-inter overflow-hidden relative selection:bg-brand-accentBlue/30 selection:text-white">
+
+<body
+    class="h-full bg-[#0a0a0a] text-white font-inter overflow-hidden relative selection:bg-brand-accentBlue/30 selection:text-white">
 
     <!-- Back Ambient Glowing Lights -->
     <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none">
         <!-- Blue Glow -->
-        <div class="absolute -top-40 -left-40 w-96 h-96 rounded-full bg-brand-accentBlue opacity-25 filter blur-[100px] animate-float-slow-1"></div>
+        <div
+            class="absolute -top-40 -left-40 w-96 h-96 rounded-full bg-brand-accentBlue opacity-25 filter blur-[100px] animate-float-slow-1">
+        </div>
         <!-- Amber Glow -->
-        <div class="absolute -bottom-40 -right-40 w-[500px] h-[500px] rounded-full bg-amber-500 opacity-20 filter blur-[120px] animate-float-slow-2"></div>
+        <div
+            class="absolute -bottom-40 -right-40 w-[500px] h-[500px] rounded-full bg-amber-500 opacity-20 filter blur-[120px] animate-float-slow-2">
+        </div>
         <!-- Center Glow for Splash -->
-        <div id="centerGlow" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full bg-brand-accentBlue opacity-30 filter blur-[80px] animate-pulse-glow transition-all duration-1000"></div>
+        <div id="centerGlow"
+            class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full bg-brand-accentBlue opacity-30 filter blur-[80px] animate-pulse-glow transition-all duration-1000">
+        </div>
     </div>
 
     <!-- Cinematic Background Image with Zoom & Blur -->
     <div class="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-        <img src="premium_detailing_bg.png" alt="Premium Detailing Car Background" class="w-full h-full object-cover zoom-background select-none">
+        <img src="premium_detailing_bg.png" alt="Premium Detailing Car Background"
+            class="w-full h-full object-cover zoom-background select-none">
         <!-- Gradient Dark Overlay -->
-        <div class="absolute inset-0 bg-gradient-to-t from-[#080808] via-[#0c0c0c]/80 to-[#080808]/90"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20"></div>
     </div>
 
     <!-- ================= SPLASH SCREEN ================= -->
-    <div id="splashScreen" class="absolute inset-0 z-50 flex flex-col items-center justify-between p-8 transition-all duration-1000">
+    <div id="splashScreen"
+        class="absolute inset-0 z-50 flex flex-col items-center justify-between p-8 transition-all duration-1000">
         <!-- Top Branding -->
-        <div class="flex items-center space-x-2 mt-8 opacity-0 translate-y-[-20px] transition-all duration-[800ms] delay-300 splash-animate">
-            <span class="text-xs uppercase tracking-[0.4em] font-outfit text-gray-400 font-semibold">Apex Auto Studio</span>
+        <div
+            class="flex items-center space-x-2 mt-8 opacity-0 translate-y-[-20px] transition-all duration-[800ms] delay-300 splash-animate">
+            <span class="text-xs uppercase tracking-[0.4em] font-outfit text-gray-400 font-semibold">Apex Auto
+                Studio</span>
         </div>
 
         <!-- Center Logo & Name -->
         <div class="flex flex-col items-center justify-center space-y-6 text-center max-w-lg">
             <!-- Icon/Shield Logo -->
-            <div class="relative w-24 h-24 flex items-center justify-center rounded-2xl glass-panel border-white/20 glass-panel-glow opacity-0 scale-75 transition-all duration-[1000ms] delay-100 splash-animate" style="animation: float 6s ease-in-out infinite;">
+            <div class="relative w-24 h-24 flex items-center justify-center rounded-2xl glass-panel border-white/20 glass-panel-glow opacity-0 scale-75 transition-all duration-[1000ms] delay-100 splash-animate"
+                style="animation: float 6s ease-in-out infinite;">
                 <!-- Glowing Aura -->
                 <div class="absolute inset-0 bg-brand-accentBlue/20 rounded-2xl blur-md"></div>
                 <!-- Clean Modern SVG Shield / Car Icon -->
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-12 h-12 text-brand-accentBlue relative z-10">
-                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                    <path d="M7 11h10"/>
-                    <path d="M9 14h6"/>
-                    <circle cx="12" cy="8" r="1.5" fill="currentColor"/>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+                    class="w-12 h-12 text-brand-accentBlue relative z-10">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                    <path d="M7 11h10" />
+                    <path d="M9 14h6" />
+                    <circle cx="12" cy="8" r="1.5" fill="currentColor" />
                 </svg>
             </div>
 
             <div class="space-y-3">
-                <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight font-outfit bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-100 to-gray-400 opacity-0 translate-y-[20px] transition-all duration-[1000ms] delay-500 splash-animate">
+                <h1
+                    class="text-4xl md:text-5xl font-extrabold tracking-tight font-outfit bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-100 to-gray-400 opacity-0 translate-y-[20px] transition-all duration-[1000ms] delay-500 splash-animate">
                     PREMIUM CAR DETAIL
                 </h1>
-                <p class="text-sm md:text-base text-gray-400 tracking-widest font-light uppercase opacity-0 translate-y-[20px] transition-all duration-[1000ms] delay-700 splash-animate">
+                <p
+                    class="text-sm md:text-base text-gray-400 tracking-widest font-light uppercase opacity-0 translate-y-[20px] transition-all duration-[1000ms] delay-700 splash-animate">
                     Luxury Treatment For Your Vehicle
                 </p>
             </div>
@@ -184,45 +248,63 @@
                     <span id="loadPercent">0%</span>
                 </div>
                 <div class="h-[3px] w-full bg-white/5 rounded-full overflow-hidden relative">
-                    <div id="progressBar" class="progress-bar-fill h-full w-0 bg-gradient-to-r from-brand-accentBlue to-indigo-500 rounded-full shadow-[0_0_8px_#00D8FF]"></div>
+                    <div id="progressBar"
+                        class="progress-bar-fill h-full w-0 bg-gradient-to-r from-brand-accentBlue to-indigo-500 rounded-full shadow-[0_0_8px_#00D8FF]">
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- Footer -->
-        <div class="mb-4 text-center opacity-0 translate-y-[20px] transition-all duration-[800ms] delay-1000 splash-animate">
-            <button onclick="skipSplash()" class="text-xs text-gray-500 hover:text-brand-accentBlue tracking-widest uppercase transition-colors duration-300 hover:underline">
+        <div
+            class="mb-4 text-center opacity-0 translate-y-[20px] transition-all duration-[800ms] delay-1000 splash-animate">
+            <button onclick="skipSplash()"
+                class="text-xs text-gray-500 hover:text-brand-accentBlue tracking-widest uppercase transition-colors duration-300 hover:underline">
                 Skip Intro
             </button>
         </div>
     </div>
 
     <!-- ================= LOGIN SCREEN ================= -->
-    <div id="loginScreen" class="absolute inset-0 z-40 flex items-center justify-center p-4 md:p-8 opacity-0 scale-[0.97] pointer-events-none transition-all duration-[1000ms] ease-out">
-        <div class="w-full max-w-[480px] glass-panel glass-panel-glow rounded-3xl p-8 md:p-10 relative overflow-hidden flex flex-col justify-between">
+    <div id="loginScreen"
+        class="absolute inset-0 z-40 flex items-center justify-center p-4 md:p-8 opacity-0 scale-[0.97] pointer-events-none transition-all duration-[1000ms] ease-out">
+        <div
+            class="w-full max-w-[480px] glass-panel glass-panel-glow rounded-3xl p-6 md:p-10 relative overflow-hidden flex flex-col justify-between max-h-[95vh] overflow-y-auto">
             <!-- Glassmorphism Reflection Accent -->
-            <div class="absolute -top-[50%] -left-[50%] w-[200%] h-[200%] rotate-[45deg] bg-gradient-to-b from-white/10 to-transparent pointer-events-none select-none"></div>
+            <div
+                class="absolute -top-[50%] -left-[50%] w-[200%] h-[200%] rotate-[45deg] bg-gradient-to-b from-white/10 to-transparent pointer-events-none select-none">
+            </div>
 
             <!-- Inner Layout -->
             <div class="relative z-10 space-y-6">
                 <!-- Branding Header -->
                 <div class="flex flex-col items-center text-center space-y-2">
-                    <div class="w-12 h-12 rounded-2xl bg-brand-accentBlue/10 border border-brand-accentBlue/20 flex items-center justify-center text-brand-accentBlue mb-1">
+                    <div
+                        class="w-12 h-12 rounded-2xl bg-brand-accentBlue/10 border border-brand-accentBlue/20 flex items-center justify-center text-brand-accentBlue mb-1">
                         <i data-lucide="shield-check" class="w-6 h-6"></i>
                     </div>
-                    <h2 id="cardTitle" class="text-2xl font-bold font-outfit tracking-tight text-white">Welcome Back</h2>
-                    <p id="cardSubtitle" class="text-xs text-gray-400">Sign in to book premium detailing & manage bookings</p>
+                    <h2 id="cardTitle" class="text-2xl font-bold font-outfit tracking-tight text-white">Welcome Back
+                    </h2>
+                    <p id="cardSubtitle" class="text-xs text-gray-400">Sign in to book premium detailing & manage
+                        bookings</p>
                 </div>
 
                 <!-- Tabs Toggle -->
                 <div class="flex border-b border-white/10 text-[11px] sm:text-xs gap-1 sm:gap-2">
-                    <button id="tabBtnLogin" onclick="switchTab('login')" class="flex-1 py-2 text-brand-accentBlue border-b-2 border-brand-accentBlue font-bold transition-all text-center">Sign In</button>
-                    <button id="tabBtnRegister" onclick="switchTab('register')" class="flex-1 py-2 text-gray-500 hover:text-white transition-all font-medium text-center">Create Account</button>
-                    <button id="tabBtnApply" onclick="switchTab('apply')" class="flex-1 py-2 text-gray-500 hover:text-white transition-all font-medium text-center">Join Crew</button>
+                    <button id="tabBtnLogin" onclick="switchTab('login')"
+                        class="flex-1 py-2 text-brand-accentBlue border-b-2 border-brand-accentBlue font-bold transition-all text-center">Sign
+                        In</button>
+                    <button id="tabBtnRegister" onclick="switchTab('register')"
+                        class="flex-1 py-2 text-gray-500 hover:text-white transition-all font-medium text-center">Create
+                        Account</button>
+                    <button id="tabBtnApply" onclick="switchTab('apply')"
+                        class="flex-1 py-2 text-gray-500 hover:text-white transition-all font-medium text-center">Join
+                        Crew</button>
                 </div>
 
                 <!-- Alert Notification Box -->
-                <div id="authAlert" class="hidden p-4 rounded-2xl text-sm border flex items-start space-x-3 transition-all duration-300">
+                <div id="authAlert"
+                    class="hidden p-4 rounded-2xl text-sm border flex items-start space-x-3 transition-all duration-300">
                     <i id="alertIcon" class="w-5 h-5 shrink-0 mt-0.5"></i>
                     <span id="alertMessage" class="font-medium"></span>
                 </div>
@@ -231,29 +313,36 @@
                 <form id="loginForm" onsubmit="handleLoginSubmit(event)" class="space-y-4">
                     <!-- Email Input -->
                     <div class="space-y-1 relative">
-                        <label for="email" class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Email Address</label>
+                        <label for="email"
+                            class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Email
+                            Address</label>
                         <div class="relative">
-                            <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-500 pointer-events-none">
+                            <span
+                                class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-500 pointer-events-none">
                                 <i data-lucide="mail" class="w-4 h-4"></i>
                             </span>
                             <input type="text" id="email" required placeholder="admin@apexdetail.com"
-                                   class="w-full pl-11 pr-4 py-3 bg-black/40 border border-white/10 rounded-2xl text-white placeholder-gray-600 focus:border-brand-accentBlue/50 focus:ring-1 focus:ring-brand-accentBlue/30 transition-all duration-300 premium-input text-sm">
+                                class="w-full pl-11 pr-4 py-3 bg-black/40 border border-white/10 rounded-2xl text-white placeholder-gray-600 focus:border-brand-accentBlue/50 focus:ring-1 focus:ring-brand-accentBlue/30 transition-all duration-300 premium-input text-sm">
                         </div>
                     </div>
 
                     <!-- Password Input -->
                     <div class="space-y-1 relative">
                         <div class="flex justify-between items-center px-1">
-                            <label for="password" class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Password</label>
-                            <a href="#" onclick="forgotPassword(event)" class="text-xs text-brand-accentBlue hover:underline transition-colors">Forgot?</a>
+                            <label for="password"
+                                class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Password</label>
+                            <a href="#" onclick="forgotPassword(event)"
+                                class="text-xs text-brand-accentBlue hover:underline transition-colors">Forgot?</a>
                         </div>
                         <div class="relative">
-                            <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-500 pointer-events-none">
+                            <span
+                                class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-500 pointer-events-none">
                                 <i data-lucide="lock" class="w-4 h-4"></i>
                             </span>
                             <input type="password" id="password" required placeholder="••••••••"
-                                   class="w-full pl-11 pr-11 py-3 bg-black/40 border border-white/10 rounded-2xl text-white placeholder-gray-600 focus:border-brand-accentBlue/50 focus:ring-1 focus:ring-brand-accentBlue/30 transition-all duration-300 premium-input text-sm">
-                            <button type="button" onclick="togglePasswordVisibility('password', 'eyeIcon')" class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-500 hover:text-white transition-colors">
+                                class="w-full pl-11 pr-11 py-3 bg-black/40 border border-white/10 rounded-2xl text-white placeholder-gray-600 focus:border-brand-accentBlue/50 focus:ring-1 focus:ring-brand-accentBlue/30 transition-all duration-300 premium-input text-sm">
+                            <button type="button" onclick="togglePasswordVisibility('password', 'eyeIcon')"
+                                class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-500 hover:text-white transition-colors">
                                 <i id="eyeIcon" data-lucide="eye" class="w-4 h-4"></i>
                             </button>
                         </div>
@@ -262,7 +351,8 @@
                     <!-- Remember Me -->
                     <div class="flex items-center justify-between px-1">
                         <label class="flex items-center space-x-2 text-xs text-gray-400 cursor-pointer group">
-                            <input type="checkbox" id="rememberMe" class="rounded border-white/10 bg-black/40 text-brand-accentBlue focus:ring-brand-accentBlue/30 focus:ring-offset-0 w-4 h-4 transition-all">
+                            <input type="checkbox" id="rememberMe"
+                                class="rounded border-white/10 bg-black/40 text-brand-accentBlue focus:ring-brand-accentBlue/30 focus:ring-offset-0 w-4 h-4 transition-all">
                             <span class="group-hover:text-gray-300 transition-colors">Remember me</span>
                         </label>
                     </div>
@@ -270,13 +360,15 @@
                     <!-- Buttons Group -->
                     <div class="space-y-3 pt-1">
                         <!-- Sign In Button -->
-                        <button type="submit" id="signInButton" class="w-full shine-effect bg-gradient-to-r from-brand-accentBlue to-indigo-500 text-white font-semibold py-3.5 rounded-2xl shadow-[0_4px_20px_rgba(0,216,255,0.25)] hover:shadow-[0_4px_30px_rgba(0,216,255,0.4)] active:scale-[0.98] transition-all duration-300 flex items-center justify-center space-x-2">
+                        <button type="submit" id="signInButton"
+                            class="w-full shine-effect bg-gradient-to-r from-brand-accentBlue to-indigo-500 text-white font-semibold py-3.5 rounded-2xl shadow-[0_4px_20px_rgba(0,216,255,0.25)] hover:shadow-[0_4px_30px_rgba(0,216,255,0.4)] active:scale-[0.98] transition-all duration-300 flex items-center justify-center space-x-2">
                             <span>Access Portal</span>
                             <i data-lucide="arrow-right" class="w-4 h-4"></i>
                         </button>
 
                         <!-- Guest Access / Direct Bypass Button -->
-                        <button type="button" onclick="loginAsGuest()" class="w-full bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/10 text-white font-medium py-3 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-2">
+                        <button type="button" onclick="loginAsGuest()"
+                            class="w-full bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/10 text-white font-medium py-3 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-2">
                             <i data-lucide="user" class="w-4 h-4 text-brand-accentBlue"></i>
                             <span>Quick Guest Booking</span>
                         </button>
@@ -287,26 +379,32 @@
                 <form id="registerForm" onsubmit="handleRegisterSubmit(event)" class="hidden space-y-4">
                     <!-- Email Input -->
                     <div class="space-y-1 relative">
-                        <label for="regEmail" class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Email Address</label>
+                        <label for="regEmail"
+                            class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Email
+                            Address</label>
                         <div class="relative">
-                            <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-500 pointer-events-none">
+                            <span
+                                class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-500 pointer-events-none">
                                 <i data-lucide="mail" class="w-4 h-4"></i>
                             </span>
                             <input type="email" id="regEmail" required placeholder="client@domain.com"
-                                   class="w-full pl-11 pr-4 py-3 bg-black/40 border border-white/10 rounded-2xl text-white placeholder-gray-600 focus:border-brand-accentBlue/50 focus:ring-1 focus:ring-brand-accentBlue/30 transition-all duration-300 premium-input text-sm">
+                                class="w-full pl-11 pr-4 py-3 bg-black/40 border border-white/10 rounded-2xl text-white placeholder-gray-600 focus:border-brand-accentBlue/50 focus:ring-1 focus:ring-brand-accentBlue/30 transition-all duration-300 premium-input text-sm">
                         </div>
                     </div>
 
                     <!-- Password Input 1 -->
                     <div class="space-y-1 relative">
-                        <label for="regPassword" class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Password</label>
+                        <label for="regPassword"
+                            class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Password</label>
                         <div class="relative">
-                            <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-500 pointer-events-none">
+                            <span
+                                class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-500 pointer-events-none">
                                 <i data-lucide="lock" class="w-4 h-4"></i>
                             </span>
                             <input type="password" id="regPassword" required placeholder="Create Password"
-                                   class="w-full pl-11 pr-11 py-3 bg-black/40 border border-white/10 rounded-2xl text-white placeholder-gray-600 focus:border-brand-accentBlue/50 focus:ring-1 focus:ring-brand-accentBlue/30 transition-all duration-300 premium-input text-sm">
-                            <button type="button" onclick="togglePasswordVisibility('regPassword', 'eyeIconReg')" class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-500 hover:text-white transition-colors">
+                                class="w-full pl-11 pr-11 py-3 bg-black/40 border border-white/10 rounded-2xl text-white placeholder-gray-600 focus:border-brand-accentBlue/50 focus:ring-1 focus:ring-brand-accentBlue/30 transition-all duration-300 premium-input text-sm">
+                            <button type="button" onclick="togglePasswordVisibility('regPassword', 'eyeIconReg')"
+                                class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-500 hover:text-white transition-colors">
                                 <i id="eyeIconReg" data-lucide="eye" class="w-4 h-4"></i>
                             </button>
                         </div>
@@ -314,77 +412,183 @@
 
                     <!-- Password Input 2 (Confirm Password) -->
                     <div class="space-y-1 relative">
-                        <label for="regConfirmPassword" class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Confirm Password</label>
+                        <label for="regConfirmPassword"
+                            class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Confirm
+                            Password</label>
                         <div class="relative">
-                            <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-500 pointer-events-none">
+                            <span
+                                class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-500 pointer-events-none">
                                 <i data-lucide="check-square" class="w-4 h-4"></i>
                             </span>
                             <input type="password" id="regConfirmPassword" required placeholder="Verify Password"
-                                   class="w-full pl-11 pr-11 py-3 bg-black/40 border border-white/10 rounded-2xl text-white placeholder-gray-600 focus:border-brand-accentBlue/50 focus:ring-1 focus:ring-brand-accentBlue/30 transition-all duration-300 premium-input text-sm">
-                            <button type="button" onclick="togglePasswordVisibility('regConfirmPassword', 'eyeIconRegConf')" class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-500 hover:text-white transition-colors">
+                                class="w-full pl-11 pr-11 py-3 bg-black/40 border border-white/10 rounded-2xl text-white placeholder-gray-600 focus:border-brand-accentBlue/50 focus:ring-1 focus:ring-brand-accentBlue/30 transition-all duration-300 premium-input text-sm">
+                            <button type="button"
+                                onclick="togglePasswordVisibility('regConfirmPassword', 'eyeIconRegConf')"
+                                class="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-500 hover:text-white transition-colors">
                                 <i id="eyeIconRegConf" data-lucide="eye" class="w-4 h-4"></i>
                             </button>
                         </div>
                     </div>
 
-                    <button type="submit" class="w-full shine-effect bg-gradient-to-r from-brand-accentBlue to-indigo-500 text-white font-semibold py-3.5 rounded-2xl shadow-[0_4px_20px_rgba(0,216,255,0.25)] hover:shadow-[0_4px_30px_rgba(0,216,255,0.4)] transition-all duration-300 flex items-center justify-center space-x-2">
+                    <button type="submit"
+                        class="w-full shine-effect bg-gradient-to-r from-brand-accentBlue to-indigo-500 text-white font-semibold py-3.5 rounded-2xl shadow-[0_4px_20px_rgba(0,216,255,0.25)] hover:shadow-[0_4px_30px_rgba(0,216,255,0.4)] transition-all duration-300 flex items-center justify-center space-x-2">
                         <span>Create Client Account</span>
                         <i data-lucide="user-plus" class="w-4 h-4"></i>
                     </button>
                 </form>
 
                 <!-- 3. JOIN CREW / WORKER APPLICATION FORM -->
-                <form id="applyForm" onsubmit="handleApplySubmit(event)" class="hidden space-y-4">
-                    <!-- Full Name -->
-                    <div class="space-y-1 relative">
-                        <label for="applyName" class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Full Name</label>
-                        <div class="relative">
-                            <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-500 pointer-events-none">
-                                <i data-lucide="user" class="w-4 h-4"></i>
-                            </span>
-                            <input type="text" id="applyName" required placeholder="Justin Valet"
-                                   class="w-full pl-11 pr-4 py-3 bg-black/40 border border-white/10 rounded-2xl text-white placeholder-gray-600 focus:border-brand-accentBlue/50 focus:ring-1 focus:ring-brand-accentBlue/30 transition-all duration-300 premium-input text-sm">
+                <form id="applyForm" onsubmit="handleApplySubmit(event)" class="hidden relative">
+
+                    <!-- STEP 1: Personal Info -->
+                    <div id="applyStep1" class="space-y-4 transition-all duration-300">
+                        <!-- Full Name -->
+                        <div class="space-y-1 relative">
+                            <label for="applyName"
+                                class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Full
+                                Name</label>
+                            <div class="relative">
+                                <span
+                                    class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-500 pointer-events-none">
+                                    <i data-lucide="user" class="w-4 h-4"></i>
+                                </span>
+                                <input type="text" id="applyName" required placeholder="Justin Valet"
+                                    class="w-full pl-11 pr-4 py-3 bg-black/40 border border-white/10 rounded-2xl text-white placeholder-gray-600 focus:border-brand-accentBlue/50 focus:ring-1 focus:ring-brand-accentBlue/30 transition-all duration-300 premium-input text-sm">
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- Email Input -->
-                    <div class="space-y-1 relative">
-                        <label for="applyEmail" class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Email Address</label>
-                        <div class="relative">
-                            <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-500 pointer-events-none">
-                                <i data-lucide="mail" class="w-4 h-4"></i>
-                            </span>
-                            <input type="email" id="applyEmail" required placeholder="valet@domain.com"
-                                   class="w-full pl-11 pr-4 py-3 bg-black/40 border border-white/10 rounded-2xl text-white placeholder-gray-600 focus:border-brand-accentBlue/50 focus:ring-1 focus:ring-brand-accentBlue/30 transition-all duration-300 premium-input text-sm">
+                        <!-- Email Input -->
+                        <div class="space-y-1 relative">
+                            <label for="applyEmail"
+                                class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Email
+                                Address</label>
+                            <div class="relative">
+                                <span
+                                    class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-500 pointer-events-none">
+                                    <i data-lucide="mail" class="w-4 h-4"></i>
+                                </span>
+                                <input type="email" id="applyEmail" required placeholder="valet@domain.com"
+                                    class="w-full pl-11 pr-4 py-3 bg-black/40 border border-white/10 rounded-2xl text-white placeholder-gray-600 focus:border-brand-accentBlue/50 focus:ring-1 focus:ring-brand-accentBlue/30 transition-all duration-300 premium-input text-sm">
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- Phone Input -->
-                    <div class="space-y-1 relative">
-                        <label for="applyPhone" class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Phone Number</label>
-                        <div class="relative">
-                            <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-500 pointer-events-none">
-                                <i data-lucide="phone" class="w-4 h-4"></i>
-                            </span>
-                            <input type="text" id="applyPhone" required placeholder="+27 82 555 0192"
-                                   class="w-full pl-11 pr-4 py-3 bg-black/40 border border-white/10 rounded-2xl text-white placeholder-gray-600 focus:border-brand-accentBlue/50 focus:ring-1 focus:ring-brand-accentBlue/30 transition-all duration-300 premium-input text-sm">
+                        <!-- Phone Input -->
+                        <div class="space-y-1 relative">
+                            <label for="applyPhone"
+                                class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Phone
+                                Number</label>
+                            <div class="relative">
+                                <span
+                                    class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-500 pointer-events-none">
+                                    <i data-lucide="phone" class="w-4 h-4"></i>
+                                </span>
+                                <input type="text" id="applyPhone" required placeholder="+27 82 555 0192"
+                                    class="w-full pl-11 pr-4 py-3 bg-black/40 border border-white/10 rounded-2xl text-white placeholder-gray-600 focus:border-brand-accentBlue/50 focus:ring-1 focus:ring-brand-accentBlue/30 transition-all duration-300 premium-input text-sm">
+                            </div>
                         </div>
+
+                        <button type="button" onclick="nextApplyStep()"
+                            class="w-full mt-2 shine-effect bg-white/5 hover:bg-white/10 border border-white/10 hover:border-brand-accentBlue/50 text-white font-semibold py-3.5 rounded-2xl transition-all duration-300 flex items-center justify-center space-x-2">
+                            <span>Continue to Application</span>
+                            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                        </button>
                     </div>
 
-                    <!-- Experience Select -->
-                    <div class="space-y-1 relative">
-                        <label for="applyExp" class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Detailing Experience</label>
-                        <select id="applyExp" required class="w-full px-4 py-3 bg-black/40 border border-white/10 rounded-2xl text-white placeholder-gray-600 focus:border-brand-accentBlue/50 focus:ring-1 focus:ring-brand-accentBlue/30 transition-all duration-300 text-sm focus:outline-none">
-                            <option value="Entry Level (< 1 year)">Entry Level (< 1 year)</option>
-                            <option value="Intermediate Valet (1-3 years)">Intermediate Valet (1-3 years)</option>
-                            <option value="Detailing Specialist (3+ years)">Detailing Specialist (3+ years)</option>
-                        </select>
-                    </div>
+                    <!-- STEP 2: Options & Equipment -->
+                    <div id="applyStep2"
+                        class="hidden space-y-4 opacity-0 transition-all duration-300 transform translate-y-4">
+                        <button type="button" onclick="prevApplyStep()"
+                            class="text-[11px] text-gray-400 hover:text-brand-accentBlue flex items-center space-x-1 mb-2 transition-colors uppercase tracking-wider font-bold">
+                            <i data-lucide="arrow-left" class="w-3 h-3"></i>
+                            <span>Back</span>
+                        </button>
 
-                    <button type="submit" class="w-full shine-effect bg-gradient-to-r from-brand-accentBlue to-indigo-500 text-white font-semibold py-3.5 rounded-2xl shadow-[0_4px_20px_rgba(0,216,255,0.25)] hover:shadow-[0_4px_30px_rgba(0,216,255,0.4)] transition-all duration-300 flex items-center justify-center space-x-2">
-                        <span>Submit Application</span>
-                        <i data-lucide="send" class="w-4 h-4"></i>
-                    </button>
+                        <!-- Equipment Toggle -->
+                        <div class="space-y-2 relative">
+                            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Do you
+                                have detailing equipment?</label>
+                            <div class="flex space-x-2 bg-black/40 p-1.5 rounded-2xl border border-white/10">
+                                <button type="button" id="eqBtnYes" onclick="setEquipment(true)"
+                                    class="flex-1 py-2.5 text-xs font-semibold rounded-xl bg-brand-accentBlue/20 text-brand-accentBlue border border-brand-accentBlue/30 transition-all">Yes,
+                                    I have equipment</button>
+                                <button type="button" id="eqBtnNo" onclick="setEquipment(false)"
+                                    class="flex-1 py-2.5 text-xs font-semibold rounded-xl text-gray-400 hover:text-white transition-all">No,
+                                    I need it</button>
+                            </div>
+                            <input type="hidden" id="hasEquipment" value="Yes">
+                        </div>
+
+                        <!-- Dynamic Equipment List -->
+                        <div id="equipmentSection" class="space-y-2">
+                            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Select
+                                your equipment types</label>
+                            <div
+                                class="grid grid-cols-2 gap-2 max-h-36 overflow-y-auto pr-2 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-white/10 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-brand-accentBlue/50">
+                                <label
+                                    class="flex items-center space-x-2 bg-black/40 border border-white/10 p-2.5 rounded-xl cursor-pointer hover:border-brand-accentBlue/30 hover:bg-brand-accentBlue/5 transition-all">
+                                    <input type="checkbox"
+                                        class="eqItem rounded border-white/20 bg-black/60 text-brand-accentBlue focus:ring-brand-accentBlue/30 focus:ring-offset-0 w-3.5 h-3.5"
+                                        value="Polisher">
+                                    <span class="text-xs text-gray-300">Polisher</span>
+                                </label>
+                                <label
+                                    class="flex items-center space-x-2 bg-black/40 border border-white/10 p-2.5 rounded-xl cursor-pointer hover:border-brand-accentBlue/30 hover:bg-brand-accentBlue/5 transition-all">
+                                    <input type="checkbox"
+                                        class="eqItem rounded border-white/20 bg-black/60 text-brand-accentBlue focus:ring-brand-accentBlue/30 focus:ring-offset-0 w-3.5 h-3.5"
+                                        value="Extractor">
+                                    <span class="text-xs text-gray-300">Extractor</span>
+                                </label>
+                                <label
+                                    class="flex items-center space-x-2 bg-black/40 border border-white/10 p-2.5 rounded-xl cursor-pointer hover:border-brand-accentBlue/30 hover:bg-brand-accentBlue/5 transition-all">
+                                    <input type="checkbox"
+                                        class="eqItem rounded border-white/20 bg-black/60 text-brand-accentBlue focus:ring-brand-accentBlue/30 focus:ring-offset-0 w-3.5 h-3.5"
+                                        value="Vacuum">
+                                    <span class="text-xs text-gray-300">Vacuum</span>
+                                </label>
+                                <label
+                                    class="flex items-center space-x-2 bg-black/40 border border-white/10 p-2.5 rounded-xl cursor-pointer hover:border-brand-accentBlue/30 hover:bg-brand-accentBlue/5 transition-all">
+                                    <input type="checkbox"
+                                        class="eqItem rounded border-white/20 bg-black/60 text-brand-accentBlue focus:ring-brand-accentBlue/30 focus:ring-offset-0 w-3.5 h-3.5"
+                                        value="Pressure Washer">
+                                    <span class="text-xs text-gray-300">Pressure Wash</span>
+                                </label>
+                                <label
+                                    class="flex items-center space-x-2 bg-black/40 border border-white/10 p-2.5 rounded-xl cursor-pointer hover:border-brand-accentBlue/30 hover:bg-brand-accentBlue/5 transition-all">
+                                    <input type="checkbox"
+                                        class="eqItem rounded border-white/20 bg-black/60 text-brand-accentBlue focus:ring-brand-accentBlue/30 focus:ring-offset-0 w-3.5 h-3.5"
+                                        value="Steam Cleaner">
+                                    <span class="text-xs text-gray-300">Steam Cleaner</span>
+                                </label>
+                                <label
+                                    class="flex items-center space-x-2 bg-black/40 border border-white/10 p-2.5 rounded-xl cursor-pointer hover:border-brand-accentBlue/30 hover:bg-brand-accentBlue/5 transition-all">
+                                    <input type="checkbox"
+                                        class="eqItem rounded border-white/20 bg-black/60 text-brand-accentBlue focus:ring-brand-accentBlue/30 focus:ring-offset-0 w-3.5 h-3.5"
+                                        value="Brushes & Microfibers">
+                                    <span class="text-xs text-gray-300">Basic Kit</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div id="equipmentMessage"
+                            class="hidden text-[10px] text-brand-accentBlue bg-brand-accentBlue/10 border border-brand-accentBlue/20 px-3 py-2.5 rounded-xl flex items-start gap-2">
+                            <i data-lucide="info" class="w-3.5 h-3.5 shrink-0 mt-0.5"></i>
+                            <span>Don't worry, we will provide all the necessary equipment to get you started!</span>
+                        </div>
+
+                        <!-- Uniform Message -->
+                        <div
+                            class="text-[10px] text-amber-400/80 bg-amber-500/10 border border-amber-500/20 px-3 py-2.5 rounded-xl flex items-start gap-2">
+                            <i data-lucide="shirt" class="w-3.5 h-3.5 shrink-0 mt-0.5"></i>
+                            <span>Note: Professional uniforms are mandatory. They will be supplied and the cost will be
+                                deducted from your first pay.</span>
+                        </div>
+
+                        <button type="submit"
+                            class="w-full mt-2 shine-effect bg-gradient-to-r from-brand-accentBlue to-indigo-500 text-white font-semibold py-3.5 rounded-2xl shadow-[0_4px_20px_rgba(0,216,255,0.25)] hover:shadow-[0_4px_30px_rgba(0,216,255,0.4)] transition-all duration-300 flex items-center justify-center space-x-2">
+                            <span>Form is done - Send Application</span>
+                            <i data-lucide="check-circle" class="w-4 h-4"></i>
+                        </button>
+                    </div>
                 </form>
 
                 <!-- Social login / Divider -->
@@ -396,16 +600,22 @@
                     </div>
 
                     <div class="grid grid-cols-2 gap-3">
-                        <button type="button" onclick="socialLogin('Google')" class="flex items-center justify-center space-x-2 py-2.5 bg-black/20 hover:bg-black/40 border border-white/5 hover:border-white/10 rounded-xl transition-all duration-300 text-sm text-gray-300">
+                        <button type="button" onclick="socialLogin('Google')"
+                            class="flex items-center justify-center space-x-2 py-2.5 bg-black/20 hover:bg-black/40 border border-white/5 hover:border-white/10 rounded-xl transition-all duration-300 text-sm text-gray-300">
                             <svg class="w-4 h-4" viewBox="0 0 24 24">
-                                <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                                <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                                <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
-                                <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                                <path fill="currentColor"
+                                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                                <path fill="currentColor"
+                                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                                <path fill="currentColor"
+                                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
+                                <path fill="currentColor"
+                                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
                             </svg>
                             <span>Google</span>
                         </button>
-                        <button type="button" onclick="socialLogin('Apple')" class="flex items-center justify-center space-x-2 py-2.5 bg-black/20 hover:bg-black/40 border border-white/5 hover:border-white/10 rounded-xl transition-all duration-300 text-sm text-gray-300">
+                        <button type="button" onclick="socialLogin('Apple')"
+                            class="flex items-center justify-center space-x-2 py-2.5 bg-black/20 hover:bg-black/40 border border-white/5 hover:border-white/10 rounded-xl transition-all duration-300 text-sm text-gray-300">
                             <i data-lucide="apple" class="w-4 h-4 text-white"></i>
                             <span>Apple ID</span>
                         </button>
@@ -416,7 +626,8 @@
     </div>
 
     <!-- Screen Transition Mask (for redirecting to dashboard) -->
-    <div id="screenMask" class="absolute inset-0 z-[100] bg-black opacity-0 pointer-events-none transition-all duration-1000"></div>
+    <div id="screenMask"
+        class="absolute inset-0 z-[100] bg-black opacity-0 pointer-events-none transition-all duration-1000"></div>
 
     <!-- JS Logic -->
     <script>
@@ -425,13 +636,12 @@
         // Admin: Replace with your actual Firebase config
         // ==========================================
         const firebaseConfig = {
-          apiKey: "AIzaSyDX_BOKpoxpvhLpbn8dfYKIMde1R-uxlIY",
-          authDomain: "cardetailing-b7f14.firebaseapp.com",
-          databaseURL: "https://cardetailing-b7f14-default-rtdb.firebaseio.com",
-          projectId: "cardetailing-b7f14",
-          storageBucket: "cardetailing-b7f14.firebasestorage.app",
-          messagingSenderId: "105489690407",
-          appId: "1:105489690407:web:a1a45e4477ba7d9e670302"
+            apiKey: "",
+            authDomain: "",
+            projectId: "",
+            storageBucket: "",
+            messagingSenderId: "",
+            appId: ""
         };
 
         // Initialize Firebase only if API key is provided
@@ -443,7 +653,7 @@
         } else {
             console.warn("⚠️ Firebase config not set. Using local database fallback for development.");
         }
-        
+
         // Initialize Lucide Icons
         lucide.createIcons();
 
@@ -461,22 +671,22 @@
         // 2. Splash Loader simulation
         let loadProgress = 0;
         let loaderInterval;
-        
+
         function startSplashLoader() {
             const progressBar = document.getElementById('progressBar');
             const loadPercent = document.getElementById('loadPercent');
-            
+
             loaderInterval = setInterval(() => {
                 // Smooth increment with variation
                 let increment = Math.floor(Math.random() * 4) + 1;
                 loadProgress += increment;
-                
+
                 if (loadProgress >= 100) {
                     loadProgress = 100;
                     clearInterval(loaderInterval);
                     setTimeout(transitionToLogin, 400);
                 }
-                
+
                 progressBar.style.width = loadProgress + '%';
                 loadPercent.innerText = loadProgress + '%';
             }, 80);
@@ -524,22 +734,22 @@
             const registerForm = document.getElementById('registerForm');
             const applyForm = document.getElementById('applyForm');
             const socialDiv = document.getElementById('socialConnectDivider');
-            
+
             const btnLogin = document.getElementById('tabBtnLogin');
             const btnRegister = document.getElementById('tabBtnRegister');
             const btnApply = document.getElementById('tabBtnApply');
-            
+
             const title = document.getElementById('cardTitle');
             const subtitle = document.getElementById('cardSubtitle');
-            
+
             // Hide alerts on tab swap
             document.getElementById('authAlert').classList.add('hidden');
-            
+
             // Reset tab styles
             [btnLogin, btnRegister, btnApply].forEach(btn => {
                 btn.className = "flex-1 py-2 text-gray-500 hover:text-white transition-all font-medium text-center";
             });
-            
+
             // Active tab assignments
             if (tab === 'login') {
                 loginForm.classList.remove('hidden');
@@ -565,6 +775,21 @@
                 btnApply.className = "flex-1 py-2 text-brand-accentBlue border-b-2 border-brand-accentBlue font-bold transition-all text-center";
                 title.innerText = "Join Detailing Crew";
                 subtitle.innerText = "Submit an application to become a certified operative";
+
+                // Reset back to Step 1 if returning to the tab
+                if (typeof prevApplyStep === 'function') {
+                    const step1 = document.getElementById('applyStep1');
+                    const step2 = document.getElementById('applyStep2');
+                    if (step1 && step2 && step1.classList.contains('hidden')) {
+                        step2.classList.add('hidden');
+                        step2.style.opacity = '0';
+                        step2.style.transform = 'translateY(10px)';
+
+                        step1.classList.remove('hidden');
+                        step1.style.opacity = '1';
+                        step1.style.transform = 'translateY(0)';
+                    }
+                }
             }
         }
 
@@ -572,7 +797,7 @@
         function togglePasswordVisibility(inputId, iconId) {
             const input = document.getElementById(inputId);
             const icon = document.getElementById(iconId);
-            
+
             if (input.type === 'password') {
                 input.type = 'text';
                 icon.setAttribute('data-lucide', 'eye-off');
@@ -589,7 +814,7 @@
             const email = document.getElementById('regEmail').value.trim();
             const password = document.getElementById('regPassword').value.trim();
             const confirmPassword = document.getElementById('regConfirmPassword').value.trim();
-            
+
             if (password !== confirmPassword) {
                 showAlert('error', 'Passwords do not match. Verify confirm password.');
                 return;
@@ -603,17 +828,88 @@
 
             clients.push({ email, password });
             localStorage.setItem('apex_clients', JSON.stringify(clients));
-            
+
             showAlert('success', 'Client account created! Loading Login portal...');
-            
+
             document.getElementById('regEmail').value = '';
             document.getElementById('regPassword').value = '';
             document.getElementById('regConfirmPassword').value = '';
-            
+
             setTimeout(() => {
                 switchTab('login');
                 document.getElementById('email').value = email;
             }, 1500);
+        }
+
+        function nextApplyStep() {
+            // Validate first step fields
+            const name = document.getElementById('applyName').value.trim();
+            const email = document.getElementById('applyEmail').value.trim();
+            const phone = document.getElementById('applyPhone').value.trim();
+
+            if (!name || !email || !phone) {
+                showAlert('error', 'Please fill out your Name, Email, and Phone before continuing.');
+                return;
+            }
+
+            const step1 = document.getElementById('applyStep1');
+            const step2 = document.getElementById('applyStep2');
+
+            step1.style.opacity = '0';
+            step1.style.transform = 'translateY(-10px)';
+
+            setTimeout(() => {
+                step1.classList.add('hidden');
+                step2.classList.remove('hidden');
+                lucide.createIcons();
+
+                setTimeout(() => {
+                    step2.style.opacity = '1';
+                    step2.style.transform = 'translateY(0)';
+                }, 50);
+            }, 300);
+        }
+
+        function prevApplyStep() {
+            const step1 = document.getElementById('applyStep1');
+            const step2 = document.getElementById('applyStep2');
+
+            step2.style.opacity = '0';
+            step2.style.transform = 'translateY(10px)';
+
+            setTimeout(() => {
+                step2.classList.add('hidden');
+                step1.classList.remove('hidden');
+
+                setTimeout(() => {
+                    step1.style.opacity = '1';
+                    step1.style.transform = 'translateY(0)';
+                }, 50);
+            }, 300);
+        }
+
+        function setEquipment(hasEq) {
+            const btnYes = document.getElementById('eqBtnYes');
+            const btnNo = document.getElementById('eqBtnNo');
+            const inputHas = document.getElementById('hasEquipment');
+            const eqSection = document.getElementById('equipmentSection');
+            const msg = document.getElementById('equipmentMessage');
+
+            if (hasEq) {
+                inputHas.value = 'Yes';
+                btnYes.className = "flex-1 py-2.5 text-xs font-semibold rounded-xl bg-brand-accentBlue/20 text-brand-accentBlue border border-brand-accentBlue/30 transition-all";
+                btnNo.className = "flex-1 py-2.5 text-xs font-semibold rounded-xl text-gray-400 hover:text-white transition-all hover:bg-white/5";
+
+                eqSection.classList.remove('hidden');
+                msg.classList.add('hidden');
+            } else {
+                inputHas.value = 'No';
+                btnNo.className = "flex-1 py-2.5 text-xs font-semibold rounded-xl bg-brand-accentBlue/20 text-brand-accentBlue border border-brand-accentBlue/30 transition-all";
+                btnYes.className = "flex-1 py-2.5 text-xs font-semibold rounded-xl text-gray-400 hover:text-white transition-all hover:bg-white/5";
+
+                eqSection.classList.add('hidden');
+                msg.classList.remove('hidden');
+            }
         }
 
         // Worker applications form submission
@@ -622,7 +918,17 @@
             const name = document.getElementById('applyName').value.trim();
             const email = document.getElementById('applyEmail').value.trim();
             const phone = document.getElementById('applyPhone').value.trim();
-            const experience = document.getElementById('applyExp').value;
+            const hasEquipment = document.getElementById('hasEquipment').value;
+
+            let equipmentDetails = "None";
+            if (hasEquipment === "Yes") {
+                const checkboxes = document.querySelectorAll('.eqItem:checked');
+                let selected = [];
+                checkboxes.forEach(cb => selected.push(cb.value));
+                equipmentDetails = selected.length > 0 ? selected.join(", ") : "Has own equipment (not specified)";
+            } else {
+                equipmentDetails = "Needs equipment provided";
+            }
 
             let applications = JSON.parse(localStorage.getItem('apex_worker_applications')) || [];
             if (applications.some(a => a.email.toLowerCase() === email.toLowerCase())) {
@@ -635,16 +941,24 @@
                 name: name,
                 email: email,
                 phone: phone,
-                experience: experience,
+                experience: 0, // removed from ui, defaulting to 0
+                equipment: equipmentDetails,
                 status: 'Pending Approval'
             });
             localStorage.setItem('apex_worker_applications', JSON.stringify(applications));
 
             showAlert('success', 'Application submitted! Studio administrators will review your credentials.');
 
+            // Reset form completely
             document.getElementById('applyName').value = '';
             document.getElementById('applyEmail').value = '';
             document.getElementById('applyPhone').value = '';
+            setEquipment(true);
+            document.querySelectorAll('.eqItem').forEach(cb => cb.checked = false);
+
+            setTimeout(() => {
+                prevApplyStep();
+            }, 1500);
         }
 
         // Core Login handler
@@ -654,7 +968,7 @@
             event.preventDefault();
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value.trim();
-            
+
             const alertBox = document.getElementById('authAlert');
             const alertIcon = document.getElementById('alertIcon');
             const alertMessage = document.getElementById('alertMessage');
@@ -673,8 +987,8 @@
             // Function to handle successful local validation & redirect
             const processLocalLogin = () => {
                 // 1. Admin checks
-                const isDemoAdmin = (email.toLowerCase() === 'admin' && password === 'admin') || (email === 'admin@apexdetail.com' && password === 'admin123');
-                
+                const isDemoAdmin = (email.toLowerCase() === 'admin' && password === 'admin') || (email === 'admin@apexdetail.com' && password === 'admin');
+
                 // 2. Active Worker checks (from dynamic admin approvals database)
                 let workers = JSON.parse(localStorage.getItem('apex_workers')) || [];
                 // Seed a default worker if empty so demo logins still work seamlessly
@@ -682,8 +996,8 @@
                     workers = [{ name: 'Worker Justin', email: 'worker@apexdetail.com', password: 'worker' }];
                     localStorage.setItem('apex_workers', JSON.stringify(workers));
                 }
-                const activeWorker = workers.find(w => w.email.toLowerCase() === email.toLowerCase() && w.password === password) 
-                                || (email.toLowerCase() === 'worker' && password === 'worker' ? { name: 'Worker Justin', email: 'worker@apexdetail.com' } : null);
+                const activeWorker = workers.find(w => w.email.toLowerCase() === email.toLowerCase() && w.password === password)
+                    || (email.toLowerCase() === 'worker' && password === 'worker' ? { name: 'Worker Justin', email: 'worker@apexdetail.com' } : null);
 
                 // 3. Client checks (from dynamic registration database)
                 const clients = JSON.parse(localStorage.getItem('apex_clients')) || [];
@@ -723,7 +1037,7 @@
                     // Verify if this email belongs to an approved worker in local system.
                     let workers = JSON.parse(localStorage.getItem('apex_workers')) || [];
                     const activeWorker = workers.find(w => w.email.toLowerCase() === email.toLowerCase());
-                    
+
                     if (activeWorker) {
                         localStorage.setItem('apex_active_worker', JSON.stringify(activeWorker));
                         redirectTarget = 'worker/index.html';
@@ -815,4 +1129,5 @@
         }
     </script>
 </body>
+
 </html>
