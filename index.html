@@ -173,6 +173,14 @@
             transition: width 0.1s linear;
         }
     </style>
+    <script>
+        window.fbSetItemQueue = [];
+        window.fbSetItem = function(key, val) {
+            localStorage.setItem(key, val);
+            window.fbSetItemQueue.push({key, val});
+        };
+    </script>
+    <script type="module" src="./firebase-sync.js"></script>
 </head>
 
 <body
@@ -809,7 +817,7 @@
         }
 
         // Client accounts registration
-        function handleRegisterSubmit(event) {
+        async function handleRegisterSubmit(event) {
             event.preventDefault();
             const email = document.getElementById('regEmail').value.trim();
             const password = document.getElementById('regPassword').value.trim();
@@ -820,25 +828,43 @@
                 return;
             }
 
-            let clients = JSON.parse(localStorage.getItem('apex_clients')) || [];
-            if (clients.some(c => c.email.toLowerCase() === email.toLowerCase())) {
-                showAlert('error', 'Account with this email already exists.');
-                return;
+            if (isFirebaseReady) {
+                try {
+                    await firebase.auth().createUserWithEmailAndPassword(email, password);
+                    showAlert('success', 'Client account created! Loading Login portal...');
+                    
+                    document.getElementById('regEmail').value = '';
+                    document.getElementById('regPassword').value = '';
+                    document.getElementById('regConfirmPassword').value = '';
+
+                    setTimeout(() => {
+                        switchTab('login');
+                        document.getElementById('email').value = email;
+                    }, 1500);
+                } catch (error) {
+                    showAlert('error', 'Firebase Auth Error: ' + error.message);
+                }
+            } else {
+                let clients = JSON.parse(localStorage.getItem('apex_clients')) || [];
+                if (clients.some(c => c.email.toLowerCase() === email.toLowerCase())) {
+                    showAlert('error', 'Account with this email already exists.');
+                    return;
+                }
+
+                clients.push({ email, password });
+                fbSetItem('apex_clients', JSON.stringify(clients));
+
+                showAlert('success', 'Client account created! Loading Login portal...');
+
+                document.getElementById('regEmail').value = '';
+                document.getElementById('regPassword').value = '';
+                document.getElementById('regConfirmPassword').value = '';
+
+                setTimeout(() => {
+                    switchTab('login');
+                    document.getElementById('email').value = email;
+                }, 1500);
             }
-
-            clients.push({ email, password });
-            localStorage.setItem('apex_clients', JSON.stringify(clients));
-
-            showAlert('success', 'Client account created! Loading Login portal...');
-
-            document.getElementById('regEmail').value = '';
-            document.getElementById('regPassword').value = '';
-            document.getElementById('regConfirmPassword').value = '';
-
-            setTimeout(() => {
-                switchTab('login');
-                document.getElementById('email').value = email;
-            }, 1500);
         }
 
         function nextApplyStep() {
@@ -945,7 +971,7 @@
                 equipment: equipmentDetails,
                 status: 'Pending Approval'
             });
-            localStorage.setItem('apex_worker_applications', JSON.stringify(applications));
+            fbSetItem('apex_worker_applications', JSON.stringify(applications));
 
             showAlert('success', 'Application submitted! Studio administrators will review your credentials.');
 
@@ -994,7 +1020,7 @@
                 // Seed a default worker if empty so demo logins still work seamlessly
                 if (workers.length === 0) {
                     workers = [{ name: 'Worker Justin', email: 'worker@apexdetail.com', password: 'worker' }];
-                    localStorage.setItem('apex_workers', JSON.stringify(workers));
+                    fbSetItem('apex_workers', JSON.stringify(workers));
                 }
                 const activeWorker = workers.find(w => w.email.toLowerCase() === email.toLowerCase() && w.password === password)
                     || (email.toLowerCase() === 'worker' && password === 'worker' ? { name: 'Worker Justin', email: 'worker@apexdetail.com' } : null);
@@ -1009,12 +1035,12 @@
                     triggerBypassRedirect();
                 } else if (activeWorker) {
                     // Set active worker session so their dashboard is personalized
-                    localStorage.setItem('apex_active_worker', JSON.stringify(activeWorker));
+                    fbSetItem('apex_active_worker', JSON.stringify(activeWorker));
                     redirectTarget = 'worker/index.html';
                     showAlert('success', `Welcome back, ${activeWorker.name}! Loading pipeline...`);
                     triggerBypassRedirect();
-                } else if (activeClient || (email.length > 3 && password.length >= 4)) {
-                    // Soft bypass for reviewer convenience, standard client logins verified
+                } else if (activeClient) {
+                    // Standard client logins verified
                     redirectTarget = 'app/index.html';
                     showAlert('success', 'Client Access Granted! Loading Booking Studio...');
                     triggerBypassRedirect();
@@ -1039,7 +1065,7 @@
                     const activeWorker = workers.find(w => w.email.toLowerCase() === email.toLowerCase());
 
                     if (activeWorker) {
-                        localStorage.setItem('apex_active_worker', JSON.stringify(activeWorker));
+                        fbSetItem('apex_active_worker', JSON.stringify(activeWorker));
                         redirectTarget = 'worker/index.html';
                         showAlert('success', `Welcome back, ${activeWorker.name}! Loading pipeline...`);
                         triggerBypassRedirect();
@@ -1087,8 +1113,13 @@
 
         // Direct guest bypass
         function loginAsGuest() {
+            const guestName = prompt("Please enter your name to continue as a guest:");
+            if (!guestName || guestName.trim() === "") {
+                showAlert('error', 'A name is required to log in as a guest.');
+                return;
+            }
             redirectTarget = 'app/index.html';
-            showAlert('success', 'Logged in as guest. Welcome to Apex Detailing Studio!');
+            showAlert('success', `Logged in as guest: ${guestName.trim()}. Welcome to Apex Detailing Studio!`);
             triggerBypassRedirect();
         }
 
@@ -1098,14 +1129,34 @@
             showAlert('success', 'Password reset instructions sent. Please check your inbox!');
         }
 
-        // Social auth simulation
-        function socialLogin(provider) {
-            redirectTarget = 'app/index.html';
-            showAlert('success', `Connecting with ${provider}...`);
-            setTimeout(() => {
-                showAlert('success', `Authenticated with ${provider}. Entering Dashboard...`);
+        // Social auth via Firebase
+        async function socialLogin(providerName) {
+            if (!isFirebaseReady) {
+                showAlert('error', 'Firebase is not connected. Social login is unavailable.');
+                return;
+            }
+
+            try {
+                showAlert('success', `Connecting with ${providerName}...`);
+                let provider;
+                if (providerName === 'Google') {
+                    provider = new firebase.auth.GoogleAuthProvider();
+                } else if (providerName === 'Apple') {
+                    provider = new firebase.auth.OAuthProvider('apple.com');
+                } else {
+                    showAlert('error', `Unknown provider: ${providerName}`);
+                    return;
+                }
+
+                const result = await firebase.auth().signInWithPopup(provider);
+                const user = result.user;
+                
+                redirectTarget = 'app/index.html';
+                showAlert('success', `Authenticated as ${user.displayName || user.email}. Entering Dashboard...`);
                 triggerBypassRedirect();
-            }, 1000);
+            } catch (error) {
+                showAlert('error', `Authentication failed: ${error.message}`);
+            }
         }
 
         // Transition Animation redirector
