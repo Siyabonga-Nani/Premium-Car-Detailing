@@ -146,6 +146,14 @@
             background: rgba(0, 216, 255, 0.3);
         }
     </style>
+    <script>
+        window.fbSetItemQueue = [];
+        window.fbSetItem = function(key, val) {
+            localStorage.setItem(key, val);
+            window.fbSetItemQueue.push({key, val});
+        };
+    </script>
+    <script type="module" src="../firebase-sync.js"></script>
 </head>
 <body class="h-full bg-[#070809] text-white font-inter overflow-y-auto overflow-x-hidden relative selection:bg-brand-accentBlue/30 selection:text-white">
 
@@ -744,6 +752,18 @@
                                    class="w-full px-4 py-3 glass-input text-sm border-brand-accentBlue/30">
                         </div>
 
+                        <!-- Discount Code -->
+                        <div class="space-y-1">
+                            <label class="text-[10px] font-bold text-brand-gold uppercase tracking-wider ml-1">Promo Code (Optional)</label>
+                            <div class="flex gap-2">
+                                <input type="text" id="discountCode" placeholder="Enter code" class="w-full px-4 py-3 glass-input text-sm uppercase">
+                                <button type="button" onclick="applyDiscount()" class="px-4 py-3 bg-brand-gold/10 hover:bg-brand-gold/20 text-brand-gold border border-brand-gold/30 rounded-2xl text-sm font-bold transition-all whitespace-nowrap">
+                                    Apply
+                                </button>
+                            </div>
+                            <span id="discountMessage" class="text-[10px] ml-1 font-bold"></span>
+                        </div>
+
                         <!-- Dynamic Live Quote Summary -->
                         <div class="p-4 rounded-2xl bg-black/50 border border-white/5 space-y-3 mt-4">
                             <span class="text-[10px] font-bold text-brand-accentBlue uppercase tracking-widest block font-mono">Live Price breakdown</span>
@@ -763,6 +783,10 @@
                             <div id="quoteProductsContainer" class="hidden space-y-2 pt-2 border-t border-white/5">
                                 <span class="text-[10px] text-gray-500 uppercase tracking-widest block font-mono">Product Add-ons</span>
                                 <div id="quoteProductsList" class="space-y-1"></div>
+                            </div>
+                            <div id="quoteDiscountContainer" class="hidden flex justify-between text-xs pt-2 border-t border-white/5">
+                                <span class="text-emerald-400 font-medium">Promo Discount</span>
+                                <span id="quoteDiscountAmount" class="font-bold text-emerald-400">-R0</span>
                             </div>
                             <div class="flex justify-between text-xs pt-2 border-t border-white/5">
                                 <span class="text-gray-400 font-medium">Estimated Total Price</span>
@@ -822,6 +846,7 @@
 
         let selectedProducts = []; // To hold the user's cart items
         let notifiedBookings = {}; // Track notifications
+        let appliedDiscount = null; // Track applied discount code
 
         function showNotification(title, message) {
             const container = document.getElementById('notificationContainer');
@@ -854,7 +879,7 @@
             if (isGuest) {
                 const username = prompt("Enter your name to register your client account:");
                 if (username && username.trim().length > 0) {
-                    localStorage.setItem('apex_client_account', username.trim());
+                    fbSetItem('apex_client_account', username.trim());
                     isGuest = false;
                     updateAuthUI();
                     alert(`Welcome, ${username}! You can now use digital payment methods.`);
@@ -1069,7 +1094,7 @@
                         workerNotes: ""
                     }
                 ];
-                localStorage.setItem('apex_bookings', JSON.stringify(bookings));
+                fbSetItem('apex_bookings', JSON.stringify(bookings));
             }
             renderBookings(bookings);
         }
@@ -1200,8 +1225,35 @@
         function deleteBooking(id) {
             let bookings = JSON.parse(localStorage.getItem('apex_bookings')) || [];
             bookings = bookings.filter(b => b.id !== id);
-            localStorage.setItem('apex_bookings', JSON.stringify(bookings));
+            fbSetItem('apex_bookings', JSON.stringify(bookings));
             renderBookings(bookings);
+        }
+
+        function applyDiscount() {
+            const codeInput = document.getElementById('discountCode').value.trim().toUpperCase();
+            const msgElement = document.getElementById('discountMessage');
+            
+            if (!codeInput) {
+                appliedDiscount = null;
+                msgElement.innerText = '';
+                updateLiveQuote();
+                return;
+            }
+            
+            const codes = JSON.parse(localStorage.getItem('apex_discount_codes')) || [];
+            const codeObj = codes.find(c => c.code === codeInput);
+            
+            if (codeObj) {
+                appliedDiscount = codeObj;
+                msgElement.className = "text-[10px] ml-1 font-bold text-emerald-400";
+                msgElement.innerText = "Code applied successfully!";
+            } else {
+                appliedDiscount = null;
+                msgElement.className = "text-[10px] ml-1 font-bold text-rose-400";
+                msgElement.innerText = "Invalid or expired code.";
+            }
+            
+            updateLiveQuote();
         }
 
         // Live calculator updating prices dynamically
@@ -1242,14 +1294,33 @@
                 quoteProductsContainer.classList.add('hidden');
             }
             
-            const total = basePrice + travelFee + vehicleModifier + productsTotal;
+            let subtotal = basePrice + vehicleModifier + productsTotal;
+            let discountAmount = 0;
+            
+            if (appliedDiscount) {
+                if (appliedDiscount.type === 'percentage') {
+                    discountAmount = subtotal * (appliedDiscount.amount / 100);
+                } else {
+                    discountAmount = appliedDiscount.amount;
+                }
+                
+                // Don't let discount exceed subtotal
+                if (discountAmount > subtotal) discountAmount = subtotal;
+                
+                document.getElementById('quoteDiscountContainer').classList.remove('hidden');
+                document.getElementById('quoteDiscountAmount').innerText = '-R' + discountAmount.toFixed(0);
+            } else {
+                document.getElementById('quoteDiscountContainer').classList.add('hidden');
+            }
+            
+            const total = subtotal - discountAmount + travelFee;
             
             document.getElementById('quoteBasePrice').innerText = 'R' + basePrice;
             document.getElementById('quoteTravelFee').innerText = 'R' + travelFee;
             if (document.getElementById('quoteVehicleTypeFee')) {
                 document.getElementById('quoteVehicleTypeFee').innerText = (vehicleModifier >= 0 ? '+R' : '-R') + Math.abs(vehicleModifier);
             }
-            document.getElementById('quoteTotal').innerText = 'R' + total;
+            document.getElementById('quoteTotal').innerText = 'R' + total.toFixed(0);
 
             // Travel policy badge rendering
             const badge = document.getElementById('travelFeeBadge');
@@ -1377,7 +1448,18 @@
             // Calculate products total and clone the array
             let productsTotal = selectedProducts.reduce((sum, p) => sum + p.price, 0);
             const bookingProducts = [...selectedProducts];
-            const total = basePrice + travelFee + vehicleModifier + productsTotal;
+            
+            let subtotal = basePrice + vehicleModifier + productsTotal;
+            let discountAmount = 0;
+            if (appliedDiscount) {
+                if (appliedDiscount.type === 'percentage') {
+                    discountAmount = subtotal * (appliedDiscount.amount / 100);
+                } else {
+                    discountAmount = appliedDiscount.amount;
+                }
+                if (discountAmount > subtotal) discountAmount = subtotal;
+            }
+            const total = subtotal - discountAmount + travelFee;
 
             // Parse any dynamic recurring dates added
             const extraInputs = document.querySelectorAll('#extraDays > div');
@@ -1389,6 +1471,17 @@
                 const t = inputs[1].value;
                 if (d && t) extraDates.push(`${d} at ${t}`);
             });
+            
+            // Subscription logic
+            let isSubscription = false;
+            let totalWashes = 1;
+            if (service === 'Weekly Subscription') {
+                isSubscription = true;
+                totalWashes = 4;
+            } else if (service === 'Premium Monthly Plan') {
+                isSubscription = true;
+                totalWashes = 6;
+            }
 
             // Create New Booking Object
             const newBooking = {
@@ -1406,9 +1499,14 @@
                 productsTotal: productsTotal,
                 products: bookingProducts,
                 total: total,
+                discountCode: appliedDiscount ? appliedDiscount.code : null,
+                discountAmount: discountAmount,
                 payment: payment,
                 paymentDetails: paymentDetails,
                 extraDays: extraDates,
+                isSubscription: isSubscription,
+                totalWashes: totalWashes,
+                completedWashes: 0,
                 status: "Pending", // default
                 workerAssigned: null,
                 workerNotes: ""
@@ -1417,7 +1515,7 @@
             // Save in localStorage
             let bookings = JSON.parse(localStorage.getItem('apex_bookings')) || [];
             bookings.unshift(newBooking);
-            localStorage.setItem('apex_bookings', JSON.stringify(bookings));
+            fbSetItem('apex_bookings', JSON.stringify(bookings));
 
             // Load and render
             loadBookings();
@@ -1426,6 +1524,9 @@
             this.reset();
             document.getElementById('extraDays').innerHTML = '';
             selectedProducts = []; // clear cart after booking
+            appliedDiscount = null; // clear discount code
+            const msgElement = document.getElementById('discountMessage');
+            if (msgElement) msgElement.innerText = '';
             updateLiveQuote();
 
             // Flash beautiful notification of success
@@ -1489,7 +1590,7 @@
                 if (tipVal > 0) {
                     bookings[index].tip = tipVal;
                 }
-                localStorage.setItem('apex_bookings', JSON.stringify(bookings));
+                fbSetItem('apex_bookings', JSON.stringify(bookings));
                 
                 closeReviewModal();
                 loadBookings();
@@ -1508,7 +1609,7 @@
             if (index !== -1 && bookings[index].unreadClient) {
                 bookings[index].unreadClient = false;
                 notifiedBookings[bookingId] = false;
-                localStorage.setItem('apex_bookings', JSON.stringify(bookings));
+                fbSetItem('apex_bookings', JSON.stringify(bookings));
                 loadBookings();
             }
             
@@ -1585,7 +1686,7 @@
                 bookings[index].unreadWorker = true;
                 bookings[index].unreadAdmin = true;
                 
-                localStorage.setItem('apex_bookings', JSON.stringify(bookings));
+                fbSetItem('apex_bookings', JSON.stringify(bookings));
                 input.value = '';
                 renderChat();
                 
