@@ -110,6 +110,14 @@
             background: rgba(0, 216, 255, 0.3);
         }
     </style>
+    <script>
+        window.fbSetItemQueue = [];
+        window.fbSetItem = function(key, val) {
+            localStorage.setItem(key, val);
+            window.fbSetItemQueue.push({key, val});
+        };
+    </script>
+    <script type="module" src="../firebase-sync.js"></script>
 </head>
 <body class="h-full bg-[#070809] text-white font-inter overflow-y-auto overflow-x-hidden relative selection:bg-brand-accentBlue/30 selection:text-white">
 
@@ -173,23 +181,24 @@
                 </div>
             </div>
 
-            <!-- Metric 2: Personal Commission -->
-            <div class="glass-card rounded-2xl p-6 flex flex-col relative overflow-hidden space-y-3">
-                <div class="flex items-center justify-between">
+            <!-- Metric 2: Earnings & Wallet -->
+            <div class="glass-card rounded-2xl p-5 flex flex-col relative overflow-hidden space-y-3">
+                <div class="flex justify-between border-b border-white/5 pb-2">
                     <div class="space-y-1 relative z-10">
-                        <span id="workerEarningsTitle" class="text-[10px] text-gray-500 uppercase tracking-wider font-mono">Pending Payout</span>
-                        <h3 id="workerEarnings" class="text-3xl font-extrabold font-outfit text-brand-gold">R0</h3>
+                        <span id="workerEarningsTitle" class="text-[9px] text-gray-500 uppercase tracking-wider font-mono">Pending Transfer</span>
+                        <h3 id="workerEarnings" class="text-xl font-extrabold font-outfit text-gray-400">R0</h3>
                     </div>
-                    <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-brand-gold/20 flex items-center justify-center text-brand-gold relative z-10 shrink-0">
-                        <i data-lucide="dollar-sign" class="w-5 h-5"></i>
+                    <div class="space-y-1 relative z-10 text-right">
+                        <span class="text-[9px] text-emerald-500 uppercase tracking-wider font-mono">Wallet Balance</span>
+                        <h3 id="workerWalletBalance" class="text-2xl font-extrabold font-outfit text-emerald-400">R0</h3>
                     </div>
                 </div>
                 <div class="flex gap-2 relative z-10">
-                    <button onclick="openWalletModal()" class="flex-1 text-[9px] font-bold text-brand-gold bg-brand-gold/10 px-2 py-1.5 rounded border border-brand-gold/20 hover:bg-brand-gold/20 transition-colors flex items-center justify-center gap-1">
-                        <i data-lucide="wallet" class="w-3 h-3"></i> Wallet Settings
+                    <button id="primaryActionBtn" onclick="withdrawFunds()" class="flex-1 text-[9px] font-bold text-black bg-emerald-500 px-2 py-2 rounded border-emerald-400 hover:bg-emerald-400 transition-colors flex items-center justify-center gap-1 shine-effect">
+                        <i data-lucide="banknote" class="w-3 h-3"></i> Withdraw
                     </button>
-                    <button id="depositCashBtn" onclick="depositCash()" class="hidden flex-1 text-[9px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-1.5 rounded border border-emerald-500/20 hover:bg-emerald-500/20 transition-colors flex items-center justify-center gap-1">
-                        <i data-lucide="download" class="w-3 h-3"></i> Deposit Cash
+                    <button onclick="openWalletModal()" class="flex-1 text-[9px] font-bold text-brand-gold bg-brand-gold/10 px-2 py-2 rounded border border-brand-gold/20 hover:bg-brand-gold/20 transition-colors flex items-center justify-center gap-1">
+                        <i data-lucide="settings" class="w-3 h-3"></i> Setup
                     </button>
                 </div>
             </div>
@@ -231,8 +240,32 @@
                     </div>
                 </section>
 
-                <!-- MAP / GPS ROUTE SIMULATION -->
-                <!-- Removed mock map: Now using real Google Maps redirection -->
+                <!-- ACTIVE SUBSCRIPTIONS SECTION -->
+                <section class="space-y-6">
+                    <div class="flex justify-between items-end border-b border-white/5 pb-4">
+                        <div>
+                            <h3 class="text-xl font-bold font-outfit text-white">Active Subscriptions</h3>
+                            <p class="text-xs text-gray-500 mt-1">Manage ongoing retainer clients and start their next wash</p>
+                        </div>
+                    </div>
+
+                    <div id="subscriptionsList" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <!-- Populated dynamically via script -->
+                    </div>
+                </section>
+
+                <!-- PROMO CODES SECTION -->
+                <section class="space-y-6">
+                    <div class="flex justify-between items-end border-b border-white/5 pb-4">
+                        <div>
+                            <h3 class="text-xl font-bold font-outfit text-white">Your Client Promo Codes</h3>
+                            <p class="text-xs text-gray-500 mt-1">Share these with loyal clients to give them a discount on their next booking</p>
+                        </div>
+                    </div>
+                    <div id="workerPromoCodesList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                        <!-- Populated dynamically -->
+                    </div>
+                </section>
 
             </div>
 
@@ -466,7 +499,7 @@
             
             // Save updated experience
             activeWorker.experience = dynamicExp;
-            localStorage.setItem('apex_active_worker', JSON.stringify(activeWorker));
+            fbSetItem('apex_active_worker', JSON.stringify(activeWorker));
 
             // Apply flat 30% commission on everything
             let commissionRate = 0.30;
@@ -482,7 +515,9 @@
                 const activeName = activeWorker.name;
                 const cleanActiveName = activeName.replace('Worker ', '');
                 
-                if (b.status === 'Completed' && (assignedWorkers.includes(activeName) || assignedWorkers.includes(cleanActiveName))) {
+                let isFractionalSettlement = b.isSubscription && (b.completedWashes || 0) > 0;
+
+                if ((b.status === 'Completed' || isFractionalSettlement) && (assignedWorkers.includes(activeName) || assignedWorkers.includes(cleanActiveName))) {
                     const totalAmt = parseFloat(b.total) || 0;
                     let productTotal = 0;
                     if (b.products && b.products.length > 0) {
@@ -496,38 +531,69 @@
                         serviceTotal = 0;
                     }
 
-                    if (!b.payoutSettled) {
-                        const splitServiceTotal = serviceTotal / assignedWorkers.length;
-                        const splitDeliveryTotal = deliveryTotal / assignedWorkers.length;
-                        
-                        totalEarnings += (splitServiceTotal * commissionRate) + splitDeliveryTotal;
-                        
-                        if (b.tip) {
-                            const splitTip = b.tip / assignedWorkers.length;
-                            totalTips += splitTip;
-                            totalEarnings += splitTip;
+                    let pendingFraction = 1;
+                    if (b.isSubscription) {
+                        let settledCount = b.settledWashes || 0;
+                        let pendingCount = (b.completedWashes || 0) - settledCount;
+                        if (pendingCount < 0) pendingCount = 0;
+                        pendingFraction = pendingCount / (b.totalWashes || 1);
+                        if ((b.completedWashes || 0) === 0) pendingFraction = 0;
+                    } else {
+                        if (b.payoutSettled || b.status !== 'Completed') pendingFraction = 0;
+                    }
+
+                    if (pendingFraction > 0) {
+                        if (b.payment !== 'Cash') {
+                            const splitServiceTotal = (serviceTotal * pendingFraction) / assignedWorkers.length;
+                            const splitDeliveryTotal = (deliveryTotal * pendingFraction) / assignedWorkers.length;
+                            
+                            totalEarnings += (splitServiceTotal * commissionRate) + splitDeliveryTotal;
+                            
+                            if (b.tip) {
+                                const splitTip = (b.tip * pendingFraction) / assignedWorkers.length;
+                                totalTips += splitTip;
+                                totalEarnings += splitTip;
+                            }
                         }
                     }
-                    if (b.payment === 'Cash' && !b.cashSettled) {
-                        pendingCashLiabilities += (totalAmt / assignedWorkers.length);
+                    
+                    let pendingCashFraction = 1;
+                    if (b.isSubscription) {
+                        let settledCountCash = b.cashSettledWashes || 0;
+                        let pendingCountCash = (b.completedWashes || 0) - settledCountCash;
+                        if (pendingCountCash < 0) pendingCountCash = 0;
+                        pendingCashFraction = pendingCountCash / (b.totalWashes || 1);
+                        if ((b.completedWashes || 0) === 0) pendingCashFraction = 0;
+                    } else {
+                        if (b.cashSettled || b.status !== 'Completed') pendingCashFraction = 0;
+                    }
+
+                    if (b.payment === 'Cash' && pendingCashFraction > 0) {
+                        const splitServiceTotal = (serviceTotal * pendingCashFraction) / assignedWorkers.length;
+                        const splitProductTotal = (productTotal * pendingCashFraction) / assignedWorkers.length;
+                        // Owe the company its cut of the service + all product costs
+                        pendingCashLiabilities += (splitServiceTotal * (1 - commissionRate)) + splitProductTotal;
                     }
                 }
             });
             
             document.getElementById('completedJobsCount').innerText = completedCount;
             if (totalTips > 0) {
-                document.getElementById('workerEarningsTitle').innerText = 'Pending Payout (30% Split / Includes R' + totalTips.toFixed(0) + ' in Tips)';
+                document.getElementById('workerEarningsTitle').innerText = 'Pending Transfer (30% Split + 100% Tips: R' + totalTips.toFixed(0) + ')';
             } else {
-                document.getElementById('workerEarningsTitle').innerText = 'Pending Payout (30% Split)';
+                document.getElementById('workerEarningsTitle').innerText = 'Pending Transfer (30% Split)';
             }
             document.getElementById('workerEarnings').innerText = 'R' + totalEarnings.toFixed(0);
             
-            const depositBtn = document.getElementById('depositCashBtn');
+            const primaryBtn = document.getElementById('primaryActionBtn');
             if (pendingCashLiabilities > 0) {
-                depositBtn.classList.remove('hidden');
-                depositBtn.innerHTML = `<i data-lucide="download" class="w-3 h-3"></i> Deposit Cash (R${pendingCashLiabilities.toFixed(0)})`;
+                primaryBtn.onclick = depositCash;
+                primaryBtn.className = "flex-1 text-[9px] font-bold text-white bg-rose-500 px-2 py-2 rounded border border-rose-400 hover:bg-rose-400 transition-colors flex items-center justify-center gap-1 shine-effect";
+                primaryBtn.innerHTML = `<i data-lucide="download" class="w-3 h-3"></i> Deposit Cash (R${pendingCashLiabilities.toFixed(0)})`;
             } else {
-                depositBtn.classList.add('hidden');
+                primaryBtn.onclick = withdrawFunds;
+                primaryBtn.className = "flex-1 text-[9px] font-bold text-black bg-emerald-500 px-2 py-2 rounded border border-emerald-400 hover:bg-emerald-400 transition-colors flex items-center justify-center gap-1 shine-effect";
+                primaryBtn.innerHTML = `<i data-lucide="banknote" class="w-3 h-3"></i> Withdraw`;
             }
             
             document.getElementById('workerRankDisplay').innerText = rankText;
@@ -539,6 +605,10 @@
             lucide.createIcons();
 
             // Synchronize active claimed job details in real-time from the database
+            let workers = JSON.parse(localStorage.getItem('apex_workers')) || [];
+            let me = workers.find(w => w.name === activeWorker.name) || activeWorker;
+            document.getElementById('workerWalletBalance').innerText = 'R' + (me.walletBalance || 0).toFixed(0);
+
             if (activeJob) {
                 const refreshedJob = bookings.find(b => b.id === activeJob.id);
                 if (refreshedJob) {
@@ -568,6 +638,141 @@
             }
 
             renderPipeline(bookings);
+            renderSubscriptions(bookings);
+            renderWorkerPromoCodes();
+        }
+
+        function renderWorkerPromoCodes() {
+            const container = document.getElementById('workerPromoCodesList');
+            if (!container) return;
+            container.innerHTML = '';
+            
+            const codes = JSON.parse(localStorage.getItem('apex_discount_codes')) || [];
+            
+            const activeName = activeWorker.name;
+            const cleanActiveName = activeName.replace('Worker ', '');
+            
+            const myCodes = codes.filter(c => c.worker === 'All' || c.worker === activeName || c.worker === cleanActiveName);
+            
+            if (myCodes.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-1 md:col-span-2 lg:col-span-3 p-8 rounded-3xl bg-white/5 border border-white/5 text-center space-y-2">
+                        <i data-lucide="tag" class="w-8 h-8 text-gray-500 mx-auto"></i>
+                        <h4 class="font-bold text-gray-400 text-sm">No Promo Codes</h4>
+                        <p class="text-xs text-gray-500">You don't have any discount codes assigned to you yet.</p>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+            
+            myCodes.forEach(c => {
+                const card = document.createElement('div');
+                card.className = 'glass-card rounded-2xl p-5 flex flex-col justify-between space-y-4 border border-indigo-500/20';
+                card.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-indigo-500/15 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
+                            <i data-lucide="gift" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-bold text-white font-mono uppercase">${c.code}</h4>
+                            <p class="text-[10px] text-gray-500 uppercase tracking-widest font-mono">Promo Code</p>
+                        </div>
+                    </div>
+                    <div class="pt-3 border-t border-white/5 flex items-center justify-between">
+                        <span class="text-xs text-gray-400 font-medium">Discount Value:</span>
+                        <span class="text-lg font-black text-emerald-400 font-outfit">${c.type === 'percentage' ? c.amount + '%' : 'R' + c.amount}</span>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+            lucide.createIcons();
+        }
+
+        function renderSubscriptions(bookings) {
+            const container = document.getElementById('subscriptionsList');
+            if (!container) return;
+            container.innerHTML = '';
+            
+            const subJobs = bookings.filter(b => {
+                if (!b.isSubscription || b.status === 'Completed') return false;
+                return b.workerAssigned === activeWorker.name || b.workerAssigned === activeWorker.name.replace('Worker ', '');
+            });
+            
+            if (subJobs.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-1 md:col-span-2 p-8 rounded-3xl bg-white/5 border border-white/5 text-center space-y-2">
+                        <i data-lucide="refresh-cw" class="w-8 h-8 text-gray-500 mx-auto"></i>
+                        <h4 class="font-bold text-gray-400 text-sm">No Active Subscriptions</h4>
+                        <p class="text-xs text-gray-500">You haven't claimed any subscription clients yet.</p>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+
+            subJobs.forEach(b => {
+                const card = document.createElement('div');
+                card.className = 'glass-card rounded-2xl p-5 flex flex-col justify-between space-y-4 border border-indigo-500/20';
+                
+                let actionBtnHtml = '';
+                if (activeJob && activeJob.id === b.id) {
+                    actionBtnHtml = `
+                        <button disabled class="w-full bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 cursor-default">
+                            <span class="animate-pulse">Active Job Panel Opened</span>
+                        </button>
+                    `;
+                } else {
+                    actionBtnHtml = `
+                        <button onclick="claimActiveJob('${b.id}')" class="shine-effect w-full bg-gradient-to-r from-indigo-500 to-brand-accentBlue text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1 shadow-md">
+                            <i data-lucide="play" class="w-3.5 h-3.5"></i>
+                            <span>Start Next Wash (${(b.completedWashes || 0) + 1}/${b.totalWashes})</span>
+                        </button>
+                    `;
+                }
+
+                card.innerHTML = `
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h4 class="font-bold text-white text-sm">${b.name}</h4>
+                                <span class="text-[10px] text-gray-500 block font-mono">Car: ${b.car}</span>
+                            </div>
+                            <span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                                Subscription
+                            </span>
+                        </div>
+                        
+                        <div class="text-xs text-gray-400 pt-2 border-t border-white/5 space-y-1">
+                            <div class="flex items-center gap-1 justify-between">
+                                <span class="text-[9px] text-gray-600 block uppercase font-mono">Location</span>
+                                <span class="truncate max-w-[150px]">${b.location} (${b.distance}km)</span>
+                            </div>
+                            <div class="flex items-center gap-1 justify-between">
+                                <span class="text-[9px] text-gray-600 block uppercase font-mono">Package Plan</span>
+                                <span class="font-bold text-brand-gold text-[10px]">${b.service}</span>
+                            </div>
+                            <div class="flex items-center gap-1 justify-between">
+                                <span class="text-[9px] text-gray-600 block uppercase font-mono">Progress</span>
+                                <span class="font-bold text-indigo-400 text-[10px]">${b.completedWashes || 0} / ${b.totalWashes} Washes</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-3 mt-2 border-t border-white/5 space-y-2">
+                        <div class="flex justify-between items-center text-xs">
+                            <button onclick="triggerDispatchGPS('${b.location}', '${b.id}')" class="text-[10px] text-brand-accentBlue hover:underline flex items-center gap-1">
+                                <i data-lucide="navigation" class="w-3 h-3"></i>
+                                <span>Get Route GPS</span>
+                            </button>
+                            <span class="font-bold text-emerald-400">R${(b.total / (b.totalWashes || 1)).toFixed(2)} / wash</span>
+                        </div>
+                        ${actionBtnHtml}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+            lucide.createIcons();
         }
 
         // Render pipeline
@@ -580,6 +785,11 @@
             const pipelineJobs = bookings.filter(b => {
                 const isAvailable = b.status !== 'Completed' && (!b.workerAssigned || b.workerAssigned === activeWorker.name || b.workerAssigned === activeWorker.name.replace('Worker ', ''));
                 if (!isAvailable) return false;
+                
+                // If it is a subscription and it has been assigned to this worker, it goes in Subscriptions section
+                if (b.isSubscription && b.workerAssigned && (b.workerAssigned === activeWorker.name || b.workerAssigned === activeWorker.name.replace('Worker ', ''))) {
+                    return false; 
+                }
                 
                 const exp = activeWorker.experience !== undefined ? activeWorker.experience : 1;
                 
@@ -695,7 +905,7 @@
                 bookings[index].workerAssigned = activeWorker.name;
                 bookings[index].workerNotes = 'Operative ' + activeWorker.name + ' assigned. Preparing transit to site.';
                 
-                localStorage.setItem('apex_bookings', JSON.stringify(bookings));
+                fbSetItem('apex_bookings', JSON.stringify(bookings));
                 loadWorkerDashboard();
                 
                 alert(`📋 Job approved successfully! You are assigned as Operator ${activeWorker.name.replace('Worker ', '')}. Dispatch map trigger available.`);
@@ -847,16 +1057,31 @@
             const index = bookings.findIndex(b => b.id === activeJob.id);
             
             if (index !== -1) {
-                bookings[index].status = nextStatus;
+                let actualNextStatus = nextStatus;
+                
+                // Subscription Logic
+                if (nextStatus === 'Completed' && bookings[index].isSubscription) {
+                    bookings[index].completedWashes = (bookings[index].completedWashes || 0) + 1;
+                    if (bookings[index].completedWashes < bookings[index].totalWashes) {
+                        actualNextStatus = 'Approved'; // Revert to Approved so they can start next wash later
+                    }
+                }
+
+                bookings[index].status = actualNextStatus;
                 bookings[index].workerNotes = autoNotes;
                 
-                localStorage.setItem('apex_bookings', JSON.stringify(bookings));
+                fbSetItem('apex_bookings', JSON.stringify(bookings));
                 
-                if (nextStatus === 'Completed') {
+                if (nextStatus === 'Completed' && actualNextStatus === 'Completed') {
                     activeJob = null;
                     document.getElementById('activeJobController').classList.add('hidden');
                     document.getElementById('noActiveJobPlaceholder').classList.remove('hidden');
                     alert("🎉 Detailing completed! Great job operative. Billing registered under company stats.");
+                } else if (nextStatus === 'Completed' && actualNextStatus !== 'Completed') {
+                    activeJob = null;
+                    document.getElementById('activeJobController').classList.add('hidden');
+                    document.getElementById('noActiveJobPlaceholder').classList.remove('hidden');
+                    alert(`✅ Wash ${bookings[index].completedWashes}/${bookings[index].totalWashes} completed for this subscription! It remains in your Active Subscriptions list for the next visit.`);
                 } else {
                     activeJob = bookings[index];
                     renderActiveJobTracker();
@@ -877,7 +1102,7 @@
                 if (!assigned.includes(workerName)) {
                     assigned.push(workerName);
                     bookings[index].workerAssigned = assigned.join(', ');
-                    localStorage.setItem('apex_bookings', JSON.stringify(bookings));
+                    fbSetItem('apex_bookings', JSON.stringify(bookings));
                     
                     activeJob = bookings[index];
                     renderActiveJobTracker();
@@ -899,7 +1124,7 @@
             
             if (index !== -1) {
                 bookings[index].workerNotes = customNotes;
-                localStorage.setItem('apex_bookings', JSON.stringify(bookings));
+                fbSetItem('apex_bookings', JSON.stringify(bookings));
                 
                 activeJob = bookings[index];
                 input.value = '';
@@ -957,7 +1182,7 @@
                         const bIndex = bookings.findIndex(b => b.id === bookingId);
                         if (bIndex !== -1) {
                             bookings[bIndex].workerLocation = { lat: workerLat, lng: workerLng };
-                            localStorage.setItem('apex_bookings', JSON.stringify(bookings));
+                            fbSetItem('apex_bookings', JSON.stringify(bookings));
                         }
                     }
                     
@@ -973,7 +1198,7 @@
                             const bIndex = bookings.findIndex(b => b.id === bookingId);
                             if (bIndex !== -1) {
                                 bookings[bIndex].workerLocation = { lat: workerLat, lng: workerLng };
-                                localStorage.setItem('apex_bookings', JSON.stringify(bookings));
+                                fbSetItem('apex_bookings', JSON.stringify(bookings));
                             }
                         }
                     }, (e) => {
@@ -1044,7 +1269,7 @@
             if (index !== -1 && bookings[index].unreadWorker) {
                 bookings[index].unreadWorker = false;
                 notifiedBookings[activeJob.id] = false;
-                localStorage.setItem('apex_bookings', JSON.stringify(bookings));
+                fbSetItem('apex_bookings', JSON.stringify(bookings));
                 loadWorkerDashboard(); // update badge
             }
             
@@ -1121,7 +1346,7 @@
                 bookings[index].unreadClient = true;
                 bookings[index].unreadAdmin = true;
                 
-                localStorage.setItem('apex_bookings', JSON.stringify(bookings));
+                fbSetItem('apex_bookings', JSON.stringify(bookings));
                 input.value = '';
                 
                 // Update local activeJob ref
@@ -1151,7 +1376,7 @@
                 });
                 
                 if (deposited > 0) {
-                    localStorage.setItem('apex_bookings', JSON.stringify(bookings));
+                    fbSetItem('apex_bookings', JSON.stringify(bookings));
                     showNotification('Cash Deposited', `Successfully transferred R${deposited.toFixed(0)} to Apex Studio.`);
                     loadWorkerDashboard();
                 }
@@ -1171,18 +1396,79 @@
         function saveWalletSettings() {
             activeWorker.payoutMethod = document.getElementById('payoutMethod').value;
             activeWorker.payoutDetails = document.getElementById('payoutDetails').value.trim();
-            localStorage.setItem('apex_active_worker', JSON.stringify(activeWorker));
+            fbSetItem('apex_active_worker', JSON.stringify(activeWorker));
             
             let workers = JSON.parse(localStorage.getItem('apex_workers')) || [];
             const index = workers.findIndex(w => w.name === activeWorker.name);
             if (index !== -1) {
                 workers[index].payoutMethod = activeWorker.payoutMethod;
                 workers[index].payoutDetails = activeWorker.payoutDetails;
-                localStorage.setItem('apex_workers', JSON.stringify(workers));
+                fbSetItem('apex_workers', JSON.stringify(workers));
             }
             
             closeWalletModal();
             showNotification('Wallet Updated', 'Your preferred payout method has been saved.');
+        }
+
+        // Action: Withdraw funds
+        function withdrawFunds() {
+            let workers = JSON.parse(localStorage.getItem('apex_workers')) || [];
+            const index = workers.findIndex(w => w.name === activeWorker.name);
+            
+            if (index !== -1) {
+                let balance = workers[index].walletBalance || 0;
+                if (balance <= 0) {
+                    alert("Your wallet is empty. No funds to withdraw.");
+                    return;
+                }
+                
+                if (!workers[index].payoutMethod || workers[index].payoutMethod === '') {
+                    alert("Please setup your Wallet Settings (Bank Details) before withdrawing.");
+                    openWalletModal();
+                    return;
+                }
+                
+                if (confirm(`Withdraw R${balance.toFixed(2)} to your personal account?`)) {
+                    workers[index].walletBalance = 0;
+                    fbSetItem('apex_workers', JSON.stringify(workers));
+                    activeWorker.walletBalance = 0;
+                    fbSetItem('apex_active_worker', JSON.stringify(activeWorker));
+                    alert("✅ Funds successfully withdrawn to your personal account. Please allow 1-2 business days for processing.");
+                    loadWorkerDashboard();
+                }
+            }
+        }
+
+        // Action: Deposit cash owed to company
+        function depositCash() {
+            let bookings = JSON.parse(localStorage.getItem('apex_bookings')) || [];
+            let modified = false;
+            let amountSettled = 0;
+            
+            if (confirm("Proceed with digital card transfer to deposit the cash you collected to the company?")) {
+                bookings.forEach(b => {
+                    const assignedWorkers = (b.workerAssigned || '').split(',').map(aw => aw.trim()).filter(aw => aw !== '');
+                    const cleanName = activeWorker.name.replace('Worker ', '');
+                    
+                    if (b.payment === 'Cash' && (assignedWorkers.includes(activeWorker.name) || assignedWorkers.includes(cleanName))) {
+                        let isFractionalSettlement = b.isSubscription && (b.completedWashes || 0) > (b.cashSettledWashes || 0);
+                        if ((b.status === 'Completed' && !b.cashSettled) || isFractionalSettlement) {
+                            if (b.isSubscription) {
+                                b.cashSettledWashes = b.completedWashes;
+                            } else {
+                                b.cashSettled = true;
+                            }
+                            modified = true;
+                        }
+                    }
+                });
+                
+                if (modified) {
+                    fbSetItem('apex_bookings', JSON.stringify(bookings));
+                    alert("✅ Cash deposit successful. Your company liabilities have been cleared.");
+                    loadWorkerDashboard();
+                }
+            }
         }
     </script>
 
